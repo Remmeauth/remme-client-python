@@ -10,23 +10,26 @@ class RemmeRest:
         protocol = 'https' if self.network_config['ssl_mode'] else 'http'
         self.node_url = protocol + "://" + self.network_config['node_address'] + ":" + self.network_config['node_port']
 
-    def get(self, *args, **kwargs):
+    def send_request(self, **kwargs):
         url = self.node_url + kwargs['url']
-        r = requests.get(url)
+        data = kwargs['data'] if 'data' in kwargs else None
+        r = kwargs['request'](url, json=data)
         if r.status_code == 200:
             return {'status': "OK", 'data': r.json()}
         return {'status': "ERROR"}
 
-    def post(self, *args, **kwargs):
-        url = self.node_url + kwargs['url']
-        data = kwargs['data']
-        r = requests.post(url, json=data)
-        if r.status_code == 200:
-            return {'status': "OK", 'data': r.json()}
-        return {'status': "ERROR"}
+    def get(self, **kwargs):
+        kwargs['request'] = requests.get
+        return self.send_request(**kwargs)
 
-    def put(self):
-        raise NotImplementedError
+    def post(self, **kwargs):
+        kwargs['request'] = requests.post
+        return self.send_request(**kwargs)
 
-    def delete(self):
-        raise NotImplementedError
+    def put(self, **kwargs):
+        kwargs['request'] = requests.put
+        return self.send_request(**kwargs)
+
+    def delete(self, **kwargs):
+        kwargs['request'] = requests.delete
+        return self.send_request(**kwargs)
