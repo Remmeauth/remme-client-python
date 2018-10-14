@@ -1,6 +1,4 @@
-from remme.remmerest import RemmeRest
-
-__author__ = 'dethline'
+from remme.remme_rest import RemmeRest
 
 
 class RemmeToken:
