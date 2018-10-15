@@ -1,5 +1,7 @@
 from remme.remme_utils import hex_to_bytes
 
+sawtooth_signing = __import__('sawtooth-signing')
+
 
 class RemmeAccount:
 
