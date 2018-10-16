@@ -1,5 +1,5 @@
 
-class Batch:
+class RemmeBatch:
 
     _remme_rest = None
 

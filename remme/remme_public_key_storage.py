@@ -1,5 +1,5 @@
 
-class RemmePublicStorage:
+class RemmePublicKeyStorage:
 
     _remme_rest = None
     _remme_transaction = None

@@ -3,12 +3,17 @@ import requests
 
 class RemmeRest:
 
-    network_config = None
+    node_address = None
+    node_port = None
+    ssl_mode = None
+    node_url = None
 
     def __init__(self, network_config):
-        self.network_config = network_config
-        protocol = 'https' if self.network_config['ssl_mode'] else 'http'
-        self.node_url = protocol + "://" + self.network_config['node_address'] + ":" + self.network_config['node_port']
+        self.node_address = network_config['node_address']
+        self.node_port = network_config['node_port']
+        self.ssl_mode = network_config['ssl_mode']
+        protocol = 'https' if self.ssl_mode else 'http'
+        self.node_url = protocol + "://" + self.node_address + ":" + self.node_port
 
     def send_request(self, **kwargs):
         url = self.node_url + kwargs['url']
@@ -33,3 +38,9 @@ class RemmeRest:
     def delete(self, **kwargs):
         kwargs['request'] = requests.delete
         return self.send_request(**kwargs)
+
+    def get_node_socket(self):
+        return self.node_address + ':' + self.node_port
+
+    def get_ssl_mode(self):
+        return self.ssl_mode

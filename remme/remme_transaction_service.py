@@ -1,5 +1,5 @@
 
-class TransactionService:
+class RemmeTransactionService:
 
     _remme_rest = None
     _remme_account = None

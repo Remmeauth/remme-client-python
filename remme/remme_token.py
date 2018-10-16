@@ -1,12 +1,10 @@
-from remme.remme_rest import RemmeRest
-
 
 class RemmeToken:
 
     rest = None
 
-    def __init__(self, network_config):
-        self.rest = RemmeRest(network_config=network_config)
+    def __init__(self, rest, transaction_service):
+        self.rest = rest
 
     def validate_transfer_data(self, public_key_to, amount):
         if amount <= 0:
