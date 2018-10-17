@@ -1,8 +1,11 @@
-import asyncio
 import aiohttp
-import requests
 
 OK = 200
+
+GET = 'get'
+POST = 'post'
+PUT = 'put'
+DELETE = 'delete'
 
 
 class RemmeRest:
@@ -19,39 +22,34 @@ class RemmeRest:
         protocol = 'https' if self.ssl_mode else 'http'
         self.node_url = protocol + "://" + self.node_address + ":" + self.node_port
 
-    def _send_request(self, **kwargs):
-        url = self.node_url + kwargs['url']
-        data = kwargs['data'] if 'data' in kwargs else None
-        r = kwargs['request'](url, json=data)
-        if r.status_code == 200:
-            return {'status': "OK", 'data': r.json()}
-        return {'status': "ERROR"}
-
-    # async def get(self, url):
-    #     async with aiohttp.ClientSession as session:
-    #         async with session.get(url) as resp:
-    #             if resp.status == OK:
-    #                 return {'status': "OK", 'data': resp.json()}
-    #             return {'status': "ERROR"}
-
-    async def get(self, url):
-        async with aiohttp.ClientSession as session:
-            async with session.get(url) as resp:
+    async def _send_request(self, request_type, route, data=None):
+        session = aiohttp.ClientSession()
+        url = self.node_url + route
+        request_method = getattr(session, request_type)
+        kwargs = {}
+        if request_type == GET and data:
+            kwargs['params'] = data
+        if request_type != GET:
+            kwargs['json'] = data
+        async with request_method(url, **kwargs) as resp:
+            try:
                 if resp.status == OK:
-                    return {'status': "OK", 'data': resp.json()}
+                    return {'status': "OK", 'data': await resp.json()}
                 return {'status': "ERROR"}
+            finally:
+                await session.close()
 
-    def post(self, **kwargs):
-        kwargs['request'] = requests.post
-        return self._send_request(**kwargs)
+    async def get(self, route):
+        return await self._send_request(GET, route)
 
-    def put(self, **kwargs):
-        kwargs['request'] = requests.put
-        return self._send_request(**kwargs)
+    async def post(self, route, data):
+        return await self._send_request(POST, route, data)
 
-    def delete(self, **kwargs):
-        kwargs['request'] = requests.delete
-        return self._send_request(**kwargs)
+    async def put(self, route, data):
+        return await self._send_request(PUT, route, data)
+
+    async def delete(self, route, data):
+        return await self._send_request(DELETE, route, data)
 
     def get_node_socket(self):
         return self.node_address + ':' + self.node_port

@@ -17,6 +17,7 @@ async def transfer_to_address(_address):
     beforeBalance = await remme.token.get_balance(_address)
     print(f'balance: {beforeBalance}')  # >>> balance: 0
     await remme.token.transfer(_address, 1000)
+    await asyncio.sleep(10)
     afterBalance = await remme.token.get_balance(_address)
     print(f'balance: {afterBalance}')  # >>> balance: 1000
 

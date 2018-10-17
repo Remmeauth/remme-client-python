@@ -37,6 +37,7 @@ class Remme:
         :param network_config: The config of network.
         """
         default_network_config = {'node_address': "localhost", 'node_port': "8080", 'ssl_mode': False}
+
         self._private_key_hex = private_key_hex
         self._network_config = default_network_config if network_config is None else network_config
 
@@ -51,6 +52,3 @@ class Remme:
         self.swap = RemmeSwap(self._rest, self.transaction_service)
         self.blockchain_info = RemmeBlockchainInfo(self._rest)
         self.events = RemmeWebSocketEvents(self._rest.get_node_socket(), self._rest.get_ssl_mode())
-
-
-
