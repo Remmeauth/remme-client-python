@@ -1,10 +1,14 @@
+import asyncio
+
 
 class RemmeToken:
 
     rest = None
+    transaction_service = None
 
     def __init__(self, rest, transaction_service):
         self.rest = rest
+        self.transaction_service = transaction_service
 
     def validate_transfer_data(self, public_key_to, amount):
         if amount <= 0:
@@ -25,10 +29,11 @@ class RemmeToken:
             raise Exception("Invalid key")
         return key
 
-    def get_balance(self, public_key):
+    async def get_balance(self, public_key):
         valid_public_key = self.validate_public_key(public_key)
         url = f'/api/v1/token/{valid_public_key}'
-        result = self.rest.get(url=url)
+        print(self.rest)
+        result = await self.rest.get(url)
         if result['status'] == "OK":
             data = result['data']
             return data['balance']

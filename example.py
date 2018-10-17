@@ -14,11 +14,10 @@ some_remme_address = "02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa115
 
 async def transfer_to_address(_address):
     remme = Remme()
-    beforeBalance = remme.token.get_balance(_address)
+    beforeBalance = await remme.token.get_balance(_address)
     print(f'balance: {beforeBalance}')  # >>> balance: 0
-    remme.token.transfer(_address, 1000)
-    await asyncio.sleep(10)
-    afterBalance = remme.token.get_balance(_address)
+    await remme.token.transfer(_address, 1000)
+    afterBalance = await remme.token.get_balance(_address)
     print(f'balance: {afterBalance}')  # >>> balance: 1000
 
 loop = asyncio.get_event_loop()

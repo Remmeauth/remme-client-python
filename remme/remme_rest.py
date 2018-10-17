@@ -1,4 +1,8 @@
+import asyncio
+import aiohttp
 import requests
+
+OK = 200
 
 
 class RemmeRest:
@@ -15,7 +19,7 @@ class RemmeRest:
         protocol = 'https' if self.ssl_mode else 'http'
         self.node_url = protocol + "://" + self.node_address + ":" + self.node_port
 
-    def send_request(self, **kwargs):
+    def _send_request(self, **kwargs):
         url = self.node_url + kwargs['url']
         data = kwargs['data'] if 'data' in kwargs else None
         r = kwargs['request'](url, json=data)
@@ -23,21 +27,31 @@ class RemmeRest:
             return {'status': "OK", 'data': r.json()}
         return {'status': "ERROR"}
 
-    def get(self, **kwargs):
-        kwargs['request'] = requests.get
-        return self.send_request(**kwargs)
+    # async def get(self, url):
+    #     async with aiohttp.ClientSession as session:
+    #         async with session.get(url) as resp:
+    #             if resp.status == OK:
+    #                 return {'status': "OK", 'data': resp.json()}
+    #             return {'status': "ERROR"}
+
+    async def get(self, url):
+        async with aiohttp.ClientSession as session:
+            async with session.get(url) as resp:
+                if resp.status == OK:
+                    return {'status': "OK", 'data': resp.json()}
+                return {'status': "ERROR"}
 
     def post(self, **kwargs):
         kwargs['request'] = requests.post
-        return self.send_request(**kwargs)
+        return self._send_request(**kwargs)
 
     def put(self, **kwargs):
         kwargs['request'] = requests.put
-        return self.send_request(**kwargs)
+        return self._send_request(**kwargs)
 
     def delete(self, **kwargs):
         kwargs['request'] = requests.delete
-        return self.send_request(**kwargs)
+        return self._send_request(**kwargs)
 
     def get_node_socket(self):
         return self.node_address + ':' + self.node_port

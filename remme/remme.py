@@ -40,13 +40,13 @@ class Remme:
         self._private_key_hex = private_key_hex
         self._network_config = default_network_config if network_config is None else network_config
 
-        self._rest = RemmeRest(network_config=self._network_config)
+        self._rest = RemmeRest(self._network_config)
         self._account = RemmeAccount(self._private_key_hex)
 
         self.transaction_service = RemmeTransactionService(self._rest, self._account)
         self.public_key_storage = RemmePublicKeyStorage(self._rest, self.transaction_service, self._account)
         self.certificate = RemmeCertificate(self.public_key_storage)
-        self.token = RemmeToken(self._network_config, self.transaction_service)
+        self.token = RemmeToken(self._rest, self.transaction_service)
         self.batch = RemmeBatch(self._rest)
         self.swap = RemmeSwap(self._rest, self.transaction_service)
         self.blockchain_info = RemmeBlockchainInfo(self._rest)
