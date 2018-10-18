@@ -2,7 +2,6 @@
 
 REMME Python Client
 ==========
-[![npm](https://img.shields.io/npm/dm/remme.svg)](https://pypi.org/project/remme)
 
 **An open source Python integration library for REMChain, simplifying the access and interaction with REMME nodes both public or permissioned.**
 
