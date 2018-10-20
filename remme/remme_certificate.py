@@ -8,7 +8,7 @@ class RemmeCertificate:
         self._rsa_key_size = 2048
         self._remme_public_key_storage = remme_public_key_storage
 
-    def create_and_store(self, certificate_data_to_create):
+    async def create_and_store(self, certificate_data_to_create):
         raise NotImplementedError
 
     def store(self, certificate):
