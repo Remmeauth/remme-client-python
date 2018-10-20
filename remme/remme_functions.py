@@ -1,34 +1,40 @@
 import hashlib
+import base64
 
 
-def hex_to_bytes(_string):
-    raise NotImplementedError
+def hex_to_bytes(_hex_string):
+    print(f"functions; hex_to_bytes args: {_hex_string}")
+    result = bytes.fromhex(_hex_string)
+    print(f"functions; hex_to_bytes result: {result}")
+    return result
 
 
-def bytes_to_hex(_uint8arr):
-    raise NotImplementedError
+def bytes_to_hex(_bytes):
+    print(f"functions; bytes_to_hex args: {_bytes}")
+    result = utf8_to_bytes(_bytes).hex()
+    print(f"functions; bytes_to_hex result: {result}")
+    return result
 
 
-def base64_to_array_buffer(_base64):
+def base64_to_byte_array(_base64):
+    base64.b64decode(_base64)
     raise NotImplementedError
 
 
 def utf8_to_bytes(_string):
-    raise NotImplementedError
+    return _string if isinstance(_string, bytes) else _string.encode('UTF-8')
 
 
 def to_hex(_string):
-    raise NotImplementedError
+    return utf8_to_bytes(_string).hex()
 
 
 def get_address_from_data(_family_name, _data):
-    print(f"get_address_from_data args: {_family_name}  ,  {_data}")
-    _family_name = _family_name if isinstance(_family_name, bytes) else _family_name.encode('UTF-8')
-    _data = _data if isinstance(_data, bytes) else _data.encode('UTF-8')
-    family_name_o = hashlib.sha512(_family_name)
-    data_o = hashlib.sha512(_data)
+    print(f"functions; get_address_from_data args: {_family_name}  ,  {_data}")
+    family_name_o = hashlib.sha512(utf8_to_bytes(_family_name))
+    data_o = hashlib.sha512(utf8_to_bytes(_data))
     result = "" + family_name_o.hexdigest()[slice(0, 6)] + data_o.hexdigest()[slice(0, 64)]
-    print(f"get_address_from_data result: {result}")
+    print(f"functions; get_address_from_data result: {result}")
     return result
 
 
@@ -38,3 +44,4 @@ def to_hex_string(_byte_array):
 
 def to_utf8_array(_string):
     raise NotImplementedError
+
