@@ -15,29 +15,28 @@ async def example():
 
     beforeBalance = await remme.token.get_balance(_address)
     print(f'balance is: {beforeBalance} REM')  # >>> balance: 0
-    await remme.token.transfer(_address, 1000)
-    await asyncio.sleep(10)
-    afterBalance = await remme.token.get_balance(_address)
-    print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
+    # await remme.token.transfer(_address, 1000)
+    # await asyncio.sleep(10)
+    # afterBalance = await remme.token.get_balance(_address)
+    # print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
 
     # certificate
 
-    certificate_data = {
-        'commonName': "some_user_name",
-        'email': "grzegorz_brzęczyszczykiewicz@mail.pl",
-        'name': "Grzegorz",
-        'surname': "Brzęczyszczykiewicz",
-        'contryName': "Rzeczpospolita Polska",
-        'validity': 360,
-        'serial': 'some serial'
-    }
-    result = await remme.certificate.create_and_store(certificate_data)
-    print(f'certificate transaction result: {result}')
-    print(f'certificate stored in block: {result.block_number}')
-    status = await remme.certificate.check(result.certificate)
-    print(f'certificate is valid: {status.valid}')
+    # certificate_data = {
+    #     'commonName': "some_user_name",
+    #     'email': "grzegorz_brzęczyszczykiewicz@mail.pl",
+    #     'name': "Grzegorz",
+    #     'surname': "Brzęczyszczykiewicz",
+    #     'contryName': "Rzeczpospolita Polska",
+    #     'validity': 360,
+    #     'serial': 'some serial'
+    # }
+    # result = await remme.certificate.create_and_store(certificate_data)
+    # print(f'certificate transaction result: {result}')
+    # print(f'certificate stored in block: {result.block_number}')
+    # status = await remme.certificate.check(result.certificate)
+    # print(f'certificate is valid: {status.valid}')
 
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(example())
-loop.close()
