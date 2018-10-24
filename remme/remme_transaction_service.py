@@ -1,4 +1,5 @@
-from remme.remme_utils import create_nonce, sha512_hexdigest, dict_to_base64
+from remme.remme_utils import create_nonce, sha512_hexdigest
+from base64 import b64encode
 from sawtooth_sdk.protobuf.transaction_pb2 import TransactionHeader, Transaction
 
 
@@ -32,13 +33,10 @@ class RemmeTransactionService:
             payload=payload_bytes
         )
         print(f"transaction : {txn}")
-        b64_txn = dict_to_base64(txn)
-        print(f"base64 transaction : {b64_txn}")
-        return b64_txn
+        return txn
 
     async def send(self, transaction):
-        if type(transaction) == bytes:
-            transaction = transaction.decode('UTF-8')
-        batch_id = await self._remme_rest.send_raw_transaction(transaction)
+        encoded_txn = b64encode(transaction.SerializeToString()).decode('utf-8')
+        batch_id = await self._remme_rest.send_raw_transaction(encoded_txn)
         print(f"batch id {batch_id}")
-        raise NotImplementedError
+        return batch_id
