@@ -10,5 +10,5 @@ setup(
     package_data={
         # 'remme.rest_api': ['openapi.yml'],
         # 'remme.settings': ['default_config.toml']
-    }, install_requires=['requests', 'aiohttp', 'sawtooth-signing']
+    }, install_requires=['requests', 'aiohttp', 'sawtooth-signing', 'sawtooth-sdk', 'cbor']
 )

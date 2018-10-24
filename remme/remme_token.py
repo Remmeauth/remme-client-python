@@ -1,4 +1,6 @@
 from remme.remme_utils import generate_address
+from remme.remme_account import AccountMethod
+import cbor
 
 
 class RemmeToken:
@@ -22,7 +24,16 @@ class RemmeToken:
         amount = self.validate_amount(amount)
         receiver_address = generate_address(self._family_name, public_key_to)
         print(f"receiver address: {receiver_address}")
-        raise NotImplementedError
+        transfer_payload = {"address_to": receiver_address, "amount": amount}
+        transaction_payload = cbor.dumps({"method": AccountMethod.TRANSFER, "data": transfer_payload})
+        transaction = await self.transaction_service.create(**{
+            "family_name": self._family_name,
+            "family_version": self._family_version,
+            "inputs": receiver_address,
+            "outputs": receiver_address,
+            "payload_bytes": transaction_payload
+        })
+        return await self.transaction_service.send(transaction)
 
     def validate_public_key(self, key):
         if len(key) != 66:

@@ -69,12 +69,12 @@ def generate_address(_family_name, _public_key_to):
 
 def create_nonce():
     print(f"utils; generate nonce")
-    hash_o = hashlib.sha512(str(math.floor(1000 * random.random())))
+    hash_o = hashlib.sha512(str(math.floor(1000 * random.random())).encode('UTF-8'))
     result = hash_o.hexdigest()
     print(f"utils; generate nonce result: {result}")
     return result
 
 
 def sha512_hexdigest(_value):
-    hash_o = hashlib.sha512(str(_value))
+    hash_o = hashlib.sha512(str(_value).encode('UTF-8'))
     return hash_o.hexdigest()
