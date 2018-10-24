@@ -1,5 +1,7 @@
 import hashlib
 import base64
+import math
+import random
 
 
 def hex_to_bytes(_hex_string):
@@ -16,9 +18,12 @@ def bytes_to_hex(_bytes):
     return result
 
 
-def base64_to_byte_array(_base64):
-    base64.b64decode(_base64)
-    raise NotImplementedError
+def base64_to_dict(_base64):
+    return eval(base64.b64decode(_base64))
+
+
+def dict_to_base64(_dict):
+    return base64.b64encode(str(_dict).encode('utf-8'))
 
 
 def utf8_to_bytes(_string):
@@ -60,3 +65,16 @@ def generate_address(_family_name, _public_key_to):
     result = "" + family_name_o.hexdigest()[slice(0, 6)] + data_o.hexdigest()[slice(0, 64)]
     print(f"utils; generate_address result: {result}")
     return result
+
+
+def create_nonce():
+    print(f"utils; generate nonce")
+    hash_o = hashlib.sha512(str(math.floor(1000 * random.random())))
+    result = hash_o.hexdigest()
+    print(f"utils; generate nonce result: {result}")
+    return result
+
+
+def sha512_hexdigest(_value):
+    hash_o = hashlib.sha512(str(_value))
+    return hash_o.hexdigest()

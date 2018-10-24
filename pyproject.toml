@@ -13,6 +13,7 @@ python = "^3.6"
 sawtooth-signing = "1.0.1"
 aiohttp = "3.2.1"
 aiohttp_json_rpc = "^0.11.2"
+sawtooth-sdk = "^1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.6"
