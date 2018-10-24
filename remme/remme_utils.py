@@ -53,11 +53,10 @@ def public_key_from_pem(public_key):
     raise NotImplementedError
 
 
-# def get_address_from_data(_family_name, _data):
 def generate_address(_family_name, _public_key_to):
-    print(f"functions; get_address_from_data args: {_family_name}  ,  {_public_key_to}")
+    print(f"utils; generate_address args: {_family_name}  ,  {_public_key_to}")
     family_name_o = hashlib.sha512(utf8_to_bytes(_family_name))
     data_o = hashlib.sha512(utf8_to_bytes(_public_key_to))
     result = "" + family_name_o.hexdigest()[slice(0, 6)] + data_o.hexdigest()[slice(0, 64)]
-    print(f"functions; get_address_from_data result: {result}")
+    print(f"utils; generate_address result: {result}")
     return result

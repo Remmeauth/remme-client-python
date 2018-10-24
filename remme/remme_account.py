@@ -1,7 +1,7 @@
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey
 import sawtooth_signing
 from remme.remme_utils import hex_to_bytes
-from remme.remme_functions import get_address_from_data
+from remme.remme_utils import generate_address
 import re
 
 
@@ -25,7 +25,7 @@ class RemmeAccount:
         self._signer = sawtooth_signing.CryptoFactory(context).new_signer(private_key)
         self.private_hex_key = private_key.as_hex()
         self.public_hex_key = self._signer.get_public_key().as_hex()
-        self.address = get_address_from_data(self._family_name, self.public_hex_key)
+        self.address = generate_address(self._family_name, self.public_hex_key)
 
     @staticmethod
     def is_valid_private_hex(_private_hex):
