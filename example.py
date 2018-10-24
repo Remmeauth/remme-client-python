@@ -15,10 +15,10 @@ async def example():
 
     beforeBalance = await remme.token.get_balance(_address)
     print(f'balance is: {beforeBalance} REM')  # >>> balance: 0
-    # await remme.token.transfer(_address, 1000)
-    # await asyncio.sleep(10)
-    # afterBalance = await remme.token.get_balance(_address)
-    # print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
+    await remme.token.transfer(_address, 1000)
+    await asyncio.sleep(10)
+    afterBalance = await remme.token.get_balance(_address)
+    print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
 
     # certificate
 
