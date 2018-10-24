@@ -15,6 +15,7 @@ aiohttp = "3.2.1"
 aiohttp_json_rpc = "^0.11.2"
 sawtooth-sdk = "^1.0"
 cbor = "^1.0"
+protobuf = "^3.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.6"

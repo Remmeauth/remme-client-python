@@ -6,11 +6,6 @@ from remme.remme_utils import generate_address
 import re
 
 
-class AccountMethod:
-    TRANSFER = 0
-    GENESIS = 1
-
-
 class RemmeAccount:
 
     _family_name = None

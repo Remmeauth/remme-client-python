@@ -11,6 +11,21 @@ async def example():
 
     remme = Remme(private_key_hex=private_key_hex)
 
+    blocks = await remme._rest.get_blocks(start=0, limit=1)
+    print(f"blocks {blocks}")
+
+    node_key = await remme._rest.export_node_key()
+    print(f"node key {node_key}")
+
+    atomic_swap_public_key = await remme._rest.get_atomic_swap_public_key()
+    print(f"atomic swap public key {atomic_swap_public_key}")
+
+    node_info = await remme._rest.get_node_info()
+    print(f"node info {node_info}")
+
+    # block_number = await remme._rest.get_block_number()
+    # print(f"block number {block_number}")
+
     # token
 
     beforeBalance = await remme.token.get_balance(_address)

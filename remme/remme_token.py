@@ -1,6 +1,6 @@
 from remme.remme_utils import generate_address
-from remme.remme_account import AccountMethod
-import cbor
+from remme.protos.account_pb2 import AccountMethod, TransferPayload
+from remme.protos.transaction_pb2 import TransactionPayload
 
 
 class RemmeToken:
@@ -24,14 +24,21 @@ class RemmeToken:
         amount = self.validate_amount(amount)
         receiver_address = generate_address(self._family_name, public_key_to)
         print(f"receiver address: {receiver_address}")
-        transfer_payload = {"address_to": receiver_address, "amount": amount}
-        transaction_payload = cbor.dumps({"method": AccountMethod.TRANSFER, "data": transfer_payload})
+
+        transfer = TransferPayload()
+        transfer.address_to = receiver_address
+        transfer.value = amount
+
+        tr = TransactionPayload()
+        tr.method = AccountMethod.TRANSFER
+        tr.data = transfer.SerializeToString()
+
         transaction = await self.transaction_service.create(**{
             "family_name": self._family_name,
             "family_version": self._family_version,
             "inputs": receiver_address,
             "outputs": receiver_address,
-            "payload_bytes": transaction_payload
+            "payload_bytes": tr.SerializeToString()
         })
         return await self.transaction_service.send(transaction)
 
