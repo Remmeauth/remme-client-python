@@ -36,5 +36,9 @@ class RemmeTransactionService:
         print(f"base64 transaction : {b64_txn}")
         return b64_txn
 
-    def send(self, transaction):
+    async def send(self, transaction):
+        if type(transaction) == bytes:
+            transaction = transaction.decode('UTF-8')
+        batch_id = await self._remme_rest.send_raw_transaction(transaction)
+        print(f"batch id {batch_id}")
         raise NotImplementedError
