@@ -13,7 +13,7 @@ class RemmeTransactionService:
         self._remme_rest = remme_rest
 
     async def create(self, family_name, family_version, inputs, outputs, payload_bytes):
-        batcher_public_key = await self._remme_rest.send_rpc_request("get_node_public_key")
+        batcher_public_key = await self._remme_rest.send_rpc_request(self._remme_rest.methods.NODE_KEY)
         txn_header_bytes = TransactionHeader(
             family_name=family_name,
             family_version=family_version,
@@ -38,6 +38,6 @@ class RemmeTransactionService:
 
     async def send(self, transaction):
         params = {"data": b64encode(transaction.SerializeToString()).decode('utf-8')}
-        batch_id = await self._remme_rest.send_rpc_request("send_raw_transaction", params)
+        batch_id = await self._remme_rest.send_rpc_request(self._remme_rest.methods.TRANSACTION, params)
         print(f"batch id {batch_id}")
         return batch_id

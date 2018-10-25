@@ -5,6 +5,7 @@ import asyncio
 async def example():
     private_key_hex = "7f752a99bbaf6755dc861bb4a7bb19acb913948d75f3b718ff4545d01d9d4ff5"
     _address = "02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13"
+    # _address = "03823c7a9e285246985089824f3aaa51fb8675d08d84b151833ca5febce37ad61e"
 
     # private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
     # some_remme_address = "03c75297511ce0cfd1315a045dd0db2a4a1710efed94f0f94ad993b5dfe2e33b62"
@@ -15,7 +16,7 @@ async def example():
     blocks = await remme.blockchain_info.get_blocks(query)
     print(f"blocks {blocks}")
 
-    node_key = await remme._rest.send_rpc_request("export_node_key")
+    node_key = await remme._rest.send_rpc_request(remme._rest.methods.NODE_PRIVATE_KEY)
     print(f"node key {node_key}")
 
     atomic_swap_public_key = await remme.swap.get_public_key()

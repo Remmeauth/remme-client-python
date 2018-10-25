@@ -18,7 +18,7 @@ class RemmeSwap:
         raise NotImplementedError
 
     async def get_public_key(self):
-        return await self._remme_rest.send_rpc_request("get_atomic_swap_public_key")
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.ATOMIC_SWAP_PUBLIC_KEY)
 
     def get_info(self, swap_id):
         raise NotImplementedError
