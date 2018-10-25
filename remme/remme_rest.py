@@ -64,7 +64,7 @@ class RemmeRest:
         request_data = {'method': method}
         if params:
             request_data['params'] = params
-        print(f"request data : {request_data}")
+        # print(f"request data : {request_data}")
         return await self.rpc_client.call(**request_data)
 
     def get_node_socket(self):

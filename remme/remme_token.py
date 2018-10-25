@@ -1,4 +1,4 @@
-from remme.remme_utils import generate_address
+from remme.remme_utils import generate_address, sha512_hexdigest
 from remme.protos.account_pb2 import AccountMethod, TransferPayload
 from remme.protos.transaction_pb2 import TransactionPayload
 
@@ -23,21 +23,27 @@ class RemmeToken:
         public_key_to = self.validate_public_key(public_key_to)
         amount = self.validate_amount(amount)
         receiver_address = generate_address(self._family_name, public_key_to)
-        print(f"receiver address: {receiver_address}")
+        # print(f"receiver address: {receiver_address}")
 
         transfer = TransferPayload()
         transfer.address_to = receiver_address
         transfer.value = amount
 
+        # print(f"transfer address : {transfer.address_to} ; transfer value : {transfer.value}")
+        # print(f"transfer serialized : {transfer.SerializeToString()}")
+
         tr = TransactionPayload()
         tr.method = AccountMethod.TRANSFER
         tr.data = transfer.SerializeToString()
 
+        # print(f"transaction method : {tr.method} ; transaction data : {tr.data}")
+        # print(f"transaction serialized : {tr.SerializeToString()}")
+
         transaction = await self.transaction_service.create(**{
             "family_name": self._family_name,
             "family_version": self._family_version,
-            "inputs": receiver_address,
-            "outputs": receiver_address,
+            "inputs": [receiver_address],
+            "outputs": [receiver_address],
             "payload_bytes": tr.SerializeToString()
         })
         return await self.transaction_service.send(transaction)
@@ -49,5 +55,5 @@ class RemmeToken:
 
     async def get_balance(self, public_key):
         result = await self.rest.get_balance(public_key=self.validate_public_key(public_key))
-        print(f'get_balance result: {result}')
+        # print(f'get_balance result: {result}')
         return result
