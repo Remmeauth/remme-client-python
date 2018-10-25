@@ -4,9 +4,6 @@ from enum import Enum
 
 class RemmeMethods(Enum):
 
-    def __repr__(self):
-        return self.value
-
     PUBLIC_KEY = "get_public_key_info",
     TOKEN = "get_balance",
     BATCH_STATUS = "get_batch_status",

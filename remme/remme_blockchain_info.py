@@ -17,8 +17,7 @@ class RemmeBlockchainInfo:
 
     async def get_blocks(self, query):
         query = query if query else {"start": 0, "limit": 0}
-        print(self._remme_rest.methods.BLOCK_INFO)
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BLOCK_INFO, params=query)
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BLOCK_INFO.value[0], params=query)
 
     def get_peers(self):
         raise NotImplementedError
@@ -39,7 +38,7 @@ class RemmeBlockchainInfo:
         raise NotImplementedError
 
     async def get_network_status(self):
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.NETWORK_STATUS)
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.NETWORK_STATUS.value[0])
 
     def get_block_info(self, query):
         raise NotImplementedError
