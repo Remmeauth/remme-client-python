@@ -54,6 +54,7 @@ class RemmeToken:
         return key
 
     async def get_balance(self, public_key):
-        result = await self.rest.get_balance(public_key=self.validate_public_key(public_key))
+        params = {"public_key": self.validate_public_key(public_key)}
+        result = await self.rest.send_rpc_request("get_balance", params)
         # print(f'get_balance result: {result}')
         return result
