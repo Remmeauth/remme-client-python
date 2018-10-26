@@ -16,7 +16,7 @@ class RemmeBlockchainInfo:
         if not self.is_valid_batch_id(batch_id):
             raise Exception("Invalid batch id given.")
         params = {'id': batch_id}
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.FETCH_BATCH.value[0], params)
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.FETCH_BATCH, params)
 
     def get_batches(self, query):
         raise NotImplementedError
@@ -26,7 +26,7 @@ class RemmeBlockchainInfo:
 
     async def get_blocks(self, query):
         query = query if query else {"start": 0, "limit": 0}
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BLOCK_INFO.value[0], params=query)
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BLOCK_INFO, params=query)
 
     def get_peers(self):
         raise NotImplementedError
@@ -47,7 +47,7 @@ class RemmeBlockchainInfo:
         raise NotImplementedError
 
     async def get_network_status(self):
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.NETWORK_STATUS.value[0])
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.NETWORK_STATUS)
 
     def get_block_info(self, query):
         raise NotImplementedError

@@ -16,4 +16,4 @@ class RemmeBatch:
         if not self.is_valid_batch_id(batch_id):
             raise Exception("Invalid batch id given.")
         params = {'id': batch_id}
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BATCH_STATUS.value[0], params)
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BATCH_STATUS, params)

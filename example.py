@@ -16,12 +16,12 @@ async def example():
     print(f"generated private key hex {generated_private_key_hex}")
     print(f"sender address {sender_address}")
 
+    node_key = await remme._rest.send_rpc_request(remme._rest.methods.NODE_PRIVATE_KEY)
+    print(f"node key {node_key}")
+
     query = {"start": 0}
     blocks = await remme.blockchain_info.get_blocks(query)
     print(f"blocks {blocks}")
-
-    node_key = await remme._rest.send_rpc_request(remme._rest.methods.NODE_PRIVATE_KEY.value[0])
-    print(f"node key {node_key}")
 
     atomic_swap_public_key = await remme.swap.get_public_key()
     print(f"atomic swap public key {atomic_swap_public_key}")

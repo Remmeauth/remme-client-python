@@ -4,6 +4,9 @@ from enum import Enum
 
 class RemmeMethods(Enum):
 
+    def __call__(self, *args, **kwargs):
+        return self.value[0]
+
     PUBLIC_KEY = "get_public_key_info",
     TOKEN = "get_balance",
     BATCH_STATUS = "get_batch_status",
@@ -43,6 +46,8 @@ class RemmeRest:
         self.methods = RemmeMethods
 
     async def send_rpc_request(self, method, params=None):
+        method = method() if hasattr(method, '__call__') else method
+        print(f"method {method}")
         try:
             await self.rpc_client.connect(self.node_address, self.node_port)
         except Exception as e:
