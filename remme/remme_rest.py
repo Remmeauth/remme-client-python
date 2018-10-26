@@ -46,16 +46,19 @@ class RemmeRest:
         self.methods = RemmeMethods
 
     async def send_rpc_request(self, method, params=None):
-        method = method() if hasattr(method, '__call__') else method
-        print(f"method {method}")
         try:
-            await self.rpc_client.connect(self.node_address, self.node_port)
+            protocol = "https" if self.ssl_mode else "http"
+            await self.rpc_client.connect(host=self.node_address, port=self.node_port, protocol=protocol)
         except Exception as e:
-            raise Exception(f"Please check if your node running at {self._get_url_for_request()}")
+            raise Exception("Please check if your node running at {url}".format(url=self._get_url_for_request()))
+        method = method() if hasattr(method, '__call__') else method
         request_data = {'method': method}
         if params:
             request_data['params'] = params
-        return await self.rpc_client.call(**request_data)
+        try:
+            return await self.rpc_client.call(**request_data)
+        finally:
+            await self.rpc_client.disconnect()
 
     def _get_url_for_request(self):
         return "https://" + self.get_node_socket() if self.ssl_mode else "http://" + self.get_node_socket()
