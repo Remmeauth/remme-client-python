@@ -39,5 +39,5 @@ class RemmeTransactionService:
     async def send(self, transaction):
         params = {"data": b64encode(transaction.SerializeToString()).decode('utf-8')}
         batch_id = await self._remme_rest.send_rpc_request(self._remme_rest.methods.TRANSACTION.value[0], params)
-        print(f"batch id {batch_id}")
         return batch_id
+

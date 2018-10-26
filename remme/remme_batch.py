@@ -15,9 +15,5 @@ class RemmeBatch:
     async def get_status(self, batch_id):
         if not self.is_valid_batch_id(batch_id):
             raise Exception("Invalid batch id given.")
-        route = f"/api/v1/batch_status/{batch_id}"
-        result = await self._remme_rest.get(route)
-        if result['status'] == "OK":
-            data = result['data']
-            return data['status']
-        raise Exception("Failed to get batch status")
+        params = {'id': batch_id}
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BATCH_STATUS.value[0], params)

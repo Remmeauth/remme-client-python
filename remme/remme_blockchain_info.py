@@ -1,3 +1,5 @@
+import re
+
 
 class RemmeBlockchainInfo:
 
@@ -6,8 +8,15 @@ class RemmeBlockchainInfo:
     def __init__(self, remme_rest):
         self._remme_rest = remme_rest
 
-    def get_batch_by_id(self, batch_id):
-        raise NotImplementedError
+    @staticmethod
+    def is_valid_batch_id(_batch_id):
+        return re.match(r"^[0-9a-f]{128}$", _batch_id) is not None
+
+    async def get_batch_by_id(self, batch_id):
+        if not self.is_valid_batch_id(batch_id):
+            raise Exception("Invalid batch id given.")
+        params = {'id': batch_id}
+        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.FETCH_BATCH.value[0], params)
 
     def get_batches(self, query):
         raise NotImplementedError
