@@ -2,6 +2,13 @@ import hashlib
 import base64
 import math
 import random
+from enum import Enum
+
+
+class RemmeFamilyName(Enum):
+    ACCOUNT = "account"
+    PUBLIC_KEY = "pub_key"
+    SWAP = "AtomicSwap"
 
 
 def hex_to_bytes(_hex_string):

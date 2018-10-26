@@ -7,10 +7,10 @@ async def example():
     # _address = "02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13"
     reciver_address = "03823c7a9e285246985089824f3aaa51fb8675d08d84b151833ca5febce37ad61e"
 
-    # private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
+    private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
     # some_remme_address = "03c75297511ce0cfd1315a045dd0db2a4a1710efed94f0f94ad993b5dfe2e33b62"
 
-    remme = Remme()
+    remme = Remme(private_key_hex=private_key_hex)
     generated_private_key_hex = remme._account.get_public_key_hex()
     sender_address = remme._account.address
     print(f"generated private key hex {generated_private_key_hex}")
@@ -29,8 +29,18 @@ async def example():
     node_info = await remme.blockchain_info.get_network_status()
     print(f"node info {node_info}")
 
-    # block_number = await remme._rest.get_block_number()
-    # print(f"block number {block_number}")
+    block_number = await remme._rest.get_block_number()
+    print(f"block number {block_number}")
+
+    # account
+
+    remme = Remme()
+    tx = await remme.token._create_transfer_tx(reciver_address, 10)
+    print(f"tx {tx.header}")
+    signature = remme._account.sign(tx.header)
+    print(f"signature {signature}")
+    is_valid = remme._account.verify(signature, tx.header)
+    print(f"tx is valid ? - {is_valid}")
 
     # token
 

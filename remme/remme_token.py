@@ -19,7 +19,7 @@ class RemmeToken:
             raise Exception("Invalid amount")
         return amount
 
-    async def transfer(self, public_key_to, amount):
+    async def _create_transfer_tx(self, public_key_to, amount):
         public_key_to = self.validate_public_key(public_key_to)
         amount = self.validate_amount(amount)
         receiver_address = generate_address(self._family_name, public_key_to)
@@ -39,13 +39,16 @@ class RemmeToken:
         # print(f"transaction method : {tr.method} ; transaction data : {tr.data}")
         # print(f"transaction serialized : {tr.SerializeToString()}")
 
-        transaction = await self.transaction_service.create(**{
+        return await self.transaction_service.create(**{
             "family_name": self._family_name,
             "family_version": self._family_version,
             "inputs": [receiver_address],
             "outputs": [receiver_address],
             "payload_bytes": tr.SerializeToString()
         })
+
+    async def transfer(self, public_key_to, amount):
+        transaction = await self._create_transfer_tx(public_key_to, amount)
         return await self.transaction_service.send(transaction)
 
     def validate_public_key(self, key):
