@@ -14,11 +14,12 @@ class RemmeTransactionService:
 
     async def create(self, family_name, family_version, inputs, outputs, payload_bytes):
         batcher_public_key = await self._remme_rest.send_rpc_request(self._remme_rest.methods.NODE_KEY.value[0])
+        sender_address = self._remme_account.address
         txn_header_bytes = TransactionHeader(
             family_name=family_name,
             family_version=family_version,
-            inputs=inputs,
-            outputs=outputs,
+            inputs=[sender_address] + inputs,
+            outputs=[sender_address] + outputs,
             signer_public_key=self._remme_account.get_public_key_hex(),
             batcher_public_key=batcher_public_key,
             nonce=create_nonce(),

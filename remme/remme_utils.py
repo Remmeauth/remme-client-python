@@ -62,7 +62,7 @@ def generate_address(_family_name, _public_key_to):
     # print(f"utils; generate_address args: {_family_name}  ,  {_public_key_to}")
     family_name_o = hashlib.sha512(utf8_to_bytes(_family_name))
     data_o = hashlib.sha512(utf8_to_bytes(_public_key_to))
-    result = "" + family_name_o.hexdigest()[slice(0, 6)] + data_o.hexdigest()[slice(0, 64)]
+    result = "" + family_name_o.hexdigest()[:6] + data_o.hexdigest()[:64]
     # print(f"utils; generate_address result: {result}")
     return result
 
