@@ -53,7 +53,8 @@ class RemmeToken:
         payload = await self._create_transfer_tx(public_key_to, amount)
         return await self.transaction_service.send(payload)
 
-    def validate_public_key(self, key):
+    @staticmethod
+    def validate_public_key(key):
         if len(key) != 66:
             raise Exception("Invalid key")
         return key

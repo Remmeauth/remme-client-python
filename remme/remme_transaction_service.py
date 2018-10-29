@@ -2,9 +2,10 @@ from remme.remme_utils import create_nonce, sha512_hexdigest
 from base64 import b64encode
 from sawtooth_sdk.protobuf.transaction_pb2 import TransactionHeader, Transaction
 from remme.remme_methods import RemmeMethods
+from remme.models.base_transaction_response import BaseTransactionResponse
 
 
-class RemmeTransactionService:
+class RemmeTransactionService():
 
     _remme_api = None
     _remme_account = None
@@ -43,5 +44,5 @@ class RemmeTransactionService:
     async def send(self, payload):
         params = {"data": payload}
         batch_id = await self._remme_api.send_request(RemmeMethods.TRANSACTION, params)
-        return batch_id
+        return BaseTransactionResponse(self._remme_api.get_node_socket(), self._remme_api.get_ssl_mode(), batch_id)
 

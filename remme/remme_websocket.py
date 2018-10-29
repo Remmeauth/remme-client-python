@@ -1,4 +1,4 @@
-from aiohttp import ClientSession
+from aiohttp import ClientSession, WSMsgType
 from time import time
 import json
 
@@ -19,7 +19,11 @@ class RemmeWebSocket:
     async def connect_to_websocket(self, callback):
         session = ClientSession()
         self._socket = await session.ws_connect(self._get_subscribe_url())
-        raise NotImplementedError
+        async for msg in self._socket:
+            if msg.type == WSMsgType.TEXT:
+                print(msg)
+            elif msg.type == WSMsgType.ERROR:
+                print(msg)
 
     def _get_subscribe_url(self):
         protocol = "wss://" if self._ssl_mode else "ws://"

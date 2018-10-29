@@ -37,21 +37,33 @@ async def example():
 
     beforeBalance = await remme.token.get_balance(reciver_address)
     print(f'balance is: {beforeBalance} REM')  # >>> balance: 0
-    batch_id = await remme.token.transfer(reciver_address, 1000)
-    print(f"batch id {batch_id}")
-    await asyncio.sleep(10)
-    afterBalance = await remme.token.get_balance(reciver_address)
-    print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
+    transaction_result = await remme.token.transfer(reciver_address, 1000)
 
-    await asyncio.sleep(10)
-    batch_status = await remme.batch.get_status(batch_id)
-    print(f"batch status {batch_status}")
+    print(f"transaction result: {transaction_result}")
 
-    # batch = await remme.blockchain_info.get_batch_by_id(batch_id)
-    # print(f"batch {batch}")
+    def transaction_callback(event, data):
+        print(event)
+        print(data)
+
+    await transaction_result.connect_to_websocket(transaction_callback)
+
+
+    # print(f"batch id {batch_id}")
+    # await asyncio.sleep(10)
+    # afterBalance = await remme.token.get_balance(reciver_address)
+    # print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
+    #
+    # await asyncio.sleep(10)
+    # batch_status = await remme.batch.get_status(batch_id)
+    # print(f"batch status {batch_status}")
 
     # web socket
 
+
+
+
+    # batch = await remme.blockchain_info.get_batch_by_id(batch_id)
+    # print(f"batch {batch}")
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(example())
