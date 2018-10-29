@@ -1,12 +1,12 @@
 
 class RemmePublicKeyStorage:
 
-    _remme_rest = None
+    _remme_api = None
     _remme_transaction = None
     _remme_account = None
 
-    def __init__(self, remme_rest, remme_transaction, remme_account):
-        self._remme_rest = remme_rest
+    def __init__(self, remme_api, remme_transaction, remme_account):
+        self._remme_api = remme_api
         self._remme_transaction = remme_transaction
         self._remme_account = remme_account
 

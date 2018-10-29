@@ -1,18 +1,19 @@
-from remme.remme_transaction_service import CreateTransactionDto
-from remme.remme_utils import generate_address, sha512_hexdigest
+from remme.models.create_transactions_d_to import CreateTransactionDto
+from remme.remme_utils import generate_address
+from remme.remme_methods import RemmeMethods
 from remme.protos.account_pb2 import AccountMethod, TransferPayload
 from remme.protos.transaction_pb2 import TransactionPayload
 
 
 class RemmeToken:
 
-    rest = None
+    api = None
     transaction_service = None
     _family_name = "account"
     _family_version = "0.1"
 
     def __init__(self, rest, transaction_service):
-        self.rest = rest
+        self.api = rest
         self.transaction_service = transaction_service
 
     def validate_amount(self, amount):
@@ -59,6 +60,6 @@ class RemmeToken:
 
     async def get_balance(self, public_key):
         params = {"public_key": self.validate_public_key(public_key)}
-        result = await self.rest.send_rpc_request(self.rest.methods.TOKEN, params)
+        result = await self.api.send_request(RemmeMethods.TOKEN, params)
         # print(f'get_balance result: {result}')
         return result

@@ -1,11 +1,13 @@
+from remme.remme_methods import RemmeMethods
+
 
 class RemmeSwap:
 
-    _remme_rest = None
+    _remme_api = None
     _remme_transaction_service = None
 
-    def __init__(self, remme_rest, transaction_service):
-        self._remme_rest = remme_rest
+    def __init__(self, remme_api, transaction_service):
+        self._remme_api = remme_api
         self._remme_transaction_service = transaction_service
 
     def approve(self, swap_id):
@@ -18,7 +20,7 @@ class RemmeSwap:
         raise NotImplementedError
 
     async def get_public_key(self):
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.ATOMIC_SWAP_PUBLIC_KEY)
+        return await self._remme_api.send_request(RemmeMethods.ATOMIC_SWAP_PUBLIC_KEY)
 
     def get_info(self, swap_id):
         raise NotImplementedError

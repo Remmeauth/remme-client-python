@@ -1,34 +1,20 @@
 from remme.remme_utils import create_nonce, sha512_hexdigest
 from base64 import b64encode
 from sawtooth_sdk.protobuf.transaction_pb2 import TransactionHeader, Transaction
-
-
-class CreateTransactionDto:
-    family_name = None
-    family_version = None
-    inputs = None
-    outputs = None
-    payload_bytes = None
-
-    def __init__(self, family_name, family_version, inputs, outputs, payload_bytes):
-        self.family_name = family_name
-        self.family_version = family_version
-        self.inputs = inputs
-        self.outputs = outputs
-        self.payload_bytes = payload_bytes
+from remme.remme_methods import RemmeMethods
 
 
 class RemmeTransactionService:
 
-    _remme_rest = None
+    _remme_api = None
     _remme_account = None
 
-    def __init__(self, remme_rest, remme_account):
+    def __init__(self, remme_api, remme_account):
         self._remme_account = remme_account
-        self._remme_rest = remme_rest
+        self._remme_api = remme_api
 
     async def create(self, transaction_d_to):
-        batcher_public_key = await self._remme_rest.send_rpc_request(self._remme_rest.methods.NODE_KEY)
+        batcher_public_key = await self._remme_api.send_request(RemmeMethods.NODE_KEY)
         sender_address = self._remme_account.address
         txn_header_bytes = TransactionHeader(
             family_name=transaction_d_to.family_name,
@@ -56,6 +42,6 @@ class RemmeTransactionService:
 
     async def send(self, payload):
         params = {"data": payload}
-        batch_id = await self._remme_rest.send_rpc_request(self._remme_rest.methods.TRANSACTION, params)
+        batch_id = await self._remme_api.send_request(RemmeMethods.TRANSACTION, params)
         return batch_id
 

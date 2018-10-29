@@ -1,12 +1,13 @@
 import re
+from remme.remme_methods import RemmeMethods
 
 
 class RemmeBatch:
 
-    _remme_rest = None
+    _remme_api = None
 
-    def __init__(self, remme_rest):
-        self._remme_rest = remme_rest
+    def __init__(self, remme_api):
+        self._remme_api = remme_api
 
     @staticmethod
     def is_valid_batch_id(_batch_id):
@@ -16,4 +17,4 @@ class RemmeBatch:
         if not self.is_valid_batch_id(batch_id):
             raise Exception("Invalid batch id given.")
         params = {'id': batch_id}
-        return await self._remme_rest.send_rpc_request(self._remme_rest.methods.BATCH_STATUS, params)
+        return await self._remme_api.send_request(RemmeMethods.BATCH_STATUS, params)

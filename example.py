@@ -1,4 +1,5 @@
 from remme.remme import Remme
+from remme.remme_methods import RemmeMethods
 import asyncio
 
 
@@ -16,7 +17,7 @@ async def example():
     print(f"generated private key hex {generated_private_key_hex}")
     print(f"sender address {sender_address}")
 
-    node_key = await remme._rest.send_rpc_request(remme._rest.methods.NODE_PRIVATE_KEY)
+    node_key = await remme._api.send_request(RemmeMethods.NODE_PRIVATE_KEY)
     print(f"node key {node_key}")
 
     query = {"start": 0}
@@ -48,6 +49,8 @@ async def example():
 
     # batch = await remme.blockchain_info.get_batch_by_id(batch_id)
     # print(f"batch {batch}")
+
+    # web socket
 
 
 loop = asyncio.get_event_loop()
