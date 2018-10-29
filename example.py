@@ -29,18 +29,8 @@ async def example():
     node_info = await remme.blockchain_info.get_network_status()
     print(f"node info {node_info}")
 
-    block_number = await remme._rest.get_block_number()
-    print(f"block number {block_number}")
-
-    # account
-
-    remme = Remme()
-    tx = await remme.token._create_transfer_tx(reciver_address, 10)
-    print(f"tx {tx.header}")
-    signature = remme._account.sign(tx.header)
-    print(f"signature {signature}")
-    is_valid = remme._account.verify(signature, tx.header)
-    print(f"tx is valid ? - {is_valid}")
+    # block_number = await remme._rest.get_block_number()
+    # print(f"block number {block_number}")
 
     # token
 
@@ -56,8 +46,8 @@ async def example():
     batch_status = await remme.batch.get_status(batch_id)
     print(f"batch status {batch_status}")
 
-    batch = await remme.blockchain_info.get_batch_by_id(batch_id)
-    print(f"batch {batch}")
+    # batch = await remme.blockchain_info.get_batch_by_id(batch_id)
+    # print(f"batch {batch}")
 
 
 loop = asyncio.get_event_loop()
