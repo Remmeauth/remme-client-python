@@ -56,8 +56,10 @@ class RemmeWebSocket:
         self._socket.close()
         self._socket = None
 
-    def get_socket_address(self):
+    @property
+    def socket_address(self):
         return self._socket_address
 
-    def get_ssl_mode(self):
+    @property
+    def ssl_mode(self):
         return self._ssl_mode

@@ -1,6 +1,7 @@
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey
 from sawtooth_signing import create_context, CryptoFactory
-from remme.remme_utils import hex_to_bytes, generate_address, RemmeFamilyName, get_private_key_hex_regexp
+from remme.remme_utils import hex_to_bytes, generate_address, RemmeFamilyName
+from remme.remme_patterns import RemmePatterns
 import re
 
 
@@ -17,7 +18,7 @@ class RemmeAccount:
 
     @staticmethod
     def is_valid_private_hex(_private_hex):
-        return re.match(get_private_key_hex_regexp(), _private_hex) is not None
+        return re.match(RemmePatterns.PRIVATE_KEY.value, _private_hex) is not None
 
     def __init__(self, private_key_hex):
         self._family_name = RemmeFamilyName.ACCOUNT.value[0]

@@ -1,5 +1,5 @@
 from remme.models.create_transactions_d_to import CreateTransactionDto
-from remme.remme_utils import generate_address
+from remme.remme_utils import generate_address, RemmeFamilyName
 from remme.remme_methods import RemmeMethods
 from remme.protos.account_pb2 import AccountMethod, TransferPayload
 from remme.protos.transaction_pb2 import TransactionPayload
@@ -9,7 +9,6 @@ class RemmeToken:
 
     api = None
     transaction_service = None
-    _family_name = "account"
     _family_version = "0.1"
 
     def __init__(self, rest, transaction_service):
@@ -24,7 +23,7 @@ class RemmeToken:
     async def _create_transfer_tx(self, public_key_to, amount):
         public_key_to = self.validate_public_key(public_key_to)
         amount = self.validate_amount(amount)
-        receiver_address = generate_address(self._family_name, public_key_to)
+        receiver_address = generate_address(RemmeFamilyName.ACCOUNT, public_key_to)
         # print(f"receiver address: {receiver_address}")
 
         transfer = TransferPayload()
@@ -41,7 +40,7 @@ class RemmeToken:
         # print(f"transaction method : {tr.method} ; transaction data : {tr.data}")
         # print(f"transaction serialized : {tr.SerializeToString()}")
 
-        transaction_d_to = CreateTransactionDto(family_name=self._family_name,
+        transaction_d_to = CreateTransactionDto(family_name=RemmeFamilyName.ACCOUNT,
                                                 family_version=self._family_version,
                                                 inputs=[receiver_address],
                                                 outputs=[receiver_address],
