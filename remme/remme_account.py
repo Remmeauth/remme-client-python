@@ -18,7 +18,7 @@ class RemmeAccount:
 
     @staticmethod
     def is_valid_private_hex(_private_hex):
-        return re.match(RemmePatterns.PRIVATE_KEY.value, _private_hex) is not None
+        return re.match(RemmePatterns.PRIVATE_KEY.value[0], _private_hex) is not None
 
     def __init__(self, private_key_hex):
         self._family_name = RemmeFamilyName.ACCOUNT.value[0]

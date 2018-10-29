@@ -23,7 +23,7 @@ class RemmeToken:
     async def _create_transfer_tx(self, public_key_to, amount):
         public_key_to = self.validate_public_key(public_key_to)
         amount = self.validate_amount(amount)
-        receiver_address = generate_address(RemmeFamilyName.ACCOUNT, public_key_to)
+        receiver_address = generate_address(RemmeFamilyName.ACCOUNT.value[0], public_key_to)
         # print(f"receiver address: {receiver_address}")
 
         transfer = TransferPayload()
@@ -40,7 +40,7 @@ class RemmeToken:
         # print(f"transaction method : {tr.method} ; transaction data : {tr.data}")
         # print(f"transaction serialized : {tr.SerializeToString()}")
 
-        transaction_d_to = CreateTransactionDto(family_name=RemmeFamilyName.ACCOUNT,
+        transaction_d_to = CreateTransactionDto(family_name=RemmeFamilyName.ACCOUNT.value[0],
                                                 family_version=self._family_version,
                                                 inputs=[receiver_address],
                                                 outputs=[receiver_address],
