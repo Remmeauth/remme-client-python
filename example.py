@@ -12,7 +12,7 @@ async def example():
     # some_remme_address = "03c75297511ce0cfd1315a045dd0db2a4a1710efed94f0f94ad993b5dfe2e33b62"
 
     remme = Remme(private_key_hex=private_key_hex)
-    generated_private_key_hex = remme._account.get_public_key_hex()
+    generated_private_key_hex = remme._account.public_key_hex
     sender_address = remme._account.address
     print(f"generated private key hex {generated_private_key_hex}")
     print(f"sender address {sender_address}")
@@ -45,7 +45,7 @@ async def example():
         print(event)
         print(data)
 
-    await transaction_result.connect_to_websocket(transaction_callback)
+    # await transaction_result.connect_to_websocket(transaction_callback)
 
 
     # print(f"batch id {batch_id}")

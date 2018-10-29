@@ -22,7 +22,7 @@ class RemmeTransactionService():
             family_version=transaction_d_to.family_version,
             inputs=[sender_address] + transaction_d_to.inputs,
             outputs=[sender_address] + transaction_d_to.outputs,
-            signer_public_key=self._remme_account.get_public_key_hex(),
+            signer_public_key=self._remme_account.public_key_hex,
             batcher_public_key=batcher_public_key,
             nonce=create_nonce(),
             dependencies=[],
@@ -44,5 +44,5 @@ class RemmeTransactionService():
     async def send(self, payload):
         params = {"data": payload}
         batch_id = await self._remme_api.send_request(RemmeMethods.TRANSACTION, params)
-        return BaseTransactionResponse(self._remme_api.get_node_socket(), self._remme_api.get_ssl_mode(), batch_id)
+        return BaseTransactionResponse(self._remme_api.node_socket, self._remme_api.ssl_mode, batch_id)
 

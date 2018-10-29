@@ -51,4 +51,4 @@ class Remme:
         self.batch = RemmeBatch(self._api)
         self.swap = RemmeSwap(self._api, self.transaction_service)
         self.blockchain_info = RemmeBlockchainInfo(self._api)
-        self.events = RemmeWebSocketEvents(self._api.get_node_socket(), self._api.get_ssl_mode())
+        self.events = RemmeWebSocketEvents(self._api.node_socket, self._api.ssl_mode)

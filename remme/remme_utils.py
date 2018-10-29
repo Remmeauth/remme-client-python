@@ -11,6 +11,14 @@ class RemmeFamilyName(Enum):
     SWAP = "AtomicSwap"
 
 
+def get_private_key_hex_regexp():
+    return r"^[0-9a-f]{64}$"
+
+
+def get_batch_id_regexp():
+    return r"^[0-9a-f]{128}$"
+
+
 def hex_to_bytes(_hex_string):
     # print(f"functions; hex_to_bytes args: {_hex_string}")
     result = bytes.fromhex(_hex_string)

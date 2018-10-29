@@ -1,5 +1,6 @@
 import re
 from remme.remme_methods import RemmeMethods
+from remme.remme_utils import get_batch_id_regexp
 
 
 class RemmeBatch:
@@ -11,7 +12,7 @@ class RemmeBatch:
 
     @staticmethod
     def is_valid_batch_id(_batch_id):
-        return re.match(r"^[0-9a-f]{128}$", _batch_id) is not None
+        return re.match(get_batch_id_regexp(), _batch_id) is not None
 
     async def get_status(self, batch_id):
         if not self.is_valid_batch_id(batch_id):
