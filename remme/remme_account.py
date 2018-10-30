@@ -18,10 +18,10 @@ class RemmeAccount:
 
     @staticmethod
     def is_valid_private_hex(_private_hex):
-        return re.match(RemmePatterns.PRIVATE_KEY.value[0], _private_hex) is not None
+        return re.match(RemmePatterns.PRIVATE_KEY.value, _private_hex) is not None
 
     def __init__(self, private_key_hex):
-        self._family_name = RemmeFamilyName.ACCOUNT.value[0]
+        self._family_name = RemmeFamilyName.ACCOUNT.value
         if private_key_hex and not self.is_valid_private_hex(private_key_hex):
             raise Exception("Invalid private key given!")
         self._context = create_context("secp256k1")
@@ -57,20 +57,40 @@ class RemmeAccount:
 
     @property
     def address(self):
+        """
+
+        :return:
+        """
         return self._address
 
     @property
     def public_key(self):
+        """
+        Get public key that that was generated from public key hex
+        :return: {sawtooth_signing.secp256k1.Secp256k1PublicKey}
+        """
         return self._public_key
 
     @property
     def public_key_hex(self):
+        """
+        Get public key hex that was generated automatically or given by user
+        :return: {string}
+        """
         return self._public_key_hex
 
     @property
     def private_key(self):
+        """
+        Get private key that was generated from user's public key
+        :return: {sawtooth_signing.secp256k1.Secp256k1PrivateKey}
+        """
         return self._private_key
 
     @property
     def private_key_hex(self):
+        """
+        Get private key hex that was generated from user's private key
+        :return: {string}
+        """
         return self._private_key_hex

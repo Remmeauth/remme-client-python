@@ -12,7 +12,7 @@ class RemmeBlockchainInfo:
 
     @staticmethod
     def is_valid_batch_id(_batch_id):
-        return re.match(RemmePatterns.HEADER_SIGNATURE.value[0], _batch_id) is not None
+        return re.match(RemmePatterns.HEADER_SIGNATURE.value, _batch_id) is not None
 
     async def get_batch_by_id(self, batch_id):
         if not self.is_valid_batch_id(batch_id):
