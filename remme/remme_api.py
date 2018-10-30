@@ -7,14 +7,12 @@ class RemmeAPI:
     _node_address = None
     _ssl_mode = None
     _rpc_client = None
-    _node_protocol = None
     _request_URI = None
 
     def __init__(self, network_config):
         self._node_address = network_config['node_address'] + ":" + network_config['node_port']
         self._ssl_mode = network_config['ssl_mode']
-        self._node_protocol = "https://" if self._ssl_mode else "http://"
-        self._request_URI = self._node_protocol + self._node_address
+        self._request_URI = "https://" if self._ssl_mode else "http://" + self._node_address
         self._rpc_client = aiohttp_json_rpc.JsonRpcClient()
 
     async def send_request(self, method, params=None):
