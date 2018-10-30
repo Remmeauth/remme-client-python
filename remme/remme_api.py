@@ -32,7 +32,7 @@ class RemmeAPI:
             await self._rpc_client.disconnect()
 
     @property
-    def node_socket(self):
+    def node_address(self):
         return self._node_address
 
     @property
