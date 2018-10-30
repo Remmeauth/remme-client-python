@@ -3,6 +3,28 @@ from remme.remme_methods import RemmeMethods
 
 
 class RemmeAPI:
+    """
+     Main class that send requests to our REMME protocol;
+     Check JSON-RPC API specification:
+     https://remmeio.atlassian.net/wiki/spaces/WikiREMME/pages/292814862/RPC+API+specification.
+     @param {string} node_address
+     @param {string | int} node_port
+     @param {boolean} ssl_mode
+
+     @example
+     ```python
+        from remme.remme import Remme
+
+        network_config = {
+            'node_address': "localhost",
+            'node_port': "8080",
+            'ssl_mode': False
+        }
+
+        remme = Remme(network_config=network_config)
+        result = await remme._api.send_request(RemmeMethods.SOME_REMME_METHOD)
+        print(f"result {result}")
+    """
 
     _node_address = None
     _ssl_mode = None
