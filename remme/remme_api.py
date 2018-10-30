@@ -20,7 +20,7 @@ class RemmeAPI:
             'node_port': "8080",
             'ssl_mode': False
         }
-
+     ```
         remme = Remme(network_config=network_config)
         result = await remme._api.send_request(RemmeMethods.SOME_REMME_METHOD)
         print(f"result {result}")
@@ -32,12 +32,23 @@ class RemmeAPI:
     _request_URI = None
 
     def __init__(self, network_config):
+        """
+        :param network_config: {dict}
+        """
         self._node_address = network_config['node_address'] + ":" + network_config['node_port']
         self._ssl_mode = network_config['ssl_mode']
         self._request_URI = "https://" if self._ssl_mode else "http://" + self._node_address
         self._rpc_client = aiohttp_json_rpc.JsonRpcClient()
 
     async def send_request(self, method, params=None):
+        """
+        Make and send request with given method and payload.
+        Create url from given network config
+        Get JSON-RPC method and create request config in correspond to this spec https://www.jsonrpc.org/specification.
+        :param method: {RemmeMethods}
+        :param params: {dict}
+        :return: {Promise}
+        """
         if not isinstance(method, RemmeMethods):
             raise Exception("Invalid RPC method given.")
         try:
@@ -54,8 +65,16 @@ class RemmeAPI:
 
     @property
     def node_address(self):
+        """
+        Get node address that was provided by user
+        :return: {string}
+        """
         return self._node_address
 
     @property
     def ssl_mode(self):
+        """
+        Get ssl mode that was provided by user
+        :return: {string}
+        """
         return self._ssl_mode
