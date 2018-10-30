@@ -11,59 +11,39 @@ async def example():
     private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
     # some_remme_address = "03c75297511ce0cfd1315a045dd0db2a4a1710efed94f0f94ad993b5dfe2e33b62"
 
+    # I want to create tokens for testing
+    # I create some account, and generate public key to receive funds.
+
     remme = Remme(private_key_hex=private_key_hex)
-    generated_private_key_hex = remme._account.public_key_hex
-    sender_address = remme._account.address
-    print(f"generated private key hex {generated_private_key_hex}")
-    print(f"sender address {sender_address}")
+    receiver_public_key_hex = remme._account.public_key_hex
+    print(f"generated private key hex for receiving funds {receiver_public_key_hex}")
+
+    # Next I get private key of my Node
 
     node_key = await remme._api.send_request(RemmeMethods.NODE_PRIVATE_KEY)
     print(f"node key {node_key}")
 
-    query = {"start": 0}
-    blocks = await remme.blockchain_info.get_blocks(query)
-    print(f"blocks {blocks}")
+    # Next I create account with Node private key
 
-    atomic_swap_public_key = await remme.swap.get_public_key()
-    print(f"atomic swap public key {atomic_swap_public_key}")
+    remme = Remme(private_key_hex=node_key)
 
-    node_info = await remme.blockchain_info.get_network_status()
-    print(f"node info {node_info}")
+    # I create transaction signed by Node to send funds to test account
 
-    # block_number = await remme._rest.get_block_number()
-    # print(f"block number {block_number}")
-
-    # token
-
-    beforeBalance = await remme.token.get_balance(reciver_address)
+    beforeBalance = await remme.token.get_balance(receiver_public_key_hex)
     print(f'balance is: {beforeBalance} REM')  # >>> balance: 0
-    transaction_result = await remme.token.transfer(reciver_address, 1000)
+    transaction_result = await remme.token.transfer(receiver_public_key_hex, 10)
 
-    print(f"transaction result: {transaction_result}")
+    batch_id = transaction_result.data['batch_id'][0]
 
-    def transaction_callback(event, data):
-        print(event)
-        print(data)
+    print(f"batch id {batch_id}")
+    await asyncio.sleep(10)
+    afterBalance = await remme.token.get_balance(receiver_public_key_hex)
+    print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
 
-    # await transaction_result.connect_to_websocket(transaction_callback)
+    await asyncio.sleep(10)
+    batch_status = await remme.batch.get_status(batch_id)
+    print(f"batch status {batch_status}")
 
-
-    # print(f"batch id {batch_id}")
-    # await asyncio.sleep(10)
-    # afterBalance = await remme.token.get_balance(reciver_address)
-    # print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
-    #
-    # await asyncio.sleep(10)
-    # batch_status = await remme.batch.get_status(batch_id)
-    # print(f"batch status {batch_status}")
-
-    # web socket
-
-
-
-
-    # batch = await remme.blockchain_info.get_batch_by_id(batch_id)
-    # print(f"batch {batch}")
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(example())

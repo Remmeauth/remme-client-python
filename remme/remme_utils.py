@@ -84,3 +84,11 @@ def create_nonce():
 
 def sha512_hexdigest(data):
     return hashlib.sha512(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
+
+
+def is_hex(data):
+    try:
+        int(data, 16)
+        return True
+    except ValueError:
+        return False

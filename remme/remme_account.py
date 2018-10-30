@@ -1,6 +1,6 @@
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey
 from sawtooth_signing import create_context, CryptoFactory
-from remme.remme_utils import hex_to_bytes, generate_address, RemmeFamilyName
+from remme.remme_utils import hex_to_bytes, generate_address, RemmeFamilyName, is_hex
 from remme.remme_patterns import RemmePatterns
 import re
 
@@ -38,9 +38,11 @@ class RemmeAccount:
         self._address = generate_address(self._family_name, self._public_key_hex)
 
     def sign(self, transaction):
-        if type(transaction) == str:
+        if isinstance(transaction, str) and is_hex(transaction):
             transaction = hex_to_bytes(transaction)
-        return self._signer.sign(transaction)
+        if isinstance(transaction, bytes):
+            return self._signer.sign(transaction)
+        raise Exception("Invalid type of transaction")
 
     def verify(self, signature, transaction):
         if not isinstance(transaction, bytes):
