@@ -16,13 +16,9 @@ class RemmeAccount:
     _public_key = None
     _address = None
 
-    @staticmethod
-    def is_valid_private_hex(_private_hex):
-        return re.match(RemmePatterns.PRIVATE_KEY.value, _private_hex) is not None
-
     def __init__(self, private_key_hex):
         self._family_name = RemmeFamilyName.ACCOUNT.value
-        if private_key_hex and not self.is_valid_private_hex(private_key_hex):
+        if private_key_hex and re.match(RemmePatterns.PRIVATE_KEY.value, private_key_hex) is None:
             raise Exception("Invalid private key given!")
         self._context = create_context("secp256k1")
         if not private_key_hex:
@@ -40,9 +36,9 @@ class RemmeAccount:
     def sign(self, transaction):
         if isinstance(transaction, str) and is_hex(transaction):
             transaction = hex_to_bytes(transaction)
-        if isinstance(transaction, bytes):
-            return self._signer.sign(transaction)
-        raise Exception("Invalid type of transaction")
+        if not isinstance(transaction, bytes):
+            raise Exception("Invalid type of transaction")
+        return self._signer.sign(transaction)
 
     def verify(self, signature, transaction):
         if not isinstance(transaction, bytes):
@@ -53,13 +49,17 @@ class RemmeAccount:
 
     @property
     def family_name(self):
+        """
+        Get constant account transaction's family name
+        :return: {string}
+        """
         return self._family_name
 
     @property
     def address(self):
         """
-
-        :return:
+        Get address generated from public key hex
+        :return: {bytes}
         """
         return self._address
 
