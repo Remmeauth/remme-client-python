@@ -27,6 +27,10 @@ def bytes_to_utf8(_bytes):
     return _bytes.decode('UTF-8')
 
 
+def is_string_or_bytes(message):
+    return isinstance(message, str) or isinstance(message, bytes)
+
+
 def is_valid_hex_string(message):
     return isinstance(message, str) and is_hex(message)
 

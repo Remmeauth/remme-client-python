@@ -1,6 +1,6 @@
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey
 from sawtooth_signing import create_context, CryptoFactory
-from remme.remme_utils import generate_address, bytes_to_utf8, utf8_to_bytes
+from remme.remme_utils import generate_address, is_string_or_bytes, utf8_to_bytes
 from remme.remme_patterns import RemmePatterns
 from remme.remme_family_name import RemmeFamilyName
 import re
@@ -106,6 +106,8 @@ class RemmeAccount:
         :param transaction: {string | bytes}
         :return: {boolean}
         """
+        if not is_string_or_bytes(signature) or not is_string_or_bytes(transaction):
+            raise Exception("Invalid parameters given. Expected string or bytes")
         return self._context.verify(signature, transaction, self._public_key)
 
     @property
