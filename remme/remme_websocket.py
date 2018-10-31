@@ -4,6 +4,63 @@ import json
 
 
 class RemmeWebSocket:
+    """
+    Class that work with sockets. Class can be used for inheritance.
+    This class is used for response on transaction sending.
+    Each method that return batch_id, for truth return class that inherit from RemmeWebSocket with preset data.
+    So for example:
+    @example
+    ```python
+    remme = new Remme()
+    some_remme_address = "03c2e53acce583c8bb2382319f4dee3e816b67f3a733ef90fe3329062251d0c638";
+    transaction_result = await remme.token.transfer(some_remme_address, 10);
+
+    # transaction_result is inherit from RemmeWebSocket and self.data = {
+    #        batch_ids: [
+    #           transactionResult.batchId,
+    #        ],
+    #    };
+    # so you can connect_to_web_socket easy. Just:
+
+    transactionResult.connectToWebSocket((err: Error, res: any) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log(res);
+        mySocketConnection.closeConnection();
+    });
+    ```
+
+    But you also can use your class for work with WebSockets. Just inherit it from RemmeWebSocket, like this:
+    ```python
+    class MySocketConnection(RemmeWebSocket) {
+         def __init__({node_address: node_address, ssl_mode: ssl_mode, data: data}) {
+             super(node_address, ssl_mode);
+             self.data = data;
+         }
+    }
+
+    remme_web_socket = mySocketConnection({
+         node_address: "localhost:8080",
+         ssl_mode: False,
+         data: {
+             batch_ids: [
+                transaction_result.batch_id,
+             ],
+         }
+    });
+
+    mySocketConnection.connectToWebSocket((err: Error, res: any) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log(res);
+        mySocketConnection.closeConnection();
+    });
+    ```
+    """
 
     _is_event = None
     _socket_address = None

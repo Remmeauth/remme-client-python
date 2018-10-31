@@ -20,15 +20,11 @@ def dict_to_base64(_dict):
 
 
 def utf8_to_bytes(_string):
-    return _string if isinstance(_string, bytes) else _string.encode('UTF-8')
+    return _string.encode('UTF-8')
 
 
 def bytes_to_utf8(_bytes):
-    return _bytes if isinstance(_bytes, str) else _bytes.decode('UTF-8')
-
-
-def to_hex(_string):
-    return utf8_to_bytes(_string).hex()
+    return _bytes.decode('UTF-8')
 
 
 def is_valid_hex_string(message):

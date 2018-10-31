@@ -84,7 +84,8 @@ class RemmeAccount:
         :param transaction: {string | bytes}
         :return: {hex_encoded_string}
         """
-        transaction = utf8_to_bytes(transaction)
+        if isinstance(transaction, str):
+            transaction = utf8_to_bytes(transaction)
         return self._signer.sign(transaction)
 
     def verify(self, signature, transaction):
@@ -105,8 +106,10 @@ class RemmeAccount:
         :param transaction: {string | bytes}
         :return: {boolean}
         """
-        signature = bytes_to_utf8(signature)
-        transaction = utf8_to_bytes(transaction)
+        if isinstance(signature, bytes):
+            signature = bytes_to_utf8(signature)
+        if isinstance(transaction, str):
+            transaction = utf8_to_bytes(transaction)
         return self._context.verify(signature, transaction, self._public_key)
 
     @property
