@@ -106,10 +106,6 @@ class RemmeAccount:
         :param transaction: {string | bytes}
         :return: {boolean}
         """
-        if isinstance(signature, bytes):
-            signature = bytes_to_utf8(signature)
-        if isinstance(transaction, str):
-            transaction = utf8_to_bytes(transaction)
         return self._context.verify(signature, transaction, self._public_key)
 
     @property
