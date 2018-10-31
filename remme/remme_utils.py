@@ -2,20 +2,6 @@ import hashlib
 import base64
 import math
 import random
-from enum import Enum
-
-
-class RemmeFamilyName(Enum):
-    ACCOUNT = "account"
-    PUBLIC_KEY = "pub_key"
-    SWAP = "AtomicSwap"
-
-
-def hex_to_bytes(_hex_string):
-    # print(f"functions; hex_to_bytes args: {_hex_string}")
-    result = bytes.fromhex(_hex_string)
-    # print(f"functions; hex_to_bytes result: {result}")
-    return result
 
 
 def bytes_to_hex(_bytes):
@@ -41,28 +27,16 @@ def to_hex(_string):
     return utf8_to_bytes(_string).hex()
 
 
-def to_hex_string(_byte_array):
-    raise NotImplementedError
+def is_valid_hex_string(message):
+    return isinstance(message, str) and is_hex(message)
 
 
-def to_utf8_array(_string):
-    raise NotImplementedError
-
-
-def certificate_to_pem(certificate):
-    raise NotImplementedError
-
-
-def certificate_from_pem(certificate):
-    raise NotImplementedError
-
-
-def public_key_to_pem(public_key):
-    raise NotImplementedError
-
-
-def public_key_from_pem(public_key):
-    raise NotImplementedError
+def hex_to_bytes(message):
+    if isinstance(message, bytes):
+        return message
+    if is_valid_hex_string(message):
+        return bytes.fromhex(message)
+    raise Exception("Invalid type of message given. Expected hex string or bytes.")
 
 
 def generate_address(_family_name, _public_key_to):

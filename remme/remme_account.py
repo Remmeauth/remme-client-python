@@ -1,7 +1,8 @@
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey
 from sawtooth_signing import create_context, CryptoFactory
-from remme.remme_utils import hex_to_bytes, generate_address, RemmeFamilyName, is_hex
+from remme.remme_utils import generate_address, hex_to_bytes, is_valid_hex_string
 from remme.remme_patterns import RemmePatterns
+from remme.remme_family_name import RemmeFamilyName
 import re
 
 
@@ -71,20 +72,6 @@ class RemmeAccount:
         self._public_key_hex = self._public_key.as_hex()
         self._address = generate_address(self._family_name, self._public_key_hex)
 
-    @staticmethod
-    def _validate_byte_message(message):
-        if isinstance(message, bytes):
-            return message
-        if isinstance(message, str) and is_hex(message):
-            return hex_to_bytes(message)
-        raise Exception(f"Invalid type of message given. Expected hex string or bytes.")
-
-    @staticmethod
-    def _validate_string_hex_message(message):
-        if isinstance(message, str) and is_hex(message):
-            return message
-        raise Exception(f"Invalid type of message given. Expected hex string.")
-
     def sign(self, transaction):
         """
         Get transaction and sign it by signer
@@ -97,7 +84,7 @@ class RemmeAccount:
         :param transaction: {hex_encoded_string | bytes}
         :return: {hex_encoded_string}
         """
-        transaction = self._validate_byte_message(transaction)
+        transaction = hex_to_bytes(transaction)
         return self._signer.sign(transaction)
 
     def verify(self, signature, transaction):
@@ -118,14 +105,16 @@ class RemmeAccount:
         :param transaction: {hex_encoded_string | bytes}
         :return: {boolean}
         """
-        transaction = self._validate_byte_message(transaction)
-        signature = self._validate_string_hex_message(signature)
+        if not is_valid_hex_string(signature):
+            raise Exception("Invalid type of message given. Expected hex string.")
+        transaction = hex_to_bytes(transaction)
         return self._context.verify(signature, transaction, self._public_key)
 
     @property
     def family_name(self):
         """
-        Get constant account transaction's family name
+        Family name for generate address for this account in the blockchain.
+        (https://docs.remme.io/remme-core/docs/family-account.html)
         :return: {string}
         """
         return self._family_name
@@ -133,8 +122,9 @@ class RemmeAccount:
     @property
     def address(self):
         """
-        Get address generated from public key hex
-        :return: {bytes}
+        Address of this account in blockchain.
+        (https://docs.remme.io/remme-core/docs/family-account.html#addressing)
+        :return: {string}
         """
         return self._address
 
