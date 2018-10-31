@@ -1,6 +1,6 @@
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey
 from sawtooth_signing import create_context, CryptoFactory
-from remme.remme_utils import generate_address, hex_to_bytes, is_valid_hex_string
+from remme.remme_utils import generate_address, bytes_to_utf8, utf8_to_bytes
 from remme.remme_patterns import RemmePatterns
 from remme.remme_family_name import RemmeFamilyName
 import re
@@ -11,20 +11,20 @@ class RemmeAccount:
     Account that is used for signing transactions and storing public keys which he was signed.
     @example
     ```python
-    account = RemmeAccount(private_key_hex="ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9");
-    print(account.private_key_hex); # "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9";
+    account = RemmeAccount(private_key_hex="ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9")
+    print(account.private_key_hex) # "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
 
-    another_account = RemmeAccount();
-    print(anotherAccount.private_key_hex) # "b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f";
+    another_account = RemmeAccount()
+    print(anotherAccount.private_key_hex) # "b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f"
 
-    data = "transaction data";
-    signed_data = account.sign(data);
+    data = "transaction data"
+    signed_data = account.sign(data)
 
-    is_verify = account.verify(signed_data, data);
-    print(is_verify); // True
+    is_verify = account.verify(signed_data, data)
+    print(is_verify) // True
 
-    is_verify_in_another_account = another_account.verify(signed_data, data);
-    print(is_verify_in_another_account); // False
+    is_verify_in_another_account = another_account.verify(signed_data, data)
+    print(is_verify_in_another_account) // False
     ```
     """
 
@@ -43,16 +43,16 @@ class RemmeAccount:
         generate public key from private key and generate account address by using public key and family name
         (https://docs.remme.io/remme-core/docs/family-account.html#addressing)
         @example
-        Get private key;
+        Get private key
         ```python
-        account = RemmeAccount("ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9");
-        print(account.private_key_hex); // "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9";
+        account = RemmeAccount("ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9")
+        print(account.private_key_hex) // "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
         ```
 
-        Generate new private key;
+        Generate new private key
         ```python
-        account = RemmeAccount();
-        print(account.private_key_hex); // "b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f";
+        account = RemmeAccount()
+        print(account.private_key_hex) // "b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f"
         ```
         :param private_key_hex: {string}
         """
@@ -77,14 +77,14 @@ class RemmeAccount:
         Get transaction and sign it by signer
         @example
         ```python
-        data = "transaction data";
-        signed_data = account.sign(data);
-        print(signedData);
+        data = "transaction data"
+        signed_data = account.sign(data)
+        print(signedData)
         ```
-        :param transaction: {hex_encoded_string | bytes}
+        :param transaction: {string | bytes}
         :return: {hex_encoded_string}
         """
-        transaction = hex_to_bytes(transaction)
+        transaction = utf8_to_bytes(transaction)
         return self._signer.sign(transaction)
 
     def verify(self, signature, transaction):
@@ -92,22 +92,21 @@ class RemmeAccount:
         Verify given signature to given transaction
         @example
         ```python
-        data = "transaction data";
-        signed_data = account.sign(data);
+        data = "transaction data"
+        signed_data = account.sign(data)
 
-        is_verify = account.verify(signed_data, data);
-        print(is_verify); # True
+        is_verify = account.verify(signed_data, data)
+        print(is_verify) # True
 
-        is_verify_in_another_account = another_account.verify(signed_data, data);
-        print(is_verify_in_another_account); # False
+        is_verify_in_another_account = another_account.verify(signed_data, data)
+        print(is_verify_in_another_account) # False
         ```
-        :param signature: {hex_encoded_string}
-        :param transaction: {hex_encoded_string | bytes}
+        :param signature: {string | bytes}
+        :param transaction: {string | bytes}
         :return: {boolean}
         """
-        if not is_valid_hex_string(signature):
-            raise Exception("Invalid type of message given. Expected hex string.")
-        transaction = hex_to_bytes(transaction)
+        signature = bytes_to_utf8(signature)
+        transaction = utf8_to_bytes(transaction)
         return self._context.verify(signature, transaction, self._public_key)
 
     @property

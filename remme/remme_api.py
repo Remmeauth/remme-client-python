@@ -4,7 +4,7 @@ from remme.remme_methods import RemmeMethods
 
 class RemmeAPI:
     """
-     Main class that send requests to our REMME protocol;
+     Main class that send requests to our REMME protocol
      Check JSON-RPC API specification:
      https://remmeio.atlassian.net/wiki/spaces/WikiREMME/pages/292814862/RPC+API+specification.
      @param {string} node_address
