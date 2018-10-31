@@ -77,13 +77,13 @@ class RemmeAccount:
             return message
         if isinstance(message, str) and is_hex(message):
             return hex_to_bytes(message)
-        raise Exception(f"Invalid type of message given. Expected hex string or bytes. {type(message)} given")
+        raise Exception(f"Invalid type of message given. Expected hex string or bytes.")
 
     @staticmethod
     def _validate_string_hex_message(message):
         if isinstance(message, str) and is_hex(message):
             return message
-        raise Exception(f"Invalid type of message given. Expected hex string. {type(message)} given")
+        raise Exception(f"Invalid type of message given. Expected hex string.")
 
     def sign(self, transaction):
         """
