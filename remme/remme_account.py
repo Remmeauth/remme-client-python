@@ -11,20 +11,20 @@ class RemmeAccount:
     Account that is used for signing transactions and storing public keys which he was signed.
     @example
     ```python
-    account = RemmeAccount(private_key_hex="ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9")
-    print(account.private_key_hex) # "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
+    remme = Remme(private_key_hex="ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9")
+    print(remme._account.private_key_hex)  # "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
 
-    another_account = RemmeAccount()
-    print(anotherAccount.private_key_hex) # "b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f"
+    another_remme = Remme()
+    print(another_remme._account.private_key_hex)  # "b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f"
 
     data = "transaction data"
-    signed_data = account.sign(data)
+    signed_data = remme._account.sign(data)
 
-    is_verify = account.verify(signed_data, data)
-    print(is_verify) // True
+    is_verify = remme._account.verify(signed_data, data)
+    print(is_verify)  # True
 
-    is_verify_in_another_account = another_account.verify(signed_data, data)
-    print(is_verify_in_another_account) // False
+    is_verify_in_another_account = another_remme._account.verify(signed_data, data)
+    print(is_verify_in_another_account)  # False
     ```
     """
 
@@ -108,6 +108,8 @@ class RemmeAccount:
         """
         if not is_string_or_bytes(signature) or not is_string_or_bytes(transaction):
             raise Exception("Invalid parameters given. Expected string or bytes")
+        if isinstance(transaction, str):
+            transaction = utf8_to_bytes(transaction)
         return self._context.verify(signature, transaction, self._public_key)
 
     @property
