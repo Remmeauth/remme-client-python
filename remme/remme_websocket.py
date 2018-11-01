@@ -93,7 +93,6 @@ class RemmeWebSocket:
         """
         session = ClientSession()
         ws_url = self._get_subscribe_url()
-        print(f"ws url : {ws_url}")  # default: ws://localhost:8080/ws
         async with session.ws_connect(ws_url) as self._socket:
             await self._socket.send_str(self._get_socket_query())
             async for msg in self._socket:
