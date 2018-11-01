@@ -152,7 +152,7 @@ class RemmeWebSocket:
         """
         if not self._socket:
             raise Exception("Socket is not running")
-        # await self._socket.send_str(self._get_socket_query(is_subscribe=False))
+        await self._socket.send_str(self._get_socket_query(is_subscribe=False))
         await self._socket.close()
         await self._session.close()
         self._socket = None
