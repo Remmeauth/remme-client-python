@@ -5,7 +5,7 @@ from remme.remme_methods import RemmeMethods
 from remme.models.base_transaction_response import BaseTransactionResponse
 
 
-class RemmeTransactionService():
+class RemmeTransactionService:
 
     _remme_api = None
     _remme_account = None
