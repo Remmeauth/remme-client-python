@@ -100,6 +100,14 @@ class RemmeWebSocket:
 
         transactionResult.connect_to_web_socket(call_back, err_back)
         ```
+        Can be used only with one callback
+        ```python
+        def call_back(result):
+            print(resul)
+            my_socket_connection.close_connection()
+
+        transactionResult.connect_to_web_socket(call_back)
+        ```
         :param call_back: {function}
         :param err_back: {function | None}
         :return:
