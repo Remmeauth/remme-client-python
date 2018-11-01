@@ -83,44 +83,26 @@ class RemmeWebSocket:
         self._node_address = node_address
         self._ssl_mode = ssl_mode
 
-    async def connect_to_web_socket(self, call_back, err_back=None):
+    async def connect_to_web_socket(self):
         """
         Method for connect to WebSocket.
         In this method implement new WebSocket instance and provided some listeners for onopen, onmessage, onclose.
         This method get callback that will be called when get events: onmessage, onclose.
         For this method you should set property data.
         ```python
-        def call_back(result):
-            print(resul)
-            my_socket_connection.close_connection()
-
-        def err_back(result):
-            print(result)
-            my_socket_connection.close_connection()
-
-        transactionResult.connect_to_web_socket(call_back, err_back)
-        ```
-        Can be used only with one callback
-        ```python
-        def call_back(result):
-            print(resul)
-            my_socket_connection.close_connection()
+        result = await transactionResult.connect_to_web_socket(call_back)
+        print(result)
+        my_socket_connection.close_connection()
 
         transactionResult.connect_to_web_socket(call_back)
         ```
-        :param call_back: {function}
-        :param err_back: {function | None}
-        :return:
+        :return: {}
         """
         self._session = ClientSession()
         ws_url = self._get_subscribe_url()
-        async with self._session.ws_connect(ws_url) as self._socket:
-            await self._socket.send_str(self._get_socket_query())
-            async for msg in self._socket:
-                if msg.type == WSMsgType.TEXT:
-                    await call_back(msg.data)
-                else:
-                    await err_back(msg.data)
+        self._socket = await self._session.ws_connect(ws_url)
+        await self._socket.send_str(self._get_socket_query())
+        return self
 
     def _get_subscribe_url(self):
         protocol = "wss://" if self._ssl_mode else "ws://"
