@@ -92,7 +92,9 @@ class RemmeWebSocket:
         :return:
         """
         session = ClientSession()
-        async with session.ws_connect(self._get_subscribe_url()) as ws:
+        ws_url = self._get_subscribe_url()
+        print(f"ws url : {ws_url}")  # default: ws://localhost:8080/ws
+        async with session.ws_connect(ws_url) as ws:
             async for msg in ws:
                 print(f"Message received from server {msg}")
                 callback(msg)
