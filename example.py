@@ -1,5 +1,7 @@
+from remme.models.base_transaction_response import BaseTransactionResponse
 from remme.remme import Remme
 from remme.remme_methods import RemmeMethods
+from remme.remme_websocket import RemmeWebSocket
 import asyncio
 
 
@@ -47,6 +49,12 @@ async def example():
         await asyncio.sleep(10)
         batch_status = await remme.batch.get_status(batch_id)
         print(f"batch status {batch_status}")
+
+    # using web socket as context manager
+
+    # async with BaseTransactionResponse(node_address="localhost:8080", ssl_mode=False, batch_id=batch_id) as ws:
+    #     print("connected")
+    #     await ws.close_web_socket()
 
 
 loop = asyncio.get_event_loop()

@@ -16,3 +16,9 @@ class BaseTransactionResponse(RemmeWebSocket):
             ]
         }
         print("base transaction response", self)
+
+    async def __aenter__(self):
+        return await super().__aenter__()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await super().__aexit__(exc_type, exc_val, exc_tb)
