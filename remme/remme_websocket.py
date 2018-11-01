@@ -101,7 +101,8 @@ class RemmeWebSocket:
         self._session = ClientSession()
         ws_url = self._get_subscribe_url()
         self._socket = await self._session.ws_connect(ws_url)
-        await self._socket.send_str(self._get_socket_query())
+        if self._data:
+            await self._socket.send_str(self._get_socket_query())
         return self
 
     def _get_subscribe_url(self):
@@ -134,7 +135,8 @@ class RemmeWebSocket:
         """
         if not self._socket:
             raise Exception("Socket is not running")
-        await self._socket.send_str(self._get_socket_query(is_subscribe=False))
+        if self._data:
+            await self._socket.send_str(self._get_socket_query(is_subscribe=False))
         await self._socket.close()
         await self._session.close()
         self._socket = None
@@ -155,3 +157,13 @@ class RemmeWebSocket:
         :return: {string}
         """
         return self._ssl_mode
+
+    async def __aenter__(self):
+        if not self._socket:
+            await self.connect_to_web_socket()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if self._socket:
+            await self.close_web_socket()
+        return False
