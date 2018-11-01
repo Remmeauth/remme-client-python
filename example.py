@@ -1,6 +1,7 @@
 from remme.remme import Remme
 from remme.remme_methods import RemmeMethods
 import asyncio
+import json
 
 
 async def example():
@@ -34,19 +35,20 @@ async def example():
     transaction_result = await remme.token.transfer(receiver_public_key_hex, 10)
 
     async def call_back(result):
-        print(f"Callback result {result}")
+        print(f"callback result {result}")
         await transaction_result.close_web_socket()
 
     await transaction_result.connect_to_web_socket(call_back)
 
-    # print(f"batch id {batch_id}")
-    # await asyncio.sleep(10)
-    # afterBalance = await remme.token.get_balance(receiver_public_key_hex)
-    # print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
-    #
-    # await asyncio.sleep(10)
-    # batch_status = await remme.batch.get_status(batch_id)
-    # print(f"batch status {batch_status}")
+    batch_id = transaction_result._data['batch_id'][0]
+    print(f"batch id {batch_id}")
+    await asyncio.sleep(10)
+    afterBalance = await remme.token.get_balance(receiver_public_key_hex)
+    print(f'balance is: {afterBalance} REM')  # >>> balance: 1000
+
+    await asyncio.sleep(10)
+    batch_status = await remme.batch.get_status(batch_id)
+    print(f"batch status {batch_status}")
 
 
 loop = asyncio.get_event_loop()
