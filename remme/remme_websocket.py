@@ -67,6 +67,7 @@ class RemmeWebSocket:
     _ssl_mode = None
     _data = None
     _socket = None
+    _session = None
 
     def __init__(self, node_address, ssl_mode):
         """
@@ -82,22 +83,36 @@ class RemmeWebSocket:
         self._node_address = node_address
         self._ssl_mode = ssl_mode
 
-    async def connect_to_web_socket(self, callback):
+    async def connect_to_web_socket(self, call_back, err_back=None):
         """
         Method for connect to WebSocket.
         In this method implement new WebSocket instance and provided some listeners for onopen, onmessage, onclose.
         This method get callback that will be called when get events: onmessage, onclose.
         For this method you should set property data.
-        :param callback: {function}
+        ```python
+        def call_back(result):
+            print(resul)
+            my_socket_connection.close_connection()
+
+        def err_back(result):
+            print(result)
+            my_socket_connection.close_connection()
+
+        transactionResult.connect_to_web_socket(call_back, err_back)
+        ```
+        :param call_back: {function}
+        :param err_back: {function | None}
         :return:
         """
-        session = ClientSession()
+        self._session = ClientSession()
         ws_url = self._get_subscribe_url()
-        async with session.ws_connect(ws_url) as self._socket:
+        async with self._session.ws_connect(ws_url) as self._socket:
             await self._socket.send_str(self._get_socket_query())
             async for msg in self._socket:
-                print(f"Message received from server {msg}")
-                callback(msg)
+                if msg.type == WSMsgType.TEXT:
+                    await call_back(msg.data)
+                else:
+                    await err_back(msg.data)
 
     def _get_subscribe_url(self):
         protocol = "wss://" if self._ssl_mode else "ws://"
@@ -122,17 +137,18 @@ class RemmeWebSocket:
             }
         return json.dumps(query)
 
-    def close_web_socket(self):
+    async def close_web_socket(self):
         """
         Call this method when your connection is open for close it.
         :return: None
         """
         if not self._socket:
             raise Exception("Socket is not running")
-        if self._socket.ready_state == 1:
-            self._socket.send(self._get_socket_query(is_subscribe=False))
-        self._socket.close()
+        # await self._socket.send_str(self._get_socket_query(is_subscribe=False))
+        await self._socket.close()
+        await self._session.close()
         self._socket = None
+        self._session = None
 
     @property
     def socket_address(self):

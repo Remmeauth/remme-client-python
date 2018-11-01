@@ -33,10 +33,11 @@ async def example():
     print(f'balance is: {beforeBalance} REM')  # >>> balance: 0
     transaction_result = await remme.token.transfer(receiver_public_key_hex, 10)
 
-    def callback(result):
+    async def call_back(result):
         print(f"Callback result {result}")
+        await transaction_result.close_web_socket()
 
-    await transaction_result.connect_to_web_socket(callback)
+    await transaction_result.connect_to_web_socket(call_back)
 
     # print(f"batch id {batch_id}")
     # await asyncio.sleep(10)
