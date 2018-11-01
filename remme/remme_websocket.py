@@ -82,14 +82,20 @@ class RemmeWebSocket:
         self._node_address = node_address
         self._ssl_mode = ssl_mode
 
-    async def connect_to_websocket(self, callback):
+    async def connect_to_web_socket(self, callback):
+        """
+        Method for connect to WebSocket.
+        In this method implement new WebSocket instance and provided some listeners for onopen, onmessage, onclose.
+        This method get callback that will be called when get events: onmessage, onclose.
+        For this method you should set property data.
+        :param callback: {function}
+        :return:
+        """
         session = ClientSession()
-        self._socket = await session.ws_connect(self._get_subscribe_url())
-        async for msg in self._socket:
-            if msg.type == WSMsgType.TEXT:
-                print(msg)
-            elif msg.type == WSMsgType.ERROR:
-                print(msg)
+        async with session.ws_connect(self._get_subscribe_url()) as ws:
+            async for msg in ws:
+                print(f"Message received from server {msg}")
+                callback(msg)
 
     def _get_subscribe_url(self):
         protocol = "wss://" if self._ssl_mode else "ws://"
@@ -114,7 +120,11 @@ class RemmeWebSocket:
             }
         return json.dumps(query)
 
-    def close_websocket(self):
+    def close_web_socket(self):
+        """
+        Call this method when your connection is open for close it.
+        :return: None
+        """
         if not self._socket:
             raise Exception("Socket is not running")
         if self._socket.ready_state == 1:
@@ -124,8 +134,16 @@ class RemmeWebSocket:
 
     @property
     def socket_address(self):
+        """
+        Get node address that was provided by user
+        :return: {string}
+        """
         return self._node_address
 
     @property
     def ssl_mode(self):
+        """
+        Get ssl mode that was provided by user
+        :return: {string}
+        """
         return self._ssl_mode

@@ -8,7 +8,7 @@ class BaseTransactionResponse(RemmeWebSocket):
     batch_id = None
 
     def __init__(self, node_address, ssl_mode, batch_id):
-        super().__init__(node_address, ssl_mode)
+        super(BaseTransactionResponse, self).__init__(node_address, ssl_mode)
         self.batch_id = batch_id
         self.data = {
             "batch_id": [
