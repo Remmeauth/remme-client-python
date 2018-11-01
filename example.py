@@ -1,7 +1,6 @@
 from remme.remme import Remme
 from remme.remme_methods import RemmeMethods
 import asyncio
-import json
 
 
 async def example():
