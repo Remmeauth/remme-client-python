@@ -1,7 +1,4 @@
-from remme.models.base_transaction_response import BaseTransactionResponse
 from remme.remme import Remme
-from remme.remme_methods import RemmeMethods
-from remme.remme_websocket import RemmeWebSocket
 import asyncio
 import json
 
@@ -17,16 +14,16 @@ async def example():
     # start remme; some account without funds
     remme_receiver = Remme(private_key_hex=receiver_private_key_hex)
     receiver_public_key_hex = remme_receiver.account.public_key_hex
-    print(f"generated private key hex for receiving funds {receiver_public_key_hex}")
+    print(f"generated private key hex for receiving funds {receiver_public_key_hex}\n")
 
     # start another remme; some account with funds
     remme_sender = Remme(private_key_hex=sender_private_key_hex)
 
     # check balance before transaction
     beforeBalance = await remme_receiver.token.get_balance(receiver_public_key_hex)
-    print(f'balance is : {beforeBalance} REM')
+    print(f'balance is : {beforeBalance} REM\n')
     transaction_result = await remme_sender.token.transfer(receiver_public_key_hex, 10)
-    print(f'sending tokens... batch id : {transaction_result.batch_id}')
+    print(f'sending tokens... batch id : {transaction_result.batch_id}\n')
 
     ws_connection = await transaction_result.connect_to_web_socket()
     async for msg in ws_connection.socket:
@@ -35,10 +32,6 @@ async def example():
         if response['status'] == "COMMITTED":
             afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
             print(f'balance is: {afterBalance} REM')
-
-    # await asyncio.sleep(10)
-    # batch_status = await remme_sender.batch.get_status(batch_id)
-    # print(f"batch status {batch_status}")
 
 
 loop = asyncio.get_event_loop()
