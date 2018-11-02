@@ -25,13 +25,17 @@ async def example():
     transaction_result = await remme_sender.token.transfer(receiver_public_key_hex, 10)
     print(f'sending tokens... batch id : {transaction_result.batch_id}\n')
 
-    ws_connection = await transaction_result.connect_to_web_socket()
-    async for msg in ws_connection.socket:
-        print(f"websocket message {msg.data}")
-        response = json.loads(msg.data)
-        if response['status'] == "COMMITTED":
-            afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
-            print(f'balance is: {afterBalance} REM')
+    # ws_connection = await transaction_result.connect_to_web_socket()
+    # async for msg in ws_connection.socket:
+    #     print(f"websocket message {msg.data}")
+    #     response = json.loads(msg.data)
+    #     if response['status'] == "COMMITTED":
+    #         afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
+    #         print(f'balance is: {afterBalance} REM')
+
+    await asyncio.sleep(20)
+    afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
+    print(f'balance is: {afterBalance} REM')
 
 
 loop = asyncio.get_event_loop()

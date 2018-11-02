@@ -15,7 +15,6 @@ class BaseTransactionResponse(RemmeWebSocket):
                 self._batch_id
             ]
         }
-        print("base transaction response", self)
 
     @property
     def batch_id(self):

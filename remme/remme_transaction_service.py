@@ -30,9 +30,9 @@ class RemmeTransactionService:
         ).SerializeToString()
         # print(f"tx_header_bytes : {txn_header_bytes}")
         signature = self._remme_account.sign(txn_header_bytes)
-        print(f"tx signature : {signature}")
-        is_valid = self._remme_account.verify(signature, txn_header_bytes)
-        print(f"tx is valid ? - {is_valid}")
+        # print(f"tx signature : {signature}")
+        # is_valid = self._remme_account.verify(signature, txn_header_bytes)
+        # print(f"tx is valid ? - {is_valid}")
         txn = Transaction(
             header=txn_header_bytes,
             header_signature=signature,
