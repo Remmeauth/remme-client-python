@@ -36,11 +36,11 @@ async def example():
     transaction_result = await remme.token.transfer(receiver_public_key_hex, 10)
 
     ws_connection = await transaction_result.connect_to_web_socket()
-    async for msg in ws_connection._socket:
+    async for msg in ws_connection.socket:
         await ws_connection.close_web_socket()
         print(f"websocket message {msg.data}")
 
-        batch_id = transaction_result._data['batch_id'][0]
+        batch_id = transaction_result.data['batch_id'][0]
         print(f"batch id {batch_id}")
         await asyncio.sleep(10)
         afterBalance = await remme.token.get_balance(receiver_public_key_hex)

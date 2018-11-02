@@ -65,9 +65,9 @@ class RemmeWebSocket:
     _is_event = None
     _node_address = None
     _ssl_mode = None
-    _data = None
-    _socket = None
     _session = None
+    socket = None
+    data = None
 
     def __init__(self, node_address, ssl_mode):
         """
@@ -100,9 +100,8 @@ class RemmeWebSocket:
         """
         self._session = ClientSession()
         ws_url = self._get_subscribe_url()
-        self._socket = await self._session.ws_connect(ws_url)
-        if self._data:
-            await self._socket.send_str(self._get_socket_query())
+        self.socket = await self._session.ws_connect(ws_url)
+        await self.socket.send_str(self._get_socket_query())
         return self
 
     def _get_subscribe_url(self):
@@ -111,12 +110,12 @@ class RemmeWebSocket:
         return protocol + self._node_address + '/ws' + events
 
     def _get_socket_query(self, is_subscribe=True):
-        if not self._data:
+        if not self.data:
             raise Exception("Data for subscribe was not provided")
         if self._is_event:
             query = {
                 "action": "subscribe" if is_subscribe else "unsubscribe",
-                "data": self._data
+                "data": self.data
             }
         else:
             query = {
@@ -124,7 +123,7 @@ class RemmeWebSocket:
                 "action": "subscribe" if is_subscribe else "unsubscribe",
                 "entity": "batch_state",
                 "id": int(time()),
-                "parameters": self._data
+                "parameters": self.data
             }
         return json.dumps(query)
 
@@ -133,13 +132,12 @@ class RemmeWebSocket:
         Call this method when your connection is open for close it.
         :return: None
         """
-        if not self._socket:
+        if not self.socket:
             raise Exception("Socket is not running")
-        if self._data:
-            await self._socket.send_str(self._get_socket_query(is_subscribe=False))
-        await self._socket.close()
+        await self.socket.send_str(self._get_socket_query(is_subscribe=False))
+        await self.socket.close()
         await self._session.close()
-        self._socket = None
+        self.socket = None
         self._session = None
 
     @property
@@ -159,11 +157,11 @@ class RemmeWebSocket:
         return self._ssl_mode
 
     async def __aenter__(self):
-        if not self._socket:
+        if not self.socket:
             await self.connect_to_web_socket()
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self._socket:
+        if self.socket:
             await self.close_web_socket()
         return False
