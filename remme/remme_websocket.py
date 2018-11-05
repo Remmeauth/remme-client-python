@@ -2,6 +2,9 @@ from aiohttp import ClientSession, WSMsgType
 from time import time
 import json
 
+from remme.models.batch_info_d_to import BatchInfoDto
+from remme.models.batch_state_update_d_to import BatchStateUpdateDto
+
 
 class RemmeWebSocket:
     """
@@ -22,17 +25,11 @@ class RemmeWebSocket:
     #    }
     # so you can connect_to_web_socket easy. Just:
 
-    ws_connection = await transaction_result.connect_to_web_socket()
-    async for msg in ws_connection.socket:
-        response = BatchStateUpdateDto(**json.loads(msg.data))
-        if response.type == "message" and len(response.data) > 0:
-            if response.data['batch_statuses'] and 'invalid_transactions' in response.data \
-                    and len(response.data['invalid_transactions']) > 0:
-                raise Exception(response.data['invalid_transactions'][0])
-            if response.data['batch_statuses']['status'] == BatchStatus.COMMITTED.value:
-                after_balance = await remme_sender.token.get_balance(receiver_public_key_hex)
-                print(f'balance is: {after_balance} REM')
-                await ws_connection.close_web_socket()
+    async for batch_info in transaction_result.connect_to_web_socket():
+        if batch_info.status == BatchStatus.COMMITTED.value:
+            after_balance = await remme_sender.token.get_balance(receiver_public_key_hex)
+            print(f'balance is: {after_balance} REM')
+            await transaction_result.close_web_socket()
     ```
 
     But you also can use your class for work with WebSockets. Just inherit it from RemmeWebSocket, like this:
@@ -43,15 +40,12 @@ class RemmeWebSocket:
              self.data = data
 
 
-    kwargs = {"node_address":"localhost:8080", "ssl_mode":False, "data":{batch_ids: [transaction_result.batch_id,]}}}
-    async with  MySocketConnection(**kwargs) as my_socket_connection:
+    kwargs = {"node_address": "localhost:8080", "ssl_mode": False, "batch_id": batch_id}
+    tx = BaseTransactionResponse(**kwargs)
+    async for msg in tx.connect_to_web_socket():
         print("connected")
-        async for msg in ws.socket:
-            print(f"websocket message {msg.data}")
-            response = json.loads(msg.data)
-            if response['status'] == "subscribed":
-                print('subscribed successfully')
-                await ws.close_web_socket()
+        print("handle some messages")
+        await tx.close_web_socket()
 
     print("connection closed")
     ```
@@ -85,19 +79,26 @@ class RemmeWebSocket:
         This method get callback that will be called when get events: onmessage, onclose.
         For this method you should set property data.
         ```python
-        result = await transactionResult.connect_to_web_socket(call_back)
-        print(result)
-        my_socket_connection.close_connection()
+        async for msg in tx.connect_to_web_socket():
+            print("connected")
+            print("handle some messages")
+            await tx.close_web_socket()
 
-        transactionResult.connect_to_web_socket(call_back)
+        print("connection closed")
         ```
-        :return: {}
+        :return: {async messages}
         """
         self._session = ClientSession()
         ws_url = self._get_subscribe_url()
         self.socket = await self._session.ws_connect(ws_url)
-        result = await self.socket.send_str(self._get_socket_query())
-        return self
+        await self.socket.send_str(self._get_socket_query())
+        async for msg in self.socket:
+            response = BatchStateUpdateDto(**json.loads(msg.data))
+            if response.type == "message" and len(response.data) > 0:
+                if response.data['batch_statuses'] and 'invalid_transactions' in response.data \
+                        and len(response.data['invalid_transactions']) > 0:
+                    raise Exception(response.data['invalid_transactions'][0])
+                yield BatchInfoDto(**response.data['batch_statuses'])
 
     def _get_subscribe_url(self):
         protocol = "wss://" if self._ssl_mode else "ws://"
@@ -153,8 +154,8 @@ class RemmeWebSocket:
 
     async def __aenter__(self):
         if not self.socket:
-            await self.connect_to_web_socket()
-        return self
+            yield self.connect_to_web_socket()
+        yield self.socket
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.socket:
