@@ -93,4 +93,3 @@ class RemmeTransactionService:
         params = {"data": payload}
         batch_id = await self._remme_api.send_request(RemmeMethods.TRANSACTION, params)
         return BaseTransactionResponse(self._remme_api.node_address, self._remme_api.ssl_mode, batch_id)
-
