@@ -1,3 +1,5 @@
+from remme.constants.batch_status import BatchStatus
+from remme.models.batch_state_update_d_to import BatchStateUpdateDto
 from remme.remme import Remme
 import asyncio
 import json
@@ -25,17 +27,21 @@ async def example():
     transaction_result = await remme_sender.token.transfer(receiver_public_key_hex, 10)
     print(f'sending tokens... batch id : {transaction_result.batch_id}\n')
 
-    # ws_connection = await transaction_result.connect_to_web_socket()
-    # async for msg in ws_connection.socket:
-    #     print(f"websocket message {msg.data}")
-    #     response = json.loads(msg.data)
-    #     if response['status'] == "COMMITTED":
-    #         afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
-    #         print(f'balance is: {afterBalance} REM')
+    batch_status = await remme_sender.batch.get_status(transaction_result.batch_id)
+    print(f"batch status {batch_status}\n")
 
-    await asyncio.sleep(20)
-    afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
-    print(f'balance is: {afterBalance} REM')
+    ws_connection = await transaction_result.connect_to_web_socket()
+    async for msg in ws_connection.socket:
+        response = BatchStateUpdateDto(**json.loads(msg.data))
+        if response.type == "message" and len(response.data) > 0:
+            # if response.data['batch_statuses'] and 'invalid_transactions' in response.data \
+            #     and len(response.data['invalid_transactions']) > 0:
+            #     raise Exception(response.data['invalid_transactions'][0])
+            #     return
+            if response.data['batch_statuses']['status'] == BatchStatus.COMMITTED.value:
+                afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
+                print(f'balance is: {afterBalance} REM')
+                await ws_connection.close_web_socket()
 
 
 loop = asyncio.get_event_loop()

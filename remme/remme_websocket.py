@@ -101,7 +101,7 @@ class RemmeWebSocket:
         self._session = ClientSession()
         ws_url = self._get_subscribe_url()
         self.socket = await self._session.ws_connect(ws_url)
-        await self.socket.send_str(self._get_socket_query())
+        result = await self.socket.send_str(self._get_socket_query())
         return self
 
     def _get_subscribe_url(self):

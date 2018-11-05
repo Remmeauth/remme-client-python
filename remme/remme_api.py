@@ -1,5 +1,5 @@
 import aiohttp_json_rpc
-from remme.remme_methods import RemmeMethods
+from remme.constants.remme_methods import RemmeMethods
 
 
 class RemmeAPI:
