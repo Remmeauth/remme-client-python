@@ -22,8 +22,8 @@ async def example():
     remme_sender = Remme(private_key_hex=sender_private_key_hex)
 
     # check balance before transaction
-    beforeBalance = await remme_receiver.token.get_balance(receiver_public_key_hex)
-    print(f'balance is : {beforeBalance} REM\n')
+    before_balance = await remme_receiver.token.get_balance(receiver_public_key_hex)
+    print(f'balance is : {before_balance} REM\n')
     transaction_result = await remme_sender.token.transfer(receiver_public_key_hex, 10)
     print(f'sending tokens... batch id : {transaction_result.batch_id}\n')
 
@@ -34,13 +34,12 @@ async def example():
     async for msg in ws_connection.socket:
         response = BatchStateUpdateDto(**json.loads(msg.data))
         if response.type == "message" and len(response.data) > 0:
-            # if response.data['batch_statuses'] and 'invalid_transactions' in response.data \
-            #     and len(response.data['invalid_transactions']) > 0:
-            #     raise Exception(response.data['invalid_transactions'][0])
-            #     return
+            if response.data['batch_statuses'] and 'invalid_transactions' in response.data \
+                    and len(response.data['invalid_transactions']) > 0:
+                raise Exception(response.data['invalid_transactions'][0])
             if response.data['batch_statuses']['status'] == BatchStatus.COMMITTED.value:
-                afterBalance = await remme_sender.token.get_balance(receiver_public_key_hex)
-                print(f'balance is: {afterBalance} REM')
+                after_balance = await remme_sender.token.get_balance(receiver_public_key_hex)
+                print(f'balance is: {after_balance} REM')
                 await ws_connection.close_web_socket()
 
 

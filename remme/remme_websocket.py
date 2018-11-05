@@ -22,43 +22,38 @@ class RemmeWebSocket:
     #    }
     # so you can connect_to_web_socket easy. Just:
 
-    def callback(err, res):
-        if err:
-            print(err)
-            return
-        print(res)
-        my_socket_connection.close_connection()
-
-    transactionResult.connect_to_web_socket(callback)
+    ws_connection = await transaction_result.connect_to_web_socket()
+    async for msg in ws_connection.socket:
+        response = BatchStateUpdateDto(**json.loads(msg.data))
+        if response.type == "message" and len(response.data) > 0:
+            if response.data['batch_statuses'] and 'invalid_transactions' in response.data \
+                    and len(response.data['invalid_transactions']) > 0:
+                raise Exception(response.data['invalid_transactions'][0])
+            if response.data['batch_statuses']['status'] == BatchStatus.COMMITTED.value:
+                after_balance = await remme_sender.token.get_balance(receiver_public_key_hex)
+                print(f'balance is: {after_balance} REM')
+                await ws_connection.close_web_socket()
     ```
 
     But you also can use your class for work with WebSockets. Just inherit it from RemmeWebSocket, like this:
     ```python
-    class MySocketConnection(RemmeWebSocket) {
-         def __init__({node_address: node_address, ssl_mode: ssl_mode, data: data}) {
-             super(node_address, ssl_mode)
+    class MySocketConnection(RemmeWebSocket):
+         def __init__(node_address, ssl_mode, data}):
+             super(MySocketConnection, self).__init__(node_address, ssl_mode)
              self.data = data
-         }
-    }
 
-    my_socket_connection = MySocketConnection({
-         node_address: "localhost:8080",
-         ssl_mode: False,
-         data: {
-             batch_ids: [
-                transaction_result.batch_id,
-             ],
-         }
-    })
 
-    def callback(err, res):
-        if err:
-            print(err)
-            return
-        print(res)
-        my_socket_connection.close_connection()
+    kwargs = {"node_address":"localhost:8080", "ssl_mode":False, "data":{batch_ids: [transaction_result.batch_id,]}}}
+    async with  MySocketConnection(**kwargs) as my_socket_connection:
+        print("connected")
+        async for msg in ws.socket:
+            print(f"websocket message {msg.data}")
+            response = json.loads(msg.data)
+            if response['status'] == "subscribed":
+                print('subscribed successfully')
+                await ws.close_web_socket()
 
-    my_socket_connection.connect_to_web_socket(callback)
+    print("connection closed")
     ```
     """
 

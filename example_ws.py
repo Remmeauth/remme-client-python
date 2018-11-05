@@ -11,7 +11,8 @@ async def example():
     node_private_key = "4c0393f24225443678543642d5a48ac0534b894ab82ae5f118d330fd2f56dae4"
 
     batch_id = "bc1b32a5ead06cc9203d0019a54391b40a7eadb61c80675de60ecc83d4be6fed0c795dfbccc717e3d52bf3fec8a3cbfc7cf6ab8fc1cdfd07f8b76bf457288060"
-    async with BaseTransactionResponse(node_address="localhost:8080", ssl_mode=False, batch_id=batch_id) as ws:
+    kwargs = {"node_address": "localhost:8080", "ssl_mode": False, "batch_id": batch_id}
+    async with BaseTransactionResponse(**kwargs) as ws:
         print("connected")
         async for msg in ws.socket:
             print(f"websocket message {msg.data}")
@@ -19,7 +20,8 @@ async def example():
             if response['status'] == "subscribed":
                 print('subscribed successfully')
                 await ws.close_web_socket()
-                print("connection closed")
+
+    print("connection closed")
 
 
 loop = asyncio.get_event_loop()
