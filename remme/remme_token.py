@@ -1,7 +1,7 @@
 from remme.models.create_transactions_d_to import CreateTransactionDto
 from remme.remme_utils import generate_address
-from remme.remme_family_name import RemmeFamilyName
-from remme.remme_methods import RemmeMethods
+from remme.constants.remme_family_name import RemmeFamilyName
+from remme.constants.remme_methods import RemmeMethods
 from remme.protos.account_pb2 import AccountMethod, TransferPayload
 from remme.protos.transaction_pb2 import TransactionPayload
 
