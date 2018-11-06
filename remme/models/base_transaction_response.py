@@ -3,8 +3,6 @@ from remme.remme_websocket import RemmeWebSocket
 
 class BaseTransactionResponse(RemmeWebSocket):
 
-    node_address = None
-    ssl_mode = None
     _batch_id = None
 
     def __init__(self, node_address, ssl_mode, batch_id):
