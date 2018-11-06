@@ -18,10 +18,7 @@ class BaseTransactionResponse(RemmeWebSocket):
 
     @property
     def batch_id(self):
-        try:
-            return self.data["batch_ids"][0]
-        except Exception:
-            return None
+        return self._batch_id
 
     async def __aenter__(self):
         return await super().__aenter__()
