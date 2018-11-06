@@ -2,8 +2,8 @@ from aiohttp import ClientSession, WSMsgType
 from time import time
 import json
 
-from remme.models.batch_info_d_to import BatchInfoDto
-from remme.models.batch_state_update_d_to import BatchStateUpdateDto
+from remme.models.batch_info_dto import BatchInfoDto
+from remme.models.batch_state_update_dto import BatchStateUpdateDto
 
 
 class RemmeWebSocket:

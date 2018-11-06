@@ -1,4 +1,4 @@
-from remme.models.create_transactions_d_to import CreateTransactionDto
+from remme.models.create_transactions_dto import CreateTransactionDto
 from remme.remme_utils import generate_address
 from remme.constants.remme_family_name import RemmeFamilyName
 from remme.constants.remme_methods import RemmeMethods
