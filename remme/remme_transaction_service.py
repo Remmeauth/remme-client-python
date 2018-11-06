@@ -74,8 +74,8 @@ class RemmeTransactionService:
             header=txn_header_bytes,
             header_signature=signature,
             payload=transaction_d_to.payload_bytes
-        )
-        return b64encode(txn.SerializeToString()).decode('utf-8')
+        ).SerializeToString()
+        return b64encode(txn).decode('utf-8')
 
     async def send(self, payload):
         """
