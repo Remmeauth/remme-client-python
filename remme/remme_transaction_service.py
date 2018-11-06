@@ -58,12 +58,11 @@ class RemmeTransactionService:
         :return: {Couroutine}
         """
         batcher_public_key = await self._remme_api.send_request(RemmeMethods.NODE_KEY)
-        sender_address = self._remme_account.address
         txn_header_bytes = TransactionHeader(
             family_name=transaction_d_to.family_name,
             family_version=transaction_d_to.family_version,
-            inputs=[sender_address] + transaction_d_to.inputs,
-            outputs=[sender_address] + transaction_d_to.outputs,
+            inputs=[self._remme_account.address] + transaction_d_to.inputs,
+            outputs=[self._remme_account.address] + transaction_d_to.outputs,
             signer_public_key=self._remme_account.public_key_hex,
             batcher_public_key=batcher_public_key,
             nonce=create_nonce(),
@@ -71,8 +70,6 @@ class RemmeTransactionService:
             payload_sha512=sha512_hexdigest(transaction_d_to.payload_bytes)
         ).SerializeToString()
         signature = self._remme_account.sign(txn_header_bytes)
-        if not self._remme_account.verify(signature, txn_header_bytes):
-            raise Exception("This is weird. Transaction verification failed")
         txn = Transaction(
             header=txn_header_bytes,
             header_signature=signature,
