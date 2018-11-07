@@ -2,6 +2,12 @@ import hashlib
 import base64
 import math
 import random
+import re
+from remme.constants.remme_patterns import RemmePatterns
+
+
+def is_valid_batch_id(_batch_id):
+    return re.match(RemmePatterns.HEADER_SIGNATURE.value, _batch_id) is not None
 
 
 def bytes_to_hex(_bytes):

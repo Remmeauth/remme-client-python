@@ -1,4 +1,5 @@
 from remme.remme_blockchain_info import RemmeBlockchainInfo
+from remme.remme_utils import is_valid_batch_id
 from remme.remme_websocket import RemmeWebSocket
 
 
@@ -40,13 +41,21 @@ class BaseTransactionResponse(RemmeWebSocket):
     @batch_id.setter
     def batch_id(self, value):
         """
-        Set identified of batch
+        close old connection if exists to prevent listening message for old batch and set identified of batch
         :param value: {string}
         :return:
         """
-        if not RemmeBlockchainInfo.is_valid_batch_id(value):
+        if not is_valid_batch_id(value):
             raise Exception("Invalid given batch id")
+        if self.socket:
+            self.close_web_socket()
+            self.socket = None
         self._batch_id = value
+        self.data = {
+            "batch_ids": [
+                self._batch_id
+            ]
+        }
 
     async def __aenter__(self):
         return await super().__aenter__()
