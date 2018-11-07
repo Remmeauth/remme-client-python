@@ -47,9 +47,8 @@ class BaseTransactionResponse(RemmeWebSocket):
         """
         if not is_valid_batch_id(value):
             raise Exception("Invalid given batch id")
-        if self.socket:
+        if self._socket:
             self.close_web_socket()
-            self.socket = None
         self._batch_id = value
         self.data = {
             "batch_ids": [
