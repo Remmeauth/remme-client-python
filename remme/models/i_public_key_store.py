@@ -1,5 +1,8 @@
+from remme.constants.pub_key_type import PubKeyType
+from remme.constants.entity_type import EntityType
 
-class PublicKeyStore:
+
+class IPublicKeyStore:
     """
     Interface that take method store in publicKeyStorage
     """
@@ -12,7 +15,8 @@ class PublicKeyStore:
     _public_key_type = None
     _entity_type = None
 
-    def __init__(self, data, public_key, valid_from, valid_to, private_key, public_key_type, entity_type):
+    def __init__(self, data, public_key, valid_from, valid_to, private_key,
+                 public_key_type=PubKeyType.RSA.value, entity_type=EntityType.PERSONAL.value):
         """
         :param data: {string}
         :param public_key: {node-forge.pki.Key | node-forge.pki.PEM}

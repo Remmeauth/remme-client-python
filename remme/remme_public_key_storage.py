@@ -78,6 +78,7 @@ class RemmePublicKeyStorage:
         :param public_key_store_data: {PublicKeyStore}
         :return: {Promise BaseTransactionResponse}
         """
+
         raise NotImplementedError
 
     def check(self, public_key):
