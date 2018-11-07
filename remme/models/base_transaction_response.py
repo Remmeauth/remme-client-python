@@ -1,13 +1,27 @@
+from remme.remme_blockchain_info import RemmeBlockchainInfo
+from remme.remme_utils import is_valid_batch_id
 from remme.remme_websocket import RemmeWebSocket
 
 
 class BaseTransactionResponse(RemmeWebSocket):
+    """
+    Wrapper class for response on transaction request,
+    which contain identifier of batch and communication with WebSockets.
+    """
 
-    node_address = None
-    ssl_mode = None
     _batch_id = None
+    """
+    Identifier of batch that contain sending transaction
+    """
 
     def __init__(self, node_address, ssl_mode, batch_id):
+        """
+        Get address of node, ssl mode, and identifier of batch.
+        Then implement RemmeWebSocket class and provide data to it.
+        :param node_address: {string}
+        :param ssl_mode: {boolean}
+        :param batch_id: {string}
+        """
         super(BaseTransactionResponse, self).__init__(node_address, ssl_mode)
         self._batch_id = batch_id
         self.data = {
@@ -18,10 +32,29 @@ class BaseTransactionResponse(RemmeWebSocket):
 
     @property
     def batch_id(self):
-        try:
-            return self.data["batch_ids"][0]
-        except Exception:
-            return None
+        """
+        Get identifier of batch that contain sending transaction
+        :return: batch_id {string}
+        """
+        return self._batch_id
+
+    @batch_id.setter
+    def batch_id(self, value):
+        """
+        close old connection if exists to prevent listening message for old batch and set identified of batch
+        :param value: {string}
+        :return:
+        """
+        if not is_valid_batch_id(value):
+            raise Exception("Invalid given batch id")
+        if self._socket:
+            self.close_web_socket()
+        self._batch_id = value
+        self.data = {
+            "batch_ids": [
+                self._batch_id
+            ]
+        }
 
     async def __aenter__(self):
         return await super().__aenter__()
