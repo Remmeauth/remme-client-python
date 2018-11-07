@@ -1,4 +1,3 @@
-from remme.models.create_transactions_dto import CreateTransactionDto
 from remme.remme_utils import generate_address
 from remme.constants.remme_family_name import RemmeFamilyName
 from remme.constants.remme_methods import RemmeMethods
@@ -41,13 +40,11 @@ class RemmeToken:
         # print(f"transaction method : {tr.method} ; transaction data : {tr.data}")
         # print(f"transaction serialized : {tr.SerializeToString()}")
 
-        transaction_d_to = CreateTransactionDto(family_name=RemmeFamilyName.ACCOUNT.value,
+        return await self.transaction_service.create(family_name=RemmeFamilyName.ACCOUNT.value,
                                                 family_version=self._family_version,
                                                 inputs=[receiver_address],
                                                 outputs=[receiver_address],
                                                 payload_bytes=tr.SerializeToString())
-
-        return await self.transaction_service.create(transaction_d_to)
 
     async def transfer(self, public_key_to, amount):
         payload = await self._create_transfer_tx(public_key_to, amount)

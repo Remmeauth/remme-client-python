@@ -16,8 +16,7 @@ class RemmeTransactionService:
     inputs = []
     outputs = []
     payload_bytes = b"serialized transaction"
-    create_dto = CreateTransactionDto(family_name, family_version, inputs, outputs, payload_bytes)
-    transaction = await remme.transaction_service.create(create_dto)
+    transaction = await remme.transaction_service.create(family_name, family_version, inputs, outputs, payload_bytes)
     send_response = await remme.transaction_service.send(transaction)
     ```
     """
@@ -40,7 +39,7 @@ class RemmeTransactionService:
         self._remme_account = remme_account
         self._remme_api = remme_api
 
-    async def create(self, transaction_d_to):
+    async def create(self, family_name, family_version, inputs, outputs, payload_bytes):
         """
         Documentation for building transactions
         https://sawtooth.hyperledger.org/docs/core/releases/latest/_autogen/sdk_submit_tutorial_python.html#building-the-transaction
@@ -51,29 +50,32 @@ class RemmeTransactionService:
         inputs = []
         outputs = []
         payload_bytes = b"my transaction"
-        create_dto = CreateTransactionDto(family_name, family_version, inputs, outputs, payload_bytes)
-        transaction = await remme_transaction.create(create_dto)
+        transaction = await remme_transaction.create(family_name, family_version, inputs, outputs, payload_bytes)
         ```
-        :param transaction_d_to: {CreateTransactionDto} settings
+        :param family_name: {string}
+        :param family_version: {string}
+        :param inputs: {list}
+        :param outputs: {list}
+        :param payload_bytes: {bytes}
         :return: {Couroutine}
         """
         batcher_public_key = await self._remme_api.send_request(RemmeMethods.NODE_KEY)
         txn_header_bytes = TransactionHeader(
-            family_name=transaction_d_to.family_name,
-            family_version=transaction_d_to.family_version,
-            inputs=[self._remme_account.address] + transaction_d_to.inputs,
-            outputs=[self._remme_account.address] + transaction_d_to.outputs,
+            family_name=family_name,
+            family_version=family_version,
+            inputs=[self._remme_account.address] + inputs,
+            outputs=[self._remme_account.address] + outputs,
             signer_public_key=self._remme_account.public_key_hex,
             batcher_public_key=batcher_public_key,
             nonce=create_nonce(),
             dependencies=[],
-            payload_sha512=sha512_hexdigest(transaction_d_to.payload_bytes)
+            payload_sha512=sha512_hexdigest(payload_bytes)
         ).SerializeToString()
         signature = self._remme_account.sign(txn_header_bytes)
         txn = Transaction(
             header=txn_header_bytes,
             header_signature=signature,
-            payload=transaction_d_to.payload_bytes
+            payload=payload_bytes
         ).SerializeToString()
         return b64encode(txn).decode('utf-8')
 
