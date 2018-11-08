@@ -53,8 +53,12 @@ class RemmeCertificate:
         """
         self.remme_public_key_storage = remme_public_key_storage
 
-    async def create(self, create_certificate_dto):
+    def _create_certificate(self, keys, create_certificate_dto):
         raise NotImplementedError
+
+    async def create(self, create_certificate_dto):
+        keys = await generateRSAKeyPair(self._rsa_key_size)
+        return self._create_certificate(keys, create_certificate_dto)
 
     async def store(self, certificate):
         raise NotImplementedError
