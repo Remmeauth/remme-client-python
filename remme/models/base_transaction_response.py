@@ -1,4 +1,3 @@
-from remme.remme_blockchain_info import RemmeBlockchainInfo
 from remme.remme_utils import is_valid_batch_id
 from remme.remme_websocket import RemmeWebSocket
 
