@@ -1,6 +1,8 @@
 from remme.models.i_public_key_store import IPublicKeyStore
 from remme.remme import Remme
 import asyncio
+import time
+import datetime
 
 
 async def example():
@@ -8,8 +10,12 @@ async def example():
     another_private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
 
     remme = Remme(private_key_hex=private_key_hex)
-    data = IPublicKeyStore()
-    store_result = remme.public_key_storage.store(data)
+    private_key = remme.account.private_key
+    public_key = remme.account.public_key
+    valid_from = int(datetime.date(2018, 11, 8).strftime("%s"))
+    valid_to = int(datetime.date(2019, 11, 8).strftime("%s"))
+    data = IPublicKeyStore(b"test", public_key, valid_from, valid_to, private_key)
+    store_result = await remme.public_key_storage.store(data)
     async for msg in store_result.connect_to_web_socket():
         print("connected")
         await store_result.close_web_socket()
