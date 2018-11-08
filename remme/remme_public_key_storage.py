@@ -1,5 +1,4 @@
 from remme.constants.remme_family_name import RemmeFamilyName
-from remme.models.create_transactions_d_to import CreateTransactionDto
 from remme.protos.proto_buf_pb2 import NewPubKeyPayload, PubKeyMethod
 from remme.protos.transaction_pb2 import TransactionPayload
 from remme.remme_utils import generate_address, generate_settings_address
@@ -131,10 +130,9 @@ class RemmePublicKeyStorage:
         return TransactionPayload(method=method, data=data).SerializeToString()
 
     async def _create_and_send_transaction(self, inputs_and_outputs, payload_bytes):
-        transaction_dto = CreateTransactionDto(family_name=self._family_name,
-                                               family_version=self._family_version,
-                                               inputs=[inputs_and_outputs],
-                                               outputs=[inputs_and_outputs],
-                                               payload_bytes=payload_bytes)
-        transaction = await self._remme_transaction.create(transaction_dto)
+        transaction = await self._remme_transaction.create(family_name=self._family_name,
+                                                           family_version=self._family_version,
+                                                           inputs=[inputs_and_outputs],
+                                                           outputs=[inputs_and_outputs],
+                                                           payload_bytes=payload_bytes)
         return await self._remme_transaction.send(transaction)
