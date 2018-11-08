@@ -2,8 +2,8 @@ from aiohttp import ClientSession, WSMsgType
 from time import time
 import json
 
-from remme.models.batch_info_d_to import BatchInfoDto
-from remme.models.batch_state_update_d_to import BatchStateUpdateDto
+from remme.models.batch_info_dto import BatchInfoDto
+from remme.models.batch_state_update_dto import BatchStateUpdateDto
 
 
 class RemmeWebSocket:
@@ -55,7 +55,7 @@ class RemmeWebSocket:
     _node_address = None
     _ssl_mode = None
     _session = None
-    socket = None
+    _socket = None
     data = None
 
     def __init__(self, node_address, ssl_mode):
@@ -90,9 +90,9 @@ class RemmeWebSocket:
         """
         self._session = ClientSession()
         ws_url = self._get_subscribe_url()
-        self.socket = await self._session.ws_connect(ws_url)
-        await self.socket.send_str(self._get_socket_query())
-        async for msg in self.socket:
+        self._socket = await self._session.ws_connect(ws_url)
+        await self._socket.send_str(self._get_socket_query())
+        async for msg in self._socket:
             response = BatchStateUpdateDto(**json.loads(msg.data))
             if response.type == "message" and len(response.data) > 0:
                 if response.data['batch_statuses'] and 'invalid_transactions' in response.data \
@@ -128,12 +128,12 @@ class RemmeWebSocket:
         Call this method when your connection is open for close it.
         :return: None
         """
-        if not self.socket:
+        if not self._socket:
             raise Exception("Socket is not running")
-        await self.socket.send_str(self._get_socket_query(is_subscribe=False))
-        await self.socket.close()
+        await self._socket.send_str(self._get_socket_query(is_subscribe=False))
+        await self._socket.close()
         await self._session.close()
-        self.socket = None
+        self._socket = None
         self._session = None
 
     @property
@@ -153,11 +153,11 @@ class RemmeWebSocket:
         return self._ssl_mode
 
     async def __aenter__(self):
-        if not self.socket:
+        if not self._socket:
             yield self.connect_to_web_socket()
-        yield self.socket
+        yield self._socket
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.socket:
+        if self._socket:
             await self.close_web_socket()
         return False
