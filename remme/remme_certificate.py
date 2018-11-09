@@ -1,3 +1,5 @@
+import math
+
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes
@@ -118,8 +120,45 @@ class RemmeCertificate:
                                                backend=default_backend())
         return self._create_certificate(private_key, create_certificate_dto)
 
-    async def store(self, certificate):
+    def _certificate_from_pem(self, certificate):
         raise NotImplementedError
+
+    def _certificate_to_pem(self, certificate):
+        raise NotImplementedError
+
+    async def store(self, certificate):
+        """
+        if (typeof certificate === "string") {
+            certificate = certificateFromPem(certificate);
+        }
+        const certificatePEM = certificateToPem(certificate);
+        const { publicKey, privateKey } = certificate;
+        if (!privateKey) {
+            throw new Error("Your certificate does not have private key");
+        }
+        const validFrom = Math.floor(certificate.validity.notBefore.getTime() / 1000);
+        const validTo = Math.floor(certificate.validity.notAfter.getTime()  / 1000);
+        return await this._remmePublicKeyStorage.store({
+            data: certificatePEM,
+            publicKey,
+            privateKey,
+            validFrom,
+            validTo,
+        });
+        :param certificate:
+        :return:
+        """
+        if isinstance(certificate, str):
+            certificate = self._certificate_from_pem(certificate)
+        certificate_pem = self._certificate_to_pem(certificate)
+        public_key, private_key = certificate
+        if not private_key:
+            raise Exception("Your certificate does not have private key")
+        valid_from = math.floor(certificate.not_valid_before / 1000)
+        valid_to = math.floor(certificate.not_valid_after / 1000)
+        return await self.remme_public_key_storage.store(data=certificate_pem, public_key=public_key,
+                                                         private_key=private_key, valid_from=valid_from,
+                                                         valid_to=valid_to)
 
     async def create_and_store(self, create_certificate_dto):
         certificate = self.create(create_certificate_dto)

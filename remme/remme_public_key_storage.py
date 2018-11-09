@@ -64,7 +64,7 @@ class RemmePublicKeyStorage:
         self._remme_transaction = remme_transaction
         self._remme_account = remme_account
 
-    async def store(self, _data):
+    async def store(self, data, private_key, public_key, valid_from, valid_to):
         """
         Store public key with its data into REMChain.
         Send transaction to chain.
@@ -82,23 +82,26 @@ class RemmePublicKeyStorage:
             print(msg)
             store_response.close_web_socket()
         ```
-        :param _data: {PublicKeyStore}
-        :return: {Promise BaseTransactionResponse}
+        :param data:
+        :param private_key:
+        :param public_key:
+        :param valid_from:
+        :param valid_to:
+        :return:
         """
-        public_key = public_key_to_pem(_data.public_key) if isinstance(_data.public_key, object) else _data.public_key
-        private_key = private_key_from_pem(_data.private_key) if isinstance(_data.private_key,
-                                                                            str) else _data.private_key
-        message = self.generate_message(_data.data)
+        public_key = public_key_to_pem(public_key) if isinstance(public_key, object) else public_key
+        private_key = private_key_from_pem(private_key) if isinstance(private_key, str) else private_key
+        message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)
         payload = NewPubKeyPayload(
             public_key=public_key,
-            public_key_type=_data.public_key_type,
-            entity_type=_data.entity_type,
+            public_key_type=public_key_type,
+            entity_type=entity_type,
             entity_hash=entity_hash,
             entity_hash_signature=entity_hash_signature,
-            valid_from=_data.valid_from,
-            valid_to=_data.valid_to
+            valid_from=valid_from,
+            valid_to=valid_to
         ).SerializeToString()
         pub_key_address = generate_address(self._family_name, public_key)
         storage_pub_key = generate_settings_address("remme.settings.storage_pub_key")
