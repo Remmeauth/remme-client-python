@@ -1,3 +1,9 @@
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from datetime import datetime, timedelta
 from remme.models.certificate_transaction_response import CertificateTransactionResponse
 
 
@@ -53,18 +59,70 @@ class RemmeCertificate:
         """
         self.remme_public_key_storage = remme_public_key_storage
 
-    def _create_certificate(self, keys, create_certificate_dto):
-        raise NotImplementedError
+    def _create_subject(self, data):
+        """
+        :param data: {CreateCertificateDto}
+        :return: object {x509.Name}
+        """
+        if not data.common_name:
+            raise Exception("Attribute common_name must have a value")
+        serial = data.serial if isinstance(data.serial, str) else str(data.serial)
+        prepared_data = [
+            x509.NameAttribute(NameOID.COMMON_NAME, data.common_name),
+            x509.NameAttribute(NameOID.EMAIL_ADDRESS, data.email),
+            # x509.NameAttribute(NameOID.LOCALITY_NAME, data.locality_name),
+            # x509.NameAttribute(NameOID.POSTAL_ADDRESS, data.postal_address),
+            # x509.NameAttribute(NameOID.POSTAL_CODE, data.postal_code),
+            # x509.NameAttribute(NameOID.STREET_ADDRESS, data.street_address),
+            x509.NameAttribute(NameOID.COUNTRY_NAME, data.country_name),
+            # x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, data.state_name),
+            x509.NameAttribute(NameOID.GIVEN_NAME, data.name),
+            x509.NameAttribute(NameOID.SURNAME, data.surname),
+            # x509.NameAttribute(NameOID.PSEUDONYM, data.pseudonym),
+            # x509.NameAttribute(NameOID.GENERATION_QUALIFIER, data.generation_qualifier),
+            # x509.NameAttribute(NameOID.TITLE, data.title),
+            x509.NameAttribute(NameOID.SERIAL_NUMBER, serial),
+            # x509.NameAttribute(NameOID.BUSINESS_CATEGORY, data.business_category)
+        ]
+        return x509.Name(prepared_data)
 
-    async def create(self, create_certificate_dto):
-        keys = await generateRSAKeyPair(self._rsa_key_size)
-        return self._create_certificate(keys, create_certificate_dto)
+    def _prepare_serial(self, serial):
+        serial = serial or x509.random_serial_number()
+        serial = serial if isinstance(serial, int) else int(serial)
+        return serial
+
+    def _create_certificate(self, private_key, create_certificate_dto):
+        """
+        :param private_key:
+        :param create_certificate_dto:
+        :return:
+        """
+        if not create_certificate_dto.validity:
+            raise Exception("Attribute validity must have a value")
+        subject = self._create_subject(create_certificate_dto)
+        not_before = datetime.utcnow() + timedelta(days=create_certificate_dto.valid_after) \
+            if create_certificate_dto.valid_after else datetime.utcnow()
+
+        cert = x509.CertificateBuilder()\
+            .subject_name(subject)\
+            .issuer_name(subject)\
+            .public_key(private_key.public_key())\
+            .serial_number(self._prepare_serial(create_certificate_dto.serial))\
+            .not_valid_before(not_before)\
+            .not_valid_after(not_before + timedelta(days=create_certificate_dto.validity))\
+            .sign(private_key, hashes.SHA256(), default_backend())
+        return cert
+
+    def create(self, create_certificate_dto):
+        private_key = rsa.generate_private_key(public_exponent=65537, key_size=self._rsa_key_size,
+                                               backend=default_backend())
+        return self._create_certificate(private_key, create_certificate_dto)
 
     async def store(self, certificate):
         raise NotImplementedError
 
     async def create_and_store(self, create_certificate_dto):
-        certificate = await self.create(create_certificate_dto)
+        certificate = self.create(create_certificate_dto)
         batch_response = await self.store(certificate)
         cert_response = CertificateTransactionResponse(
             node_address=batch_response.node_address,

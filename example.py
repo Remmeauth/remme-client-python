@@ -9,7 +9,7 @@ async def example():
     another_private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
 
     remme = Remme(private_key_hex=private_key_hex)
-    serial = str(int(time.time()))
+    serial = int(time.time())
     certificate_data = CreateCertificateDto(common_name="user_name", email="user@email.com", name="John",
                                             surname="Smith", country_name="US", validity=360, serial=serial)
     certificate_transaction_result = await remme.certificate.create_and_store(certificate_data)
