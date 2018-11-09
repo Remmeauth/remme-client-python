@@ -1,7 +1,13 @@
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+
+from remme.constants.entity_type import EntityType
+from remme.constants.pub_key_type import PubKeyType
 from remme.constants.remme_family_name import RemmeFamilyName
 from remme.protos.proto_buf_pb2 import NewPubKeyPayload, PubKeyMethod
 from remme.protos.transaction_pb2 import TransactionPayload
-from remme.remme_utils import generate_address, generate_settings_address
+from remme.remme_utils import generate_address, generate_settings_address, sha512_hexdigest
 
 
 class RemmePublicKeyStorage:
@@ -64,7 +70,15 @@ class RemmePublicKeyStorage:
         self._remme_transaction = remme_transaction
         self._remme_account = remme_account
 
-    async def store(self, data, private_key, public_key, valid_from, valid_to):
+    def _public_key_to_pem(self, public_key):
+        return public_key.public_bytes(encoding=serialization.Encoding.PEM,
+                                       format=serialization.PublicFormat.SubjectPublicKeyInfo)
+
+    def _private_key_from_pem(self, private_key):
+        return serialization.load_pem_private_key(private_key, password=None, backend=default_backend())
+
+    async def store(self, data, private_key, public_key, valid_from, valid_to,
+                    public_key_type=PubKeyType.RSA, entity_type=EntityType.PERSONAL):
         """
         Store public key with its data into REMChain.
         Send transaction to chain.
@@ -87,10 +101,12 @@ class RemmePublicKeyStorage:
         :param public_key:
         :param valid_from:
         :param valid_to:
+        :param public_key_type:
+        :param entity_type:
         :return:
         """
-        public_key = public_key_to_pem(public_key) if isinstance(public_key, object) else public_key
-        private_key = private_key_from_pem(private_key) if isinstance(private_key, str) else private_key
+        public_key = self._public_key_to_pem(public_key) if isinstance(public_key, object) else public_key
+        private_key = self._private_key_from_pem(private_key) if isinstance(private_key, str) else private_key
         message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)
@@ -121,13 +137,15 @@ class RemmePublicKeyStorage:
         raise NotImplementedError
 
     def generate_message(self, data):
-        raise NotImplementedError
+        return sha512_hexdigest(data)
 
     def generate_entity_hash(self, message):
-        raise NotImplementedError
+        return message.encode("UTF-8")
 
     def _generate_signature(self, data, private_key):
-        raise NotImplementedError
+        return private_key.sign(data, padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
+                                                  salt_length=padding.PSS.MAX_LENGTH),
+                                hashes.SHA512())
 
     def _generate_transaction_payload(self, method, data):
         return TransactionPayload(method=method, data=data).SerializeToString()

@@ -2,7 +2,7 @@ import math
 
 from cryptography import x509
 from cryptography.x509.oid import NameOID
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from datetime import datetime, timedelta
@@ -118,51 +118,35 @@ class RemmeCertificate:
     def create(self, create_certificate_dto):
         private_key = rsa.generate_private_key(public_exponent=65537, key_size=self._rsa_key_size,
                                                backend=default_backend())
-        return self._create_certificate(private_key, create_certificate_dto)
+        return private_key, self._create_certificate(private_key, create_certificate_dto)
 
     def _certificate_from_pem(self, certificate):
-        raise NotImplementedError
+        return x509.load_pem_x509_certificate(certificate, default_backend())
 
     def _certificate_to_pem(self, certificate):
-        raise NotImplementedError
+        return certificate.public_bytes(encoding=serialization.Encoding.PEM)
 
-    async def store(self, certificate):
+    async def store(self, certificate, private_key):
         """
-        if (typeof certificate === "string") {
-            certificate = certificateFromPem(certificate);
-        }
-        const certificatePEM = certificateToPem(certificate);
-        const { publicKey, privateKey } = certificate;
-        if (!privateKey) {
-            throw new Error("Your certificate does not have private key");
-        }
-        const validFrom = Math.floor(certificate.validity.notBefore.getTime() / 1000);
-        const validTo = Math.floor(certificate.validity.notAfter.getTime()  / 1000);
-        return await this._remmePublicKeyStorage.store({
-            data: certificatePEM,
-            publicKey,
-            privateKey,
-            validFrom,
-            validTo,
-        });
         :param certificate:
         :return:
         """
         if isinstance(certificate, str):
             certificate = self._certificate_from_pem(certificate)
         certificate_pem = self._certificate_to_pem(certificate)
-        public_key, private_key = certificate
-        if not private_key:
-            raise Exception("Your certificate does not have private key")
-        valid_from = math.floor(certificate.not_valid_before / 1000)
-        valid_to = math.floor(certificate.not_valid_after / 1000)
+        public_key = certificate.public_key()
+        # private_key = certificate.private_key()
+        # if not private_key:
+        #     raise Exception("Your certificate does not have private key")
+        valid_from = math.floor(int(certificate.not_valid_before.strftime("%s")) / 1000)
+        valid_to = math.floor(int(certificate.not_valid_after.strftime("%s")) / 1000)
         return await self.remme_public_key_storage.store(data=certificate_pem, public_key=public_key,
                                                          private_key=private_key, valid_from=valid_from,
                                                          valid_to=valid_to)
 
     async def create_and_store(self, create_certificate_dto):
-        certificate = self.create(create_certificate_dto)
-        batch_response = await self.store(certificate)
+        private_key, certificate = self.create(create_certificate_dto)
+        batch_response = await self.store(certificate, private_key)
         cert_response = CertificateTransactionResponse(
             node_address=batch_response.node_address,
             ssl_mode=batch_response.ssl_mode,
