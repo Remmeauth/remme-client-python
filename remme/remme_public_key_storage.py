@@ -1,3 +1,5 @@
+import binascii
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -72,7 +74,7 @@ class RemmePublicKeyStorage:
 
     def _public_key_to_pem(self, public_key):
         return public_key.public_bytes(encoding=serialization.Encoding.PEM,
-                                       format=serialization.PublicFormat.SubjectPublicKeyInfo)
+                                       format=serialization.PublicFormat.SubjectPublicKeyInfo).decode("UTF-8")
 
     def _private_key_from_pem(self, private_key):
         return serialization.load_pem_private_key(private_key, password=None, backend=default_backend())
@@ -105,18 +107,19 @@ class RemmePublicKeyStorage:
         :param entity_type:
         :return:
         """
+        # print(f"data {data}")
         public_key = self._public_key_to_pem(public_key) if isinstance(public_key, object) else public_key
         private_key = self._private_key_from_pem(private_key) if isinstance(private_key, str) else private_key
         message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)
-        print(f"public_key {public_key}")
-        print(f"public_key_type {public_key_type}")
-        print(f"entity_type {entity_type}")
-        print(f"entity_hash {entity_hash}")
-        print(f"entity_hash_signature {entity_hash_signature}")
-        print(f"valid_from {valid_from}")
-        print(f"valid_to {valid_to}")
+        # print(f"public_key {public_key}")
+        # print(f"public_key_type {public_key_type}")
+        # print(f"entity_type {entity_type}")
+        # print(f"entity_hash {entity_hash}")
+        # print(f"entity_hash_signature {entity_hash_signature}")
+        # print(f"valid_from {valid_from}")
+        # print(f"valid_to {valid_to}")
         payload = NewPubKeyPayload(
             public_key=public_key,
             public_key_type=public_key_type,
@@ -130,7 +133,7 @@ class RemmePublicKeyStorage:
         storage_pub_key = generate_settings_address("remme.settings.storage_pub_key")
         setting_address = generate_settings_address("remme.economy_enabled")
         storage_address = generate_address(self._remme_account.family_name, storage_pub_key)
-        payload_bytes = self._generate_transaction_payload(PubKeyMethod.STORE, payload)
+        payload_bytes = self._generate_transaction_payload(PubKeyMethod.STORE.value, payload)
         return await self._create_and_send_transaction([pub_key_address, storage_pub_key, setting_address,
                                                         storage_address], payload_bytes)
 
@@ -150,9 +153,9 @@ class RemmePublicKeyStorage:
         return message.encode("UTF-8")
 
     def _generate_signature(self, data, private_key):
-        return private_key.sign(data, padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
-                                                  salt_length=padding.PSS.MAX_LENGTH),
-                                hashes.SHA512())
+        return binascii.hexlify(private_key.sign(data, padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
+                                                 salt_length=padding.PSS.MAX_LENGTH),
+                                hashes.SHA512()))
 
     def _generate_transaction_payload(self, method, data):
         return TransactionPayload(method=method, data=data).SerializeToString()
