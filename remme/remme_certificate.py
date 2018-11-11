@@ -40,7 +40,6 @@ class RemmeCertificate:
                     revoke.close_web_socket()
                     status = await remme.certificate.check(certificate_transaction_result.certificate)
                     print(status) # False
-
     ```
     """
 
