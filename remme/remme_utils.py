@@ -57,7 +57,11 @@ def generate_address(_family_name, _public_key_to):
 
 
 def generate_settings_address(key):
-    raise NotImplementedError
+    key_parts = key.split(".")[:4]
+    address_parts = [sha256_hexdigest(x)[0:16] for x in key_parts]
+    while (4 - len(address_parts)) != 0:
+        address_parts.append(sha256_hexdigest("")[0:16])
+    return "000000" + "".join(address_parts)
 
 
 def create_nonce():
@@ -70,6 +74,10 @@ def create_nonce():
 
 def sha512_hexdigest(data):
     return hashlib.sha512(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
+
+
+def sha256_hexdigest(data):
+    return hashlib.sha256(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
 
 
 def is_hex(data):

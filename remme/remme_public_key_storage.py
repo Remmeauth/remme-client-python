@@ -113,13 +113,6 @@ class RemmePublicKeyStorage:
         message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)
-        # print(f"public_key {public_key}")
-        # print(f"public_key_type {public_key_type}")
-        # print(f"entity_type {entity_type}")
-        # print(f"entity_hash {entity_hash}")
-        # print(f"entity_hash_signature {entity_hash_signature}")
-        # print(f"valid_from {valid_from}")
-        # print(f"valid_to {valid_to}")
         payload = NewPubKeyPayload(
             public_key=public_key,
             public_key_type=public_key_type,
@@ -133,7 +126,7 @@ class RemmePublicKeyStorage:
         storage_pub_key = generate_settings_address("remme.settings.storage_pub_key")
         setting_address = generate_settings_address("remme.economy_enabled")
         storage_address = generate_address(self._remme_account.family_name, storage_pub_key)
-        payload_bytes = self._generate_transaction_payload(PubKeyMethod.STORE.value, payload)
+        payload_bytes = self._generate_transaction_payload(PubKeyMethod.STORE, payload)
         return await self._create_and_send_transaction([pub_key_address, storage_pub_key, setting_address,
                                                         storage_address], payload_bytes)
 
