@@ -156,7 +156,7 @@ class RemmePublicKeyStorage:
     async def _create_and_send_transaction(self, inputs_and_outputs, payload_bytes):
         transaction = await self._remme_transaction.create(family_name=self._family_name,
                                                            family_version=self._family_version,
-                                                           inputs=[inputs_and_outputs],
-                                                           outputs=[inputs_and_outputs],
+                                                           inputs=inputs_and_outputs,
+                                                           outputs=inputs_and_outputs,
                                                            payload_bytes=payload_bytes)
         return await self._remme_transaction.send(transaction)
