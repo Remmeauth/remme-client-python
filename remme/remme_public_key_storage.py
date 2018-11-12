@@ -98,18 +98,17 @@ class RemmePublicKeyStorage:
             print(msg)
             store_response.close_web_socket()
         ```
-        :param data:
-        :param private_key:
-        :param public_key:
-        :param valid_from:
-        :param valid_to:
-        :param public_key_type:
-        :param entity_type:
-        :return:
+        :param data: {string}
+        :param private_key: {cryptography.hazmat.backends.openssl.rsa._RSAPrivateKey | PEM bytes}
+        :param public_key: {cryptography.hazmat.backends.openssl.rsa._RSAPublicKey | PEM bytes}
+        :param valid_from: {integer}
+        :param valid_to: {integer}
+        :param public_key_type: {Enum value}
+        :param entity_type: {Enum value}
+        :return: {Promise}
         """
-        # print(f"data {data}")
-        public_key = self._public_key_to_pem(public_key) if isinstance(public_key, object) else public_key
-        private_key = self._private_key_from_pem(private_key) if isinstance(private_key, str) else private_key
+        private_key = self._private_key_from_pem(private_key) if isinstance(private_key, bytes) else private_key
+        public_key = public_key if isinstance(public_key, bytes) else self._public_key_to_pem(public_key)
         message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)
@@ -122,6 +121,7 @@ class RemmePublicKeyStorage:
             valid_from=valid_from,
             valid_to=valid_to
         ).SerializeToString()
+        print(f"public key {public_key}")
         pub_key_address = generate_address(self._family_name, public_key)
         storage_pub_key = generate_settings_address("remme.settings.storage_pub_key")
         setting_address = generate_settings_address("remme.economy_enabled")
