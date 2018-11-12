@@ -163,9 +163,7 @@ class RemmePublicKeyStorage:
         return message.encode("UTF-8")
 
     def _generate_signature(self, data, private_key):
-        return binascii.hexlify(private_key.sign(data, padding.PSS(mgf=padding.MGF1(hashes.SHA512()),
-                                                 salt_length=padding.PSS.MAX_LENGTH),
-                                hashes.SHA512()))
+        return binascii.hexlify(private_key.sign(data, padding.PKCS1v15(), hashes.SHA512()))
 
     def _generate_transaction_payload(self, method, data):
         return TransactionPayload(method=method, data=data).SerializeToString()
