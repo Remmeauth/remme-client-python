@@ -121,7 +121,6 @@ class RemmePublicKeyStorage:
             valid_from=valid_from,
             valid_to=valid_to
         ).SerializeToString()
-        print(f"public key {public_key}")
         pub_key_address = generate_address(self._family_name, public_key)
         storage_pub_key = generate_settings_address("remme.settings.storage_pub_key")
         setting_address = generate_settings_address("remme.economy_enabled")
@@ -130,8 +129,26 @@ class RemmePublicKeyStorage:
         return await self._create_and_send_transaction([pub_key_address, storage_pub_key, setting_address,
                                                         storage_address], payload_bytes)
 
-    def check(self, public_key):
+    def _check_public_key(self, public_key):
         raise NotImplementedError
+
+    async def _get_info_by_public_key(self, public_key):
+        self._check_public_key(public_key)
+        raise NotImplementedError
+
+    async def check(self, public_key):
+        """
+        Check public key on validity and revocation.
+        Can take address of public key.
+        @example
+        ```python
+        is_valid = await remme.public_key_storage.check(public_key)
+        print(is_valid) # True or False
+        ```
+        :param public_key: {string | cryptography.hazmat.backends.openssl.rsa._RSAPrivateKey | PEM bytes} publicKey
+        :return: {Promise<boolean>}
+        """
+        return await self._get_info_by_public_key(public_key)
 
     def revoke(self, public_key):
         raise NotImplementedError
@@ -146,7 +163,7 @@ class RemmePublicKeyStorage:
         return message.encode("UTF-8")
 
     def _generate_signature(self, data, private_key):
-        return binascii.hexlify(private_key.sign(data, padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
+        return binascii.hexlify(private_key.sign(data, padding.PSS(mgf=padding.MGF1(hashes.SHA512()),
                                                  salt_length=padding.PSS.MAX_LENGTH),
                                 hashes.SHA512()))
 
