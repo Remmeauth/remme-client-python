@@ -74,7 +74,7 @@ class RemmePublicKeyStorage:
 
     def _public_key_to_pem(self, public_key):
         return public_key.public_bytes(encoding=serialization.Encoding.PEM,
-                                       format=serialization.PublicFormat.SubjectPublicKeyInfo).decode("UTF-8")
+                                       format=serialization.PublicFormat.SubjectPublicKeyInfo).strip(b"\n")
 
     def _private_key_from_pem(self, private_key):
         return serialization.load_pem_private_key(private_key, password=None, backend=default_backend())
@@ -108,7 +108,9 @@ class RemmePublicKeyStorage:
         :return: {Promise}
         """
         private_key = self._private_key_from_pem(private_key) if isinstance(private_key, bytes) else private_key
-        public_key = public_key if isinstance(public_key, bytes) else self._public_key_to_pem(public_key)
+        public_key = public_key.strip(b"\n") if isinstance(public_key, bytes) else self._public_key_to_pem(public_key)
+        print(f"private key {private_key}")
+        print(f"public key {public_key}")
         message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)
@@ -116,7 +118,7 @@ class RemmePublicKeyStorage:
             public_key=public_key,
             public_key_type=public_key_type,
             entity_type=entity_type,
-            entity_hash=entity_hash,
+            entity_hash=binascii.hexlify(entity_hash),
             entity_hash_signature=entity_hash_signature,
             valid_from=valid_from,
             valid_to=valid_to
@@ -160,7 +162,7 @@ class RemmePublicKeyStorage:
         return sha512_hexdigest(data)
 
     def generate_entity_hash(self, message):
-        return message.encode("UTF-8")
+        return binascii.unhexlify(message)
 
     def _generate_signature(self, data, private_key):
         return binascii.hexlify(private_key.sign(data, padding.PKCS1v15(), hashes.SHA512()))

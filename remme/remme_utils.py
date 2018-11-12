@@ -50,11 +50,7 @@ def hex_to_bytes(message):
 
 
 def generate_address(_family_name, _public_key_to):
-    family_name_o = hashlib.sha512(utf8_to_bytes(_family_name))
-    _public_key_to = _public_key_to if isinstance(_public_key_to, bytes) else utf8_to_bytes(_public_key_to)
-    data_o = hashlib.sha512(_public_key_to)
-    result = "" + family_name_o.hexdigest()[:6] + data_o.hexdigest()[:64]
-    return result
+    return "" + sha512_hexdigest(_family_name)[:6] + sha512_hexdigest(_public_key_to)[:64]
 
 
 def generate_settings_address(key):

@@ -60,11 +60,23 @@ class RemmeTransactionService:
         :return: {Couroutine}
         """
         batcher_public_key = await self._remme_api.send_request(RemmeMethods.NODE_KEY)
+        print(f"inputs {inputs + [self._remme_account.address]}")
+        print(f"outputs {outputs + [self._remme_account.address]}")
         txn_header_bytes = TransactionHeader(
             family_name=family_name,
             family_version=family_version,
-            inputs=[self._remme_account.address] + inputs,
-            outputs=[self._remme_account.address] + outputs,
+            # inputs=['a23be14ee9dee1f5d910903d35ea24ef43e4f11639ee69fd6f414f2e9c1c1aaf21d095',
+            #         '0000007ca83d6bbb759da9cde0fb0dec1400c5482a777e854144e5e3b0c44298fc1c14',
+            #         '0000007ca83d6bbb759da9ebbaccb7f4037885e3b0c44298fc1c14e3b0c44298fc1c14',
+            #         '11200756d420660cfe7e32dc139cb3bdc90d09ef138704a9b4a9641cb3b74969c5089f',
+            #         '1120077670ce6077a14293063cb64bf8eae38ab9c14c21880a9355862591d20a5a8566'],
+            inputs=inputs + [self._remme_account.address],
+            # outputs=['a23be14ee9dee1f5d910903d35ea24ef43e4f11639ee69fd6f414f2e9c1c1aaf21d095',
+            #          '0000007ca83d6bbb759da9cde0fb0dec1400c5482a777e854144e5e3b0c44298fc1c14',
+            #          '0000007ca83d6bbb759da9ebbaccb7f4037885e3b0c44298fc1c14e3b0c44298fc1c14',
+            #          '11200756d420660cfe7e32dc139cb3bdc90d09ef138704a9b4a9641cb3b74969c5089f',
+            #          '1120077670ce6077a14293063cb64bf8eae38ab9c14c21880a9355862591d20a5a8566'],
+            outputs=outputs + [self._remme_account.address],
             signer_public_key=self._remme_account.public_key_hex,
             batcher_public_key=batcher_public_key,
             nonce=create_nonce(),

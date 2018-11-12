@@ -11,21 +11,21 @@ async def example():
     private_key_file = open("test_rsa_private.key", "rb")
     public_key_file = open("test_rsa_public.key", "rb")
     remme = Remme(private_key_hex=private_key_hex)
-    data = {
-        "data": "store data",
-        "private_key": private_key_file.read(),
-        "public_key": public_key_file.read(),
-        "valid_from": int(datetime.utcnow().strftime("%s")),
-        "valid_to": int((datetime.utcnow() + timedelta(days=365)).strftime("%s"))
-    }
-    # private_key = serialization.load_pem_private_key(private_key_file.read(), password=None, backend=default_backend())
     # data = {
     #     "data": "store data",
-    #     "private_key": private_key,
-    #     "public_key": private_key.public_key(),
+    #     "private_key": private_key_file.read(),
+    #     "public_key": public_key_file.read(),
     #     "valid_from": int(datetime.utcnow().strftime("%s")),
     #     "valid_to": int((datetime.utcnow() + timedelta(days=365)).strftime("%s"))
     # }
+    private_key = serialization.load_pem_private_key(private_key_file.read(), password=None, backend=default_backend())
+    data = {
+        "data": "store data",
+        "private_key": private_key,
+        "public_key": private_key.public_key(),
+        "valid_from": int(datetime.utcnow().strftime("%s")),
+        "valid_to": int((datetime.utcnow() + timedelta(days=365)).strftime("%s"))
+    }
     pubkey_storage_transaction_result = await remme.public_key_storage.store(**data)
     async for response in pubkey_storage_transaction_result.connect_to_web_socket():
         print("connected")
