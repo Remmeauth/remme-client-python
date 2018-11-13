@@ -109,8 +109,6 @@ class RemmePublicKeyStorage:
         """
         private_key = self._private_key_from_pem(private_key) if isinstance(private_key, bytes) else private_key
         public_key = public_key.strip(b"\n") if isinstance(public_key, bytes) else self._public_key_to_pem(public_key)
-        print(f"private key {private_key}")
-        print(f"public key {public_key}")
         message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)

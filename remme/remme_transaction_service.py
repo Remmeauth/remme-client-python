@@ -60,8 +60,6 @@ class RemmeTransactionService:
         :return: {Couroutine}
         """
         batcher_public_key = await self._remme_api.send_request(RemmeMethods.NODE_KEY)
-        print(f"inputs {inputs + [self._remme_account.address]}")
-        print(f"outputs {outputs + [self._remme_account.address]}")
         txn_header_bytes = TransactionHeader(
             family_name=family_name,
             family_version=family_version,
