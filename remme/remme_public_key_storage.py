@@ -1,12 +1,14 @@
 import binascii
+import re
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from remme.constants.entity_type import EntityType
 from remme.constants.pub_key_type import PubKeyType
 from remme.constants.remme_family_name import RemmeFamilyName
+from remme.constants.remme_patterns import RemmePatterns
 from remme.protos.proto_buf_pb2 import NewPubKeyPayload, PubKeyMethod
 from remme.protos.transaction_pb2 import TransactionPayload
 from remme.remme_utils import generate_address, generate_settings_address, sha512_hexdigest
@@ -99,16 +101,16 @@ class RemmePublicKeyStorage:
             store_response.close_web_socket()
         ```
         :param data: {string}
-        :param private_key: {cryptography.hazmat.backends.openssl.rsa._RSAPrivateKey | PEM bytes}
-        :param public_key: {cryptography.hazmat.backends.openssl.rsa._RSAPublicKey | PEM bytes}
+        :param private_key: {rsa.RSAPrivateKey | PEM bytes}
+        :param public_key: {rsa.RSAPublicKey | PEM bytes}
         :param valid_from: {integer}
         :param valid_to: {integer}
         :param public_key_type: {Enum value}
         :param entity_type: {Enum value}
         :return: {Promise}
         """
-        private_key = self._private_key_from_pem(private_key) if isinstance(private_key, bytes) else private_key
-        public_key = public_key.strip(b"\n") if isinstance(public_key, bytes) else self._public_key_to_pem(public_key)
+        private_key = private_key if isinstance(private_key, rsa.RSAPrivateKey) else self._private_key_from_pem(private_key)
+        public_key = self._public_key_to_pem(public_key) if isinstance(public_key, rsa.RSAPublicKey) else public_key.strip(b"\n")
         message = self.generate_message(data)
         entity_hash = self.generate_entity_hash(message)
         entity_hash_signature = self._generate_signature(entity_hash, private_key)
@@ -130,10 +132,18 @@ class RemmePublicKeyStorage:
                                                         storage_address], payload_bytes)
 
     def _check_public_key(self, public_key):
-        raise NotImplementedError
+        try:
+            if isinstance(public_key, bytes):
+                if re.match(RemmePatterns.PUBLIC_KEY.value, public_key) is None:
+                    # I was stopped here
+                    pass
+        except Exception:
+            raise Exception("Given public key is not a valid")
 
     async def _get_info_by_public_key(self, public_key):
         self._check_public_key(public_key)
+        if isinstance(public_key, rsa.RSAPublicKey):
+            public_key = self._public_key_to_pem(public_key)
         raise NotImplementedError
 
     async def check(self, public_key):

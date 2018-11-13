@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 async def example():
     private_key_hex = "7f752a99bbaf6755dc861bb4a7bb19acb913948d75f3b718ff4545d01d9d4ff5"
     node_private_key = "4c0393f24225443678543642d5a48ac0534b894ab82ae5f118d330fd2f56dae4"
-    remme = Remme(private_key_hex=private_key_hex)
+    remme = Remme(private_key_hex=node_private_key)
 
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
 
@@ -56,6 +56,13 @@ async def example():
 
         if response.status == BatchStatus.COMMITTED.value:
             print("Batch COMMITTED")
+
+            # check public key in chain
+
+            # revoke public key in chain
+
+            # check public key in chain
+
             await pubkey_storage_transaction_result.close_web_socket()
 
 
