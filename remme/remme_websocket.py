@@ -137,7 +137,7 @@ class RemmeWebSocket:
         self._session = None
 
     @property
-    def socket_address(self):
+    def node_address(self):
         """
         Get node address that was provided by user
         :return: {string}

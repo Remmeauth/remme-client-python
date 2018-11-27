@@ -63,8 +63,8 @@ class RemmeTransactionService:
         txn_header_bytes = TransactionHeader(
             family_name=family_name,
             family_version=family_version,
-            inputs=[self._remme_account.address] + inputs,
-            outputs=[self._remme_account.address] + outputs,
+            inputs=inputs + [self._remme_account.address],
+            outputs=outputs + [self._remme_account.address],
             signer_public_key=self._remme_account.public_key_hex,
             batcher_public_key=batcher_public_key,
             nonce=create_nonce(),
