@@ -40,11 +40,13 @@ class RemmeToken:
         # print(f"transaction method : {tr.method} ; transaction data : {tr.data}")
         # print(f"transaction serialized : {tr.SerializeToString()}")
 
-        return await self.transaction_service.create(family_name=RemmeFamilyName.ACCOUNT.value,
-                                                family_version=self._family_version,
-                                                inputs=[receiver_address],
-                                                outputs=[receiver_address],
-                                                payload_bytes=tr.SerializeToString())
+        return await self.transaction_service.create(
+            family_name=RemmeFamilyName.ACCOUNT.value,
+            family_version=self._family_version,
+            inputs=[receiver_address],
+            outputs=[receiver_address],
+            payload_bytes=tr.SerializeToString(),
+        )
 
     async def transfer(self, public_key_to, amount):
         payload = await self._create_transfer_tx(public_key_to, amount)
@@ -56,8 +58,8 @@ class RemmeToken:
             raise Exception("Invalid key")
         return key
 
-    async def get_balance(self, public_key):
-        params = {"public_key": self.validate_public_key(public_key)}
+    async def get_balance(self, public_key_address):
+        params = {'public_key_address': public_key_address}
         result = await self.api.send_request(RemmeMethods.TOKEN, params)
         # print(f'get_balance result: {result}')
         return result
