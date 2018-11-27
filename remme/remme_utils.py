@@ -50,12 +50,15 @@ def hex_to_bytes(message):
 
 
 def generate_address(_family_name, _public_key_to):
-    # print(f"utils; generate_address args: {_family_name}  ,  {_public_key_to}")
-    family_name_o = hashlib.sha512(utf8_to_bytes(_family_name))
-    data_o = hashlib.sha512(utf8_to_bytes(_public_key_to))
-    result = "" + family_name_o.hexdigest()[:6] + data_o.hexdigest()[:64]
-    # print(f"utils; generate_address result: {result}")
-    return result
+    return "" + sha512_hexdigest(_family_name)[:6] + sha512_hexdigest(_public_key_to)[:64]
+
+
+def generate_settings_address(key):
+    key_parts = key.split(".")[:4]
+    address_parts = [sha256_hexdigest(x)[0:16] for x in key_parts]
+    while (4 - len(address_parts)) != 0:
+        address_parts.append(sha256_hexdigest("")[0:16])
+    return "000000" + "".join(address_parts)
 
 
 def create_nonce():
@@ -68,6 +71,10 @@ def create_nonce():
 
 def sha512_hexdigest(data):
     return hashlib.sha512(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
+
+
+def sha256_hexdigest(data):
+    return hashlib.sha256(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
 
 
 def is_hex(data):

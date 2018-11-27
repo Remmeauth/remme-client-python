@@ -45,7 +45,7 @@ class Remme:
         self.account = RemmeAccount(self._private_key_hex)
 
         self.transaction_service = RemmeTransactionService(self._api, self.account)
-        self.public_key_storage = RemmePublicKeyStorage(self._api, self.transaction_service, self.account)
+        self.public_key_storage = RemmePublicKeyStorage(self._api, self.account, self.transaction_service)
         self.certificate = RemmeCertificate(self.public_key_storage)
         self.token = RemmeToken(self._api, self.transaction_service)
         self.batch = RemmeBatch(self._api)
