@@ -27,8 +27,8 @@ async def example():
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
 
     # check balance before transaction
-    before_balance = await remme.token.get_balance(remme.account.public_key_hex)
-    print(f'balance is : {before_balance} REM\n')
+    balance = await remme.token.get_balance(remme.account.address)
+    print(f'balance is : {balance} REM\n')
 
     data = {
         "data": "store data",
