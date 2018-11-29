@@ -59,8 +59,10 @@ class RemmeTransactionService:
         :param payload_bytes: {bytes}
         :return: {Couroutine}
         """
-        batcher_public_key = await self._remme_api.send_request(RemmeMethods.NODE_KEY)
-        txn_header_bytes = TransactionHeader(
+        node_config = await self._remme_api.send_request(method=RemmeMethods.NODE_CONFIG)
+        batcher_public_key = node_config.get('node_public_key')
+
+        transaction_header_bytes = TransactionHeader(
             family_name=family_name,
             family_version=family_version,
             inputs=inputs + [self._remme_account.address],
@@ -71,13 +73,14 @@ class RemmeTransactionService:
             dependencies=[],
             payload_sha512=sha512_hexdigest(payload_bytes)
         ).SerializeToString()
-        signature = self._remme_account.sign(txn_header_bytes)
-        txn = Transaction(
-            header=txn_header_bytes,
-            header_signature=signature,
-            payload=payload_bytes
+
+        signature = self._remme_account.sign(transaction_header_bytes)
+
+        transaction = Transaction(
+            header=transaction_header_bytes, header_signature=signature, payload=payload_bytes,
         ).SerializeToString()
-        return b64encode(txn).decode('utf-8')
+
+        return b64encode(transaction).decode('utf-8')
 
     async def send(self, payload):
         """
@@ -89,6 +92,10 @@ class RemmeTransactionService:
         :param payload: {string} transaction
         :return: {Couroutine}
         """
-        params = {"data": payload}
-        batch_id = await self._remme_api.send_request(RemmeMethods.TRANSACTION, params)
-        return BaseTransactionResponse(self._remme_api.node_address, self._remme_api.ssl_mode, batch_id)
+        batch_id = await self._remme_api.send_request(method=RemmeMethods.TRANSACTION, params={
+            "data": payload,
+        })
+
+        return BaseTransactionResponse(
+            node_address=self._remme_api.node_address, ssl_mode=self._remme_api.ssl_mode, batch_id=batch_id,
+        )
