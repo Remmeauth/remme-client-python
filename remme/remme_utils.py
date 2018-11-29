@@ -1,9 +1,55 @@
-import hashlib
 import base64
+import hashlib
 import math
 import random
 import re
+
 from remme.constants.remme_patterns import RemmePatterns
+
+
+def is_amount_valid(amount):
+    """
+    Validate amount.
+    """
+    if not isinstance(amount, int):
+        return False, 'Given amount is not in integer type.'
+
+    if amount <= 0:
+        return False, 'Given amount is not valid for operations.'
+
+    return True, None
+
+
+def is_public_key_valid(public_key):
+    """
+    Validate public key.
+    """
+    if public_key == '':
+        return False, 'Public key was not provided, please set the public key.'
+
+    if len(public_key) != 66:
+        return False, 'Length of the given public key is not valid.'
+
+    if not re.match(pattern=RemmePatterns.PUBLIC_KEY.value, string=public_key):
+        return False, 'Given public key is not in hexadecimal string format.'
+
+    return True, None
+
+
+def is_address_valid(address):
+    """
+    Validate address.
+    """
+    if address == '':
+        return False, 'Address was not provided, please set the address.'
+
+    if len(address) != 70:
+        return False, 'Length of the given address is not valid.'
+
+    if not re.match(pattern=RemmePatterns.ADDRESS.value, string=address):
+        return False, 'Given address is not in hexadecimal string format.'
+
+    return True, None
 
 
 def is_valid_batch_id(_batch_id):
