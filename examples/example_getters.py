@@ -1,7 +1,5 @@
 from remme.remme import Remme
-from remme.models.base_transaction_response import BaseTransactionResponse
 import asyncio
-import json
 
 
 async def example():
@@ -12,8 +10,6 @@ async def example():
     sender_private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
 
     remme_sender = Remme(private_key_hex=sender_private_key_hex)
-
-
 
     query = {"start": 0}
     blocks = await remme_sender.blockchain_info.get_blocks(query)
