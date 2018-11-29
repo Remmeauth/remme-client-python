@@ -1,3 +1,6 @@
+"""
+Provide constants for Remme patterns.
+"""
 from enum import Enum
 
 
