@@ -2,62 +2,69 @@ from remme.constants.remme_family_name import RemmeFamilyName
 from remme.constants.remme_methods import RemmeMethods
 from remme.protos.account_pb2 import AccountMethod, TransferPayload
 from remme.protos.transaction_pb2 import TransactionPayload
+from remme.remme_utils import (
+    is_address_valid,
+    is_amount_valid,
+)
 
 
 class RemmeToken:
 
-    api = None
-    transaction_service = None
-    _family_version = "0.1"
+    _family_name = RemmeFamilyName.ACCOUNT.value
+    _family_version = '0.1'
 
-    def __init__(self, rest, transaction_service):
-        self.api = rest
+    def __init__(self, api, transaction_service):
+        self.api = api
         self.transaction_service = transaction_service
 
-    def validate_amount(self, amount):
-        if amount <= 0:
-            raise Exception("Invalid amount")
-        return amount
+        self.transfer_payload = TransferPayload()
+        self.transaction_payload = TransactionPayload()
 
-    @staticmethod
-    def validate_public_key(key):
-        if len(key) != 66:
-            raise Exception("Invalid key")
-        return key
+    async def get_balance(self, address):
+        """
+        Get token balance by address.
+        """
+        address_is_valid, error = is_address_valid(address=address)
 
-    @staticmethod
-    def validate_public_key_address(address):
-        if len(address) != 70:
-            raise Exception("Invalid address")
-        return address
+        if not address_is_valid:
+            raise Exception(error)
 
-    async def _create_transfer_tx(self, address, amount):
-        receiver_address = self.validate_public_key_address(address=address)
-        amount = self.validate_amount(amount)
+        return await self.api.send_request(method=RemmeMethods.TOKEN, params={
+            'public_key_address': address,
+        })
 
-        transfer = TransferPayload()
-        transfer.address_to = receiver_address
-        transfer.value = amount
+    async def transfer(self, address_to, amount):
+        """
+        Send transaction by receiver address and amount.
+        """
+        address_is_valid, error = is_address_valid(address=address_to)
 
-        tr = TransactionPayload()
-        tr.method = AccountMethod.TRANSFER
-        tr.data = transfer.SerializeToString()
+        if not address_is_valid:
+            raise Exception(error)
+
+        amount_is_valid, error = is_amount_valid(amount=amount)
+
+        if not address_is_valid:
+            raise Exception(error)
+
+        payload = await self._create_transaction(address_to=address_to, amount=amount)
+
+        return await self.transaction_service.send(payload=payload)
+
+    async def _create_transaction(self, address_to, amount):
+        """
+        Create transaction by receiver address and amount.
+        """
+        self.transfer_payload.address_to = address_to
+        self.transfer_payload.value = amount
+
+        self.transaction_payload.method = AccountMethod.TRANSFER
+        self.transaction_payload.data = self.transfer_payload.SerializeToString()
 
         return await self.transaction_service.create(
-            family_name=RemmeFamilyName.ACCOUNT.value,
+            family_name=self._family_name,
             family_version=self._family_version,
-            inputs=[receiver_address],
-            outputs=[receiver_address],
-            payload_bytes=tr.SerializeToString(),
+            inputs=[address_to],
+            outputs=[address_to],
+            payload_bytes=self.transaction_payload.SerializeToString(),
         )
-
-    async def transfer(self, receiver_address, amount):
-        receiver_address = self.validate_public_key_address(address=receiver_address)
-        payload = await self._create_transfer_tx(receiver_address, amount)
-        return await self.transaction_service.send(payload)
-
-    async def get_balance(self, public_key_address):
-        address = self.validate_public_key_address(address=public_key_address)
-        params = {'public_key_address': address}
-        result = await self.api.send_request(RemmeMethods.TOKEN, params)
-        return result
