@@ -7,49 +7,43 @@ import re
 from remme.constants.remme_patterns import RemmePatterns
 
 
-def is_amount_valid(amount):
+def validate_amount(amount):
     """
     Validate amount.
     """
     if not isinstance(amount, int):
-        return False, 'Given amount is not in integer type.'
+        raise Exception('Given amount is not in integer type.')
 
     if amount <= 0:
-        return False, 'Given amount is not valid for operations.'
-
-    return True, None
+        raise Exception('Given amount is not valid for operations.')
 
 
-def is_public_key_valid(public_key):
+def validate_public_key(public_key):
     """
     Validate public key.
     """
     if public_key == '':
-        return False, 'Public key was not provided, please set the public key.'
+        raise Exception('Public key was not provided, please set the public key.')
 
     if len(public_key) != 66:
-        return False, 'Length of the given public key is not valid.'
+        raise Exception('Length of the given public key is not valid.')
 
     if not re.match(pattern=RemmePatterns.PUBLIC_KEY.value, string=public_key):
-        return False, 'Given public key is not in hexadecimal string format.'
-
-    return True, None
+        raise Exception('Given public key is not in hexadecimal string format.')
 
 
-def is_address_valid(address):
+def validate_address(address):
     """
     Validate address.
     """
     if address == '':
-        return False, 'Address was not provided, please set the address.'
+        raise Exception('Address was not provided, please set the address.')
 
     if len(address) != 70:
-        return False, 'Length of the given address is not valid.'
+        raise Exception('Length of the given address is not valid.')
 
     if not re.match(pattern=RemmePatterns.ADDRESS.value, string=address):
-        return False, 'Given address is not in hexadecimal string format.'
-
-    return True, None
+        raise Exception('Given address is not in hexadecimal string format.')
 
 
 def is_valid_batch_id(_batch_id):
@@ -57,9 +51,7 @@ def is_valid_batch_id(_batch_id):
 
 
 def bytes_to_hex(_bytes):
-    # print(f"functions; bytes_to_hex args: {_bytes}")
     result = utf8_to_bytes(_bytes).hex()
-    # print(f"functions; bytes_to_hex result: {result}")
     return result
 
 
@@ -107,11 +99,13 @@ def generate_settings_address(key):
     return "000000" + "".join(address_parts)
 
 
+def public_key_address(value):
+    return {'public_key_address': value}
+
+
 def create_nonce():
-    # print(f"utils; generate nonce")
     hash_o = hashlib.sha512(str(math.floor(1000 * random.random())).encode('UTF-8'))
     result = hash_o.hexdigest()
-    # print(f"utils; generate nonce result: {result}")
     return result
 
 
