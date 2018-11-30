@@ -1,63 +1,107 @@
-from remme.remme_utils import generate_address
 from remme.constants.remme_family_name import RemmeFamilyName
 from remme.constants.remme_methods import RemmeMethods
 from remme.protos.account_pb2 import AccountMethod, TransferPayload
 from remme.protos.transaction_pb2 import TransactionPayload
+from remme.remme_utils import (
+    public_key_address,
+    validate_address,
+    validate_amount,
+)
 
 
 class RemmeToken:
+    """
+    Class that work with tokens. Transfer them and getting balance by address.
 
-    api = None
-    transaction_service = None
-    _family_version = "0.1"
+    @example
+    ```python
+    some_remme_address = '1120077f88b0b798347b3f52751bb99fa8cabaf926c5a1dad2d975d7b966a85b3a9c21'
 
-    def __init__(self, rest, transaction_service):
-        self.api = rest
+    receiver_balance = await remme.token.get_balance(some_remme_address)
+    print(f'Account {some_remme_address} as receiver, balance - {receiver_balance} REM')
+
+    balance = await remme.token.get_balance(remme.account.address)
+    print(f'Account {remme.account.address} as sender, balance - {balance} REM')
+
+    transaction_result = await remme.token.transfer(some_remme_address, 10)
+    print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
+
+    async for batch_info in transaction_result.connect_to_web_socket():
+        if batch_info.status == BatchStatus.COMMITTED.value:
+            new_balance = await remme.token.get_balance(some_remme_address)
+            print(f'Account {some_remme_address} balance - {new_balance} REM')
+            await transaction_result.close_web_socket()
+    ```
+    """
+
+    _family_name = RemmeFamilyName.ACCOUNT.value
+    _family_version = '0.1'
+
+    def __init__(self, api, transaction_service):
+        self.api = api
         self.transaction_service = transaction_service
 
-    def validate_amount(self, amount):
-        if amount <= 0:
-            raise Exception("Invalid amount")
-        return amount
+        self.transfer_payload = TransferPayload()
+        self.transaction_payload = TransactionPayload()
 
-    async def _create_transfer_tx(self, public_key_to, amount):
-        public_key_to = self.validate_public_key(public_key_to)
-        amount = self.validate_amount(amount)
-        receiver_address = generate_address(RemmeFamilyName.ACCOUNT.value, public_key_to)
-        # print(f"receiver address: {receiver_address}")
+    async def get_balance(self, address):
+        """
+        Get balance on given account address.
 
-        transfer = TransferPayload()
-        transfer.address_to = receiver_address
-        transfer.value = amount
+        @example
+        ```python
+        balance = await remme.token.get_balance(remme.account.address)
+        print(f'Account {remme.account.address} as sender, balance - {balance} REM')
+        ```
 
-        # print(f"transfer address : {transfer.address_to} ; transfer value : {transfer.value}")
-        # print(f"transfer serialized : {transfer.SerializeToString()}")
+        :param address: {string}
+        :return: {integer}
+        """
+        validate_address(address=address)
 
-        tr = TransactionPayload()
-        tr.method = AccountMethod.TRANSFER
-        tr.data = transfer.SerializeToString()
+        return await self.api.send_request(
+            method=RemmeMethods.TOKEN,
+            params=public_key_address(value=address),
+        )
 
-        # print(f"transaction method : {tr.method} ; transaction data : {tr.data}")
-        # print(f"transaction serialized : {tr.SerializeToString()}")
+    async def transfer(self, address_to, amount):
+        """
+        Transfer tokens from signed address (remme.account.address) to given address.
+        Send transaction to REMChain.
 
-        return await self.transaction_service.create(family_name=RemmeFamilyName.ACCOUNT.value,
-                                                family_version=self._family_version,
-                                                inputs=[receiver_address],
-                                                outputs=[receiver_address],
-                                                payload_bytes=tr.SerializeToString())
+        @example
+        ```python
+        some_remme_address = '1120077f88b0b798347b3f52751bb99fa8cabaf926c5a1dad2d975d7b966a85b3a9c21'
 
-    async def transfer(self, public_key_to, amount):
-        payload = await self._create_transfer_tx(public_key_to, amount)
-        return await self.transaction_service.send(payload)
+        transaction_result = await remme.token.transfer(some_remme_address, 10)
+        print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
 
-    @staticmethod
-    def validate_public_key(key):
-        if len(key) != 66:
-            raise Exception("Invalid key")
-        return key
+        async for batch_info in transaction_result.connect_to_web_socket():
+            if batch_info.status == BatchStatus.COMMITTED.value:
+                new_balance = await remme.token.get_balance(some_remme_address)
+                print(f'Account {some_remme_address} balance - {new_balance} REM')
+                await transaction_result.close_web_socket()
+        ```
 
-    async def get_balance(self, public_key):
-        params = {"public_key": self.validate_public_key(public_key)}
-        result = await self.api.send_request(RemmeMethods.TOKEN, params)
-        # print(f'get_balance result: {result}')
-        return result
+        :param address_to: {string}
+        :param amount: {integer}
+        :return: {string}
+        """
+        validate_address(address=address_to)
+        validate_amount(amount=amount)
+
+        self.transfer_payload.address_to = address_to
+        self.transfer_payload.value = amount
+
+        self.transaction_payload.method = AccountMethod.TRANSFER
+        self.transaction_payload.data = self.transfer_payload.SerializeToString()
+
+        payload = await self.transaction_service.create(
+            family_name=self._family_name,
+            family_version=self._family_version,
+            inputs=[address_to],
+            outputs=[address_to],
+            payload_bytes=self.transaction_payload.SerializeToString(),
+        )
+
+        return await self.transaction_service.send(payload=payload)

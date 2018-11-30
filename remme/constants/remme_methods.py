@@ -1,7 +1,11 @@
+"""
+Enumeration all currently available methods in our JSON-RPC.
+"""
 from enum import Enum
 
 
 class RemmeMethods(Enum):
+
     PUBLIC_KEY = "get_public_key_info"
     TOKEN = "get_balance"
     BATCH_STATUS = "get_batch_status"
@@ -9,6 +13,7 @@ class RemmeMethods(Enum):
     ATOMIC_SWAP_PUBLIC_KEY = "get_atomic_swap_public_key"
     USER_PUBLIC_KEY = "get_public_keys_list"
     NODE_KEY = "get_node_public_key"
+    NODE_CONFIG = "get_node_config"
     NODE_PRIVATE_KEY = "export_node_key"
     TRANSACTION = "send_raw_transaction"
     NETWORK_STATUS = "get_node_info"

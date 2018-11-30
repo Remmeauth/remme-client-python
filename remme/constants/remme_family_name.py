@@ -1,3 +1,6 @@
+"""
+Provide constants for Remme family names.
+"""
 from enum import Enum
 
 

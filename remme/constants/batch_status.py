@@ -1,3 +1,6 @@
+"""
+Provide constants for Remme batch statuses.
+"""
 from enum import Enum
 
 
