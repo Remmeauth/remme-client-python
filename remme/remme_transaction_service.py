@@ -77,7 +77,9 @@ class RemmeTransactionService:
         signature = self._remme_account.sign(transaction_header_bytes)
 
         transaction = Transaction(
-            header=transaction_header_bytes, header_signature=signature, payload=payload_bytes,
+            header=transaction_header_bytes,
+            header_signature=signature,
+            payload=payload_bytes,
         ).SerializeToString()
 
         return b64encode(transaction).decode('utf-8')
@@ -92,10 +94,13 @@ class RemmeTransactionService:
         :param payload: {string} transaction
         :return: {Couroutine}
         """
-        batch_id = await self._remme_api.send_request(method=RemmeMethods.TRANSACTION, params={
-            "data": payload,
-        })
+        batch_id = await self._remme_api.send_request(
+            method=RemmeMethods.TRANSACTION,
+            params={"data": payload},
+        )
 
         return BaseTransactionResponse(
-            node_address=self._remme_api.node_address, ssl_mode=self._remme_api.ssl_mode, batch_id=batch_id,
+            node_address=self._remme_api.node_address,
+            ssl_mode=self._remme_api.ssl_mode,
+            batch_id=batch_id,
         )
