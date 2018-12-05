@@ -21,7 +21,8 @@ class KeyDto:
         self._public_key_base64 = public_key_base64
         self._key_type = key_type
 
-    def get_address(self):
+    @property
+    def address(self):
         """
         Address of this key in blockchain.
 
@@ -32,7 +33,8 @@ class KeyDto:
         """
         return self._address
 
-    def get_private_key(self):
+    @property
+    def private_key(self):
         """
         Return private key.
 
@@ -43,7 +45,8 @@ class KeyDto:
 
         return self._private_key
 
-    def get_public_key(self):
+    @property
+    def public_key(self):
         """
         Return public key.
 
@@ -51,23 +54,32 @@ class KeyDto:
         """
         return self._public_key
 
-    def get_private_key_hex(self):
+    @property
+    def private_key_hex(self):
         """
         Return private key in hex format.
 
         :return: {string}
         """
+        if not self._private_key_hex:
+            raise Exception(f"Don't supported for this key type: {self._key_type} or didn't provide private key.")
+
         return self._private_key_hex
 
-    def get_public_key_hex(self):
+    @property
+    def public_key_hex(self):
         """
         Return public key in hex format.
 
         :return: {string}
         """
+        if not self._public_key_hex:
+            raise Exception(f"Don't supported for this key type: {self._key_type}.")
+
         return self._public_key_hex
 
-    def get_private_key_pem(self):
+    @property
+    def private_key_pem(self):
         """
         Return private key in pem format.
 
@@ -78,7 +90,8 @@ class KeyDto:
 
         return self._private_key_pem
 
-    def get_public_key_pem(self):
+    @property
+    def public_key_pem(self):
         """
         Return public key in pem format.
 
@@ -89,7 +102,8 @@ class KeyDto:
 
         return self._public_key_pem
 
-    def get_public_key_base64(self):
+    @property
+    def public_key_base64(self):
         """
         Return base 64 of public key.
 
@@ -97,7 +111,8 @@ class KeyDto:
         """
         return self._public_key_base64
 
-    def get_key_type(self):
+    @property
+    def key_type(self):
         """
         Return key type.
 
@@ -105,7 +120,8 @@ class KeyDto:
         """
         return KeyType[self._key_type]
 
-    def get_family_name(self):
+    @property
+    def family_name(self):
         """
         Return family name.
 
