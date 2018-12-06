@@ -4,7 +4,7 @@ import math
 import random
 import re
 
-from remme.constants.remme_patterns import RemmePatterns
+from remme.enums.remme_patterns import RemmePatterns
 
 
 def validate_amount(amount):
@@ -101,6 +101,24 @@ def generate_settings_address(key):
 
 def public_key_address(value):
     return {'public_key_address': value}
+
+
+def public_key_to_pem(public_key):
+    """
+    Convert public key to PEM format.
+    :param public_key
+    :return: PEM format string
+    """
+    return f"-----BEGIN PUBLIC KEY-----\n{base64.b64encode(public_key)}\n-----END PUBLIC KEY-----"
+
+
+def private_key_to_pem(private_key):
+    """
+    Convert private key to PEM format.
+    :param private_key
+    :return: PEM format string
+    """
+    return f"-----BEGIN PRIVATE KEY-----\n{base64.b64encode(private_key)}\n-----END PRIVATE KEY-----"
 
 
 def create_nonce():
