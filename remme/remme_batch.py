@@ -1,6 +1,6 @@
 import re
-from remme.constants.remme_methods import RemmeMethods
-from remme.constants.remme_patterns import RemmePatterns
+from remme.enums.remme_methods import RemmeMethods
+from remme.enums.remme_patterns import RemmePatterns
 
 
 class RemmeBatch:

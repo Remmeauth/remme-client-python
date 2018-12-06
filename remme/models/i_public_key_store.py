@@ -1,5 +1,5 @@
-from remme.constants.pub_key_type import PubKeyType
-from remme.constants.entity_type import EntityType
+from remme.enums.pub_key_type import PubKeyType
+from remme.enums.entity_type import EntityType
 
 
 class IPublicKeyStore:

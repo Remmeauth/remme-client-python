@@ -5,10 +5,10 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
-from remme.constants.entity_type import EntityType
-from remme.constants.pub_key_type import PubKeyType
-from remme.constants.remme_family_name import RemmeFamilyName
-from remme.constants.remme_patterns import RemmePatterns
+from remme.enums.entity_type import EntityType
+from remme.enums.pub_key_type import PubKeyType
+from remme.enums.remme_family_name import RemmeFamilyName
+from remme.enums.remme_patterns import RemmePatterns
 from remme.protos.proto_buf_pb2 import NewPubKeyPayload, PubKeyMethod
 from remme.protos.transaction_pb2 import TransactionPayload
 from remme.remme_utils import generate_address, generate_settings_address, sha512_hexdigest
