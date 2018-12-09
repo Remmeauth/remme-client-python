@@ -53,8 +53,8 @@ class RSA(KeyDto, IRemmeKeys):
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
             )
 
-        self._public_key_pem = public_key_to_pem(self.public_key)
-        self._private_key_pem = private_key_to_pem(self.private_key)
+        self._public_key_pem = public_key_to_pem(self._public_key)
+        self._private_key_pem = private_key_to_pem(self._private_key)
 
         self._public_key_base64 = dict_to_base64(self._public_key_pem)
         self._address = generate_address(RemmeFamilyName.PUBLIC_KEY, self._public_key_pem)
