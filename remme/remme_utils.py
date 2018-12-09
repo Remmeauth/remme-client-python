@@ -51,8 +51,7 @@ def is_valid_batch_id(_batch_id):
 
 
 def bytes_to_hex(_bytes):
-    result = utf8_to_bytes(_bytes).hex()
-    return result
+    return utf8_to_bytes(_bytes).hex()
 
 
 def base64_to_dict(_base64):
