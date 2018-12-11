@@ -5,7 +5,7 @@ class IRemmeKeys(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def sign(data, rsa_signature_padding):
+    def sign(data, rsa_signature_padding=None):
         """
         Sign provided data with selected key implementation.
 
@@ -17,7 +17,7 @@ class IRemmeKeys(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def verify(data, signature, rsa_signature_padding):
+    def verify(data, signature, rsa_signature_padding=None):
         """
         Verify signature for selected key implementation.
 

@@ -49,7 +49,12 @@ class RSA(KeyDto, IRemmeKeys):
             self._private_key = private_key
             self._public_key = self._private_key.public_key()
 
-        self._private_key_pem = private_key_to_pem(self._private_key)
+        elif public_key:
+            self._public_key = public_key
+
+        if self._private_key:
+            self._private_key_pem = private_key_to_pem(self._private_key)
+
         self._public_key_pem = public_key_to_pem(self._public_key)
 
         self._public_key_base64 = dict_to_base64(self._public_key_pem)
@@ -76,38 +81,45 @@ class RSA(KeyDto, IRemmeKeys):
         """
         return generate_address(RemmeFamilyName.PUBLIC_KEY, public_key_to_pem(public_key=public_key))
 
-    def sign(self, data, rsa_signature_padding):
+    def sign(self, data, rsa_signature_padding=None):
         """
         Sign provided data with selected key implementation.
         :param data: data string which will be signed
         :param rsa_signature_padding: RSA padding for signature (optional)
         :return: hex string for signature
         """
+        if self._private_key is None:
+            raise Exception('Private key is not provided!')
+
         chosen_hash = hashes.SHA512()
         hasher = hashes.Hash(chosen_hash, default_backend())
         hasher.update(utf8_to_bytes(_string=data))
         digest = hasher.finalize()
 
-        if rsa_signature_padding == RsaSignaturePadding.PSS:
+        if rsa_signature_padding:
 
-            return base64.b64encode(self._private_key.sign(
-                digest,
-                padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA512()),
-                    salt_length=self._calculate_salt_length(key=self._private_key)),
-                hashes.SHA512()
-                )
-            ).decode()
+            if rsa_signature_padding == RsaSignaturePadding.PSS:
 
-        if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
+                return base64.b64encode(self._private_key.sign(
+                    digest,
+                    padding.PSS(
+                        mgf=padding.MGF1(hashes.SHA512()),
+                        salt_length=self._calculate_salt_length(key=self._private_key)),
+                    hashes.SHA512()
+                    )
+                ).decode()
 
-            return base64.b64encode(self._private_key.sign(
-                digest,
-                padding.PKCS1v15(),
-                hashes.SHA512()
-            )).decode()
+            if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
 
-    def verify(self, data, signature, rsa_signature_padding):
+                return base64.b64encode(self._private_key.sign(
+                    digest,
+                    padding.PKCS1v15(),
+                    hashes.SHA512()
+                )).decode()
+
+        raise Exception('RSA signature padding is not provided!')
+
+    def verify(self, data, signature, rsa_signature_padding=None):
         """
         Verify signature for selected key implementation.
         :param data: data string which will be verified
@@ -120,37 +132,41 @@ class RSA(KeyDto, IRemmeKeys):
         hasher.update(utf8_to_bytes(_string=data))
         digest = hasher.finalize()
 
-        if rsa_signature_padding == RsaSignaturePadding.PSS:
-            try:
-                signature_verified = self._public_key.verify(
-                    base64.b64decode(signature),
-                    digest,
-                    padding.PSS(
-                        mgf=padding.MGF1(hashes.SHA512()),
-                        salt_length=self._calculate_salt_length(key=self._public_key)),
-                    hashes.SHA512(),
-                )
+        if rsa_signature_padding:
 
-                if signature_verified is None:
-                    print('Signature verified successfully!')
+            if rsa_signature_padding == RsaSignaturePadding.PSS:
+                try:
+                    signature_verified = self._public_key.verify(
+                        base64.b64decode(signature),
+                        digest,
+                        padding.PSS(
+                            mgf=padding.MGF1(hashes.SHA512()),
+                            salt_length=self._calculate_salt_length(key=self._public_key)),
+                        hashes.SHA512(),
+                    )
 
-            except InvalidSignature:
-                print('ERROR: Payload and/or signature failed verification!')
+                    if signature_verified is None:
+                        print('Signature verified successfully!')
 
-        if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
-            try:
-                signature_verified = self._public_key.verify(
-                    base64.b64decode(signature),
-                    digest,
-                    padding.PKCS1v15(),
-                    hashes.SHA512(),
-                )
+                except InvalidSignature:
+                    print('ERROR: Payload and/or signature failed verification!')
 
-                if signature_verified is None:
-                    print('Signature verified successfully!')
+            if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
+                try:
+                    signature_verified = self._public_key.verify(
+                        base64.b64decode(signature),
+                        digest,
+                        padding.PKCS1v15(),
+                        hashes.SHA512(),
+                    )
 
-            except InvalidSignature:
-                print('ERROR: Payload and/or signature files failed verification!')
+                    if signature_verified is None:
+                        print('Signature verified successfully!')
+
+                except InvalidSignature:
+                    print('ERROR: Payload and/or signature files failed verification!')
+
+        raise Exception('RSA signature padding is not provided!')
 
     @staticmethod
     def _calculate_salt_length(key):
