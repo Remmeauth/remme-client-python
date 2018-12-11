@@ -4,6 +4,9 @@ import math
 import random
 import re
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+
 from remme.enums.remme_patterns import RemmePatterns
 
 
@@ -104,20 +107,52 @@ def public_key_address(value):
 
 def public_key_to_pem(public_key):
     """
-    Convert public key to PEM format.
+    Convert public key object to PEM format.
     :param public_key
-    :return: PEM format string
+    :return: PEM string format
     """
-    return f"-----BEGIN PUBLIC KEY-----\n{base64.b64encode(public_key)}\n-----END PUBLIC KEY-----"
+    return public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
 
 
 def private_key_to_pem(private_key):
     """
-    Convert private key to PEM format.
+    Convert private key object to PEM format.
     :param private_key
-    :return: PEM format string
+    :return: PEM string format
     """
-    return f"-----BEGIN PRIVATE KEY-----\n{base64.b64encode(private_key)}\n-----END PRIVATE KEY-----"
+    return private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+
+
+def private_key_pem_to_object(private_key):
+    """
+    Convert private key in PEM format to RSA object.
+    :param private_key: RSA private key
+    :return: private key object
+    """
+    return serialization.load_pem_private_key(
+        data=private_key,
+        password=None,
+        backend=default_backend(),
+    )
+
+
+def public_key_pem_to_object(public_key):
+    """
+    Convert public key in PEM format to RSA object.
+    :param public_key: RSA public key
+    :return: public key object
+    """
+    return serialization.load_pem_public_key(
+        data=public_key,
+        backend=default_backend(),
+    )
 
 
 def create_nonce():
