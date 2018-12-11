@@ -2,10 +2,7 @@ import base64
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import (
-    hashes,
-    serialization,
-)
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import (
     padding,
     rsa,
@@ -29,6 +26,9 @@ from remme.remme_utils import (
 class RSA(KeyDto, IRemmeKeys):
     """
     RSA class implementation.
+
+    References:
+        - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/
     """
 
     _rsa_key_size = 2048
@@ -47,14 +47,10 @@ class RSA(KeyDto, IRemmeKeys):
 
         elif private_key:
             self._private_key = private_key
-            public_key = self.convert_string_to_object(private_key=private_key).public_key()
-            self._public_key = public_key.public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
-            )
+            self._public_key = self._private_key.public_key()
 
-        self._public_key_pem = public_key_to_pem(self._public_key)
         self._private_key_pem = private_key_to_pem(self._private_key)
+        self._public_key_pem = public_key_to_pem(self._public_key)
 
         self._public_key_base64 = dict_to_base64(self._public_key_pem)
         self._address = generate_address(RemmeFamilyName.PUBLIC_KEY, self._public_key_pem)
@@ -75,7 +71,7 @@ class RSA(KeyDto, IRemmeKeys):
     def get_address_from_public_key(public_key):
         """
         Get address from public key.
-        :param public_key
+        :param public_key object
         :return: address in blockchain generated from public key PEM string
         """
         return generate_address(RemmeFamilyName.PUBLIC_KEY, public_key_to_pem(public_key=public_key))
@@ -87,8 +83,6 @@ class RSA(KeyDto, IRemmeKeys):
         :param rsa_signature_padding: RSA padding for signature (optional)
         :return: hex string for signature
         """
-        private_key = self.convert_string_to_object(private_key=self._private_key)
-
         chosen_hash = hashes.SHA512()
         hasher = hashes.Hash(chosen_hash, default_backend())
         hasher.update(utf8_to_bytes(_string=data))
@@ -96,18 +90,18 @@ class RSA(KeyDto, IRemmeKeys):
 
         if rsa_signature_padding == RsaSignaturePadding.PSS:
 
-            return base64.b64encode(private_key.sign(
+            return base64.b64encode(self._private_key.sign(
                 digest,
                 padding.PSS(
                     mgf=padding.MGF1(hashes.SHA512()),
-                    salt_length=self._calculate_salt_length(key=private_key)),
+                    salt_length=self._calculate_salt_length(key=self._private_key)),
                 hashes.SHA512()
                 )
             ).decode()
 
         if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
 
-            return base64.b64encode(private_key.sign(
+            return base64.b64encode(self._private_key.sign(
                 digest,
                 padding.PKCS1v15(),
                 hashes.SHA512()
@@ -121,8 +115,6 @@ class RSA(KeyDto, IRemmeKeys):
         :param rsa_signature_padding: RSA padding for signature (optional)
         :return: none: in case signature is correct
         """
-        public_key = self.convert_string_to_object(public_key=self._public_key)
-
         chosen_hash = hashes.SHA512()
         hasher = hashes.Hash(chosen_hash, default_backend())
         hasher.update(utf8_to_bytes(_string=data))
@@ -130,54 +122,41 @@ class RSA(KeyDto, IRemmeKeys):
 
         if rsa_signature_padding == RsaSignaturePadding.PSS:
             try:
-                return public_key.verify(
+                signature_verified = self._public_key.verify(
                     base64.b64decode(signature),
                     digest,
                     padding.PSS(
                         mgf=padding.MGF1(hashes.SHA512()),
-                        salt_length=self._calculate_salt_length(key=public_key)),
+                        salt_length=self._calculate_salt_length(key=self._public_key)),
                     hashes.SHA512(),
                 )
+
+                if signature_verified is None:
+                    print('Signature verified successfully!')
+
             except InvalidSignature:
                 print('ERROR: Payload and/or signature failed verification!')
 
         if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
             try:
-                return public_key.verify(
+                signature_verified = self._public_key.verify(
                     base64.b64decode(signature),
                     digest,
                     padding.PKCS1v15(),
                     hashes.SHA512(),
                 )
+
+                if signature_verified is None:
+                    print('Signature verified successfully!')
+
             except InvalidSignature:
                 print('ERROR: Payload and/or signature files failed verification!')
-
-    @staticmethod
-    def convert_string_to_object(private_key=None, public_key=None):
-        """
-        Convert key with string format to RSA object.
-        :param private_key: RSA private key
-        :param public_key: RSA public key
-        :return: key object
-        """
-        if private_key is not None:
-            return serialization.load_pem_private_key(
-                data=private_key,
-                password=None,
-                backend=default_backend(),
-            )
-
-        if public_key is not None:
-            return serialization.load_pem_public_key(
-                data=public_key,
-                backend=default_backend(),
-            )
 
     @staticmethod
     def _calculate_salt_length(key):
         """
         Calculate max PSS salt length.
-        :param key: RSA public or private key
+        :param key: RSA public or private key object
         :return: integer
         """
         return calculate_max_pss_salt_length(key=key, hash_algorithm=hashes.SHA512())
