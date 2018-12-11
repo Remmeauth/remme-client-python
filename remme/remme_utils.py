@@ -7,7 +7,7 @@ import re
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
-from remme.constants.remme_patterns import RemmePatterns
+from remme.enums.remme_patterns import RemmePatterns
 
 
 def validate_amount(amount):
@@ -54,8 +54,7 @@ def is_valid_batch_id(_batch_id):
 
 
 def bytes_to_hex(_bytes):
-    result = utf8_to_bytes(_bytes).hex()
-    return result
+    return utf8_to_bytes(_bytes).hex()
 
 
 def base64_to_dict(_base64):
@@ -128,6 +127,31 @@ def private_key_to_pem(private_key):
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.NoEncryption()
+    )
+
+
+def private_key_pem_to_object(private_key):
+    """
+    Convert private key in PEM format to RSA object.
+    :param private_key: RSA private key
+    :return: private key object
+    """
+    return serialization.load_pem_private_key(
+        data=private_key,
+        password=None,
+        backend=default_backend(),
+    )
+
+
+def public_key_pem_to_object(public_key):
+    """
+    Convert public key in PEM format to RSA object.
+    :param public_key: RSA public key
+    :return: public key object
+    """
+    return serialization.load_pem_public_key(
+        data=public_key,
+        backend=default_backend(),
     )
 
 

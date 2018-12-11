@@ -1,5 +1,5 @@
 """
-Provide constants for Remme family names.
+Provide enums for Remme family names.
 """
 from enum import Enum
 

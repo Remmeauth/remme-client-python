@@ -1,5 +1,5 @@
 """
-Provide constants for Remme batch statuses.
+Provide enums for Remme batch statuses.
 """
 from enum import Enum
 

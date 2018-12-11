@@ -1,8 +1,8 @@
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey
 from sawtooth_signing import create_context, CryptoFactory
 from remme.remme_utils import generate_address, is_string_or_bytes, utf8_to_bytes
-from remme.constants.remme_patterns import RemmePatterns
-from remme.constants.remme_family_name import RemmeFamilyName
+from remme.enums.remme_patterns import RemmePatterns
+from remme.enums.remme_family_name import RemmeFamilyName
 import re
 
 

@@ -8,8 +8,8 @@ from cryptography.hazmat.primitives.asymmetric import (
     utils,
 )
 
-from remme.constants.key_type import KeyType
-from remme.constants.remme_family_name import RemmeFamilyName
+from remme.enums.key_type import KeyType
+from remme.enums.remme_family_name import RemmeFamilyName
 from remme.keys.interface import IRemmeKeys
 from remme.models.key_dto import KeyDto
 from remme.remme_utils import (
@@ -44,7 +44,12 @@ class ECDSA(KeyDto, IRemmeKeys):
             self._private_key = private_key
             self._public_key = self._private_key.public_key()
 
-        self._private_key_hex = private_key_to_pem(self.private_key).encode('hex')
+        elif public_key:
+            self._public_key = public_key
+
+        if self._private_key:
+            self._private_key_hex = private_key_to_pem(self.private_key).encode('hex')
+
         self._public_key_hex = public_key_to_pem(self._public_key).encode('hex')
 
         self._public_key_base64 = dict_to_base64(self._public_key_hex)
@@ -73,12 +78,16 @@ class ECDSA(KeyDto, IRemmeKeys):
         public_key_base64 = dict_to_base64(public_key_hex)
         return generate_address(RemmeFamilyName.PUBLIC_KEY, public_key_base64)
 
-    def sign(self, data):
+    def sign(self, data, rsa_signature_padding=None):
         """
         Sign provided data with selected key implementation.
         :param data: data string which will be signed
+        :param rsa_signature_padding: not used in ECDSA
         :return: hex string for signature
         """
+        if self._private_key is None:
+            raise Exception('Private key is not provided!')
+
         chosen_hash = hashes.SHA256()
         hasher = hashes.Hash(chosen_hash, default_backend())
         hasher.update(data.encode('utf-8'))
@@ -91,11 +100,12 @@ class ECDSA(KeyDto, IRemmeKeys):
 
         return signature
 
-    def verify(self, data, signature):
+    def verify(self, data, signature, rsa_signature_padding=None):
         """
         Verify signature for selected key implementation.
         :param data: data string which will be verified
         :param signature: hex string of signature
+        :param rsa_signature_padding: not used in ECDSA
         :return: none: in case signature is correct
         """
         try:

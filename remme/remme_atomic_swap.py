@@ -1,4 +1,4 @@
-from remme.constants.remme_methods import RemmeMethods
+from remme.enums.remme_methods import RemmeMethods
 
 
 class RemmeSwap:
