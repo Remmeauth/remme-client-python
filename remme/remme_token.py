@@ -1,5 +1,5 @@
-from remme.constants.remme_family_name import RemmeFamilyName
-from remme.constants.remme_methods import RemmeMethods
+from remme.enums.remme_family_name import RemmeFamilyName
+from remme.enums.remme_methods import RemmeMethods
 from remme.protos.account_pb2 import AccountMethod, TransferPayload
 from remme.protos.transaction_pb2 import TransactionPayload
 from remme.remme_utils import (

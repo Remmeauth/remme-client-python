@@ -1,5 +1,5 @@
 """
-Provide constants for Remme patterns.
+Provide enums for Remme patterns.
 """
 from enum import Enum
 

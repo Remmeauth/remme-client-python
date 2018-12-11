@@ -1,8 +1,8 @@
 """
 Key DTO for different kind of keys.
 """
-from remme.constants.key_type import KeyType
-from remme.constants.remme_family_name import RemmeFamilyName
+from remme.enums.key_type import KeyType
+from remme.enums.remme_family_name import RemmeFamilyName
 
 
 class KeyDto:

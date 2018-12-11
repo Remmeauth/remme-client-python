@@ -1,5 +1,5 @@
 """
-Provide constants for Remme key types.
+Provide enums for Remme key types.
 """
 from enum import Enum
 

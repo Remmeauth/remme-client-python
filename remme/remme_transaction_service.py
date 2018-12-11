@@ -1,7 +1,7 @@
 from remme.remme_utils import create_nonce, sha512_hexdigest
 from base64 import b64encode
 from sawtooth_sdk.protobuf.transaction_pb2 import TransactionHeader, Transaction
-from remme.constants.remme_methods import RemmeMethods
+from remme.enums.remme_methods import RemmeMethods
 from remme.models.base_transaction_response import BaseTransactionResponse
 
 
