@@ -4,6 +4,9 @@ import math
 import random
 import re
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+
 from remme.constants.remme_patterns import RemmePatterns
 
 
@@ -101,6 +104,31 @@ def generate_settings_address(key):
 
 def public_key_address(value):
     return {'public_key_address': value}
+
+
+def public_key_to_pem(public_key):
+    """
+    Convert public key object to PEM format.
+    :param public_key
+    :return: PEM string format
+    """
+    return public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+
+
+def private_key_to_pem(private_key):
+    """
+    Convert private key object to PEM format.
+    :param private_key
+    :return: PEM string format
+    """
+    return private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption()
+    )
 
 
 def create_nonce():
