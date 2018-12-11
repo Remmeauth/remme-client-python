@@ -49,7 +49,12 @@ class RSA(KeyDto, IRemmeKeys):
             self._private_key = private_key
             self._public_key = self._private_key.public_key()
 
-        self._private_key_pem = private_key_to_pem(self._private_key)
+        elif public_key:
+            self._public_key = public_key
+
+        if self._private_key:
+            self._private_key_pem = private_key_to_pem(self._private_key)
+
         self._public_key_pem = public_key_to_pem(self._public_key)
 
         self._public_key_base64 = dict_to_base64(self._public_key_pem)
