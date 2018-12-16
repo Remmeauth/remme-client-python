@@ -15,8 +15,6 @@ from remme.models.key_dto import KeyDto
 from remme.remme_utils import (
     dict_to_base64,
     generate_address,
-    private_key_to_pem,
-    public_key_to_pem,
 )
 
 
@@ -40,20 +38,26 @@ class ECDSA(KeyDto, IRemmeKeys):
             self._private_key = private_key
             self._public_key = public_key
 
+            self._private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
+            self._public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
+
         elif private_key:
             self._private_key = private_key
+            self._private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
             self._public_key = self._private_key.public_key()
+            self._public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
 
         elif public_key:
             self._public_key = public_key
+            self._public_key_as_bytes = self.public_key_to_bytes(public_key=public_key)
 
         if self._private_key:
-            self._private_key_hex = private_key_to_pem(self.private_key).encode('hex')
+            self._private_key_hex = self._private_key_as_bytes.hex()
 
-        self._public_key_hex = public_key_to_pem(self._public_key).encode('hex')
+        self._public_key_hex = self._public_key_as_bytes.hex()
 
         self._public_key_base64 = dict_to_base64(self._public_key_hex)
-        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY, self._public_key_base64)
+        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value, self._public_key_base64)
         self._key_type = KeyType.ECDSA
 
     @staticmethod
@@ -67,16 +71,17 @@ class ECDSA(KeyDto, IRemmeKeys):
             backend=default_backend(),
         )
 
-    @staticmethod
-    def get_address_from_public_key(public_key):
+    def get_address_from_public_key(self, public_key):
         """
         Get address from public key.
         :param public_key
         :return: address in blockchain generated from public key string
         """
-        public_key_hex = public_key_to_pem(public_key).encode('hex')
+        public_key_as_bytes = self.public_key_to_bytes(public_key=public_key)
+        public_key_hex = public_key_as_bytes.hex()
         public_key_base64 = dict_to_base64(public_key_hex)
-        return generate_address(RemmeFamilyName.PUBLIC_KEY, public_key_base64)
+
+        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key_base64)
 
     def sign(self, data, rsa_signature_padding=None):
         """
@@ -125,3 +130,33 @@ class ECDSA(KeyDto, IRemmeKeys):
 
         except InvalidSignature:
             print('ERROR: Payload and/or signature failed verification!')
+
+    @staticmethod
+    def public_key_to_bytes(public_key, compressed=False):
+        """
+        Public key object to bytes.
+        :param public_key
+        :param compressed: 0x02 and 0x03 = compressed, 0x04 = uncompressed
+        :return: bytes
+        """
+        x_numbers = public_key.public_numbers().x
+        y_numbers = public_key.public_numbers().y
+
+        x_bytes = x_numbers.to_bytes(32, 'big')
+        y_bytes = y_numbers.to_bytes(32, 'big')
+
+        if compressed:
+            compression_byte = b'\x03' if y_numbers & 1 else b'\x02'
+            return compression_byte + x_bytes
+
+        else:
+            return b'\x04' + x_bytes + y_bytes
+
+    @staticmethod
+    def private_key_to_bytes(private_key):
+        """
+        Private key object to bytes.
+        :param private_key
+        :return: bytes
+        """
+        return private_key.private_numbers().private_value.to_bytes(32, 'big')
