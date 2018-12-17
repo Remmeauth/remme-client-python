@@ -37,7 +37,7 @@ class EdDSA(KeyDto, IRemmeKeys):
 
         elif private_key:
             self._private_key = private_key
-            self._public_key = self._private_key.public_key()
+            self._public_key = self._private_key.get_verifying_key()
 
             self._private_key_as_bytes = self._private_key.to_bytes()
             self._public_key_as_bytes = self._public_key.to_bytes()
@@ -87,8 +87,8 @@ class EdDSA(KeyDto, IRemmeKeys):
         if self._private_key is None:
             raise Exception('Private key is not provided!')
 
-        signature = self._private_key.sign(msg=data.encode(), encoding='base64')
-        return signature.decode('utf-8')
+        signature = self._private_key.sign(msg=data.encode())
+        return signature.hex()
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
@@ -100,9 +100,8 @@ class EdDSA(KeyDto, IRemmeKeys):
         """
         try:
             signature_verified = self._public_key.verify(
-                sig=signature,
+                sig=bytes.fromhex(signature),
                 msg=data.encode(),
-                encoding="base64",
             )
 
             if signature_verified is None:
