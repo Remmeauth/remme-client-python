@@ -1,5 +1,3 @@
-import base64
-
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -66,18 +64,22 @@ class ECDSA(KeyDto, IRemmeKeys):
         Generate public and private key pair.
         :return: generated key pair
         """
-        return ec.generate_private_key(
+        private_key = ec.generate_private_key(
             curve=ec.SECP256K1,
             backend=default_backend(),
         )
+        public_key = private_key.public_key()
 
-    def get_address_from_public_key(self, public_key):
+        return private_key, public_key
+
+    @staticmethod
+    def get_address_from_public_key(public_key):
         """
         Get address from public key.
         :param public_key
         :return: address in blockchain generated from public key string
         """
-        public_key_as_bytes = self.public_key_to_bytes(public_key=public_key)
+        public_key_as_bytes = ECDSA.public_key_to_bytes(public_key=public_key)
         public_key_hex = public_key_as_bytes.hex()
         public_key_base64 = dict_to_base64(public_key_hex)
 
@@ -98,10 +100,10 @@ class ECDSA(KeyDto, IRemmeKeys):
         hasher.update(data.encode('utf-8'))
         digest = hasher.finalize()
 
-        signature = base64.b64encode(self._private_key.sign(
+        signature = self._private_key.sign(
             digest,
             ec.ECDSA(utils.Prehashed(chosen_hash)),
-        ))
+        ).hex()
 
         return signature
 
@@ -120,7 +122,7 @@ class ECDSA(KeyDto, IRemmeKeys):
             digest = hasher.finalize()
 
             signature_verified = self._public_key.verify(
-                base64.b64decode(signature),
+                bytes.fromhex(signature),
                 digest,
                 ec.ECDSA(utils.Prehashed(chosen_hash)),
             )
