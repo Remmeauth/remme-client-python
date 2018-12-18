@@ -36,26 +36,26 @@ class ECDSA(KeyDto, IRemmeKeys):
             self._private_key = private_key
             self._public_key = public_key
 
-            self._private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
-            self._public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
+            self.private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
+            self.public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
 
         elif private_key:
             self._private_key = private_key
-            self._private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
             self._public_key = self._private_key.public_key()
-            self._public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
+
+            self.private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
+            self.public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
 
         elif public_key:
             self._public_key = public_key
-            self._public_key_as_bytes = self.public_key_to_bytes(public_key=public_key)
+            self.public_key_as_bytes = self.public_key_to_bytes(public_key=public_key)
 
         if self._private_key:
-            self._private_key_hex = self._private_key_as_bytes.hex()
+            self._private_key_hex = self.private_key_as_bytes.hex()
 
-        self._public_key_hex = self._public_key_as_bytes.hex()
+        self._public_key_hex = self.public_key_as_bytes.hex()
 
-        self._public_key_base64 = dict_to_base64(self._public_key_hex)
-        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value, self._public_key_base64)
+        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value, self.public_key_as_bytes)
         self._key_type = KeyType.ECDSA
 
     @staticmethod
@@ -80,10 +80,11 @@ class ECDSA(KeyDto, IRemmeKeys):
         :return: address in blockchain generated from public key string
         """
         public_key_as_bytes = ECDSA.public_key_to_bytes(public_key=public_key)
-        public_key_hex = public_key_as_bytes.hex()
-        public_key_base64 = dict_to_base64(public_key_hex)
 
-        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key_base64)
+        return generate_address(
+            _family_name=RemmeFamilyName.PUBLIC_KEY.value,
+            _public_key_to=public_key_as_bytes,
+        )
 
     def sign(self, data, rsa_signature_padding=None):
         """
@@ -100,12 +101,10 @@ class ECDSA(KeyDto, IRemmeKeys):
         hasher.update(data.encode('utf-8'))
         digest = hasher.finalize()
 
-        signature = self._private_key.sign(
+        return self._private_key.sign(
             digest,
             ec.ECDSA(utils.Prehashed(chosen_hash)),
         ).hex()
-
-        return signature
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
