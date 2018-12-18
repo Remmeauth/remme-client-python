@@ -1,13 +1,13 @@
 import os
 
 import ed25519
+from ed25519 import SigningKey, VerifyingKey
 
 from remme.enums.key_type import KeyType
 from remme.enums.remme_family_name import RemmeFamilyName
 from remme.keys.interface import IRemmeKeys
 from remme.models.key_dto import KeyDto
 from remme.remme_utils import (
-    dict_to_base64,
     generate_address,
 )
 
@@ -22,38 +22,38 @@ class EdDSA(KeyDto, IRemmeKeys):
 
     def __init__(self, private_key, public_key):
         """
-        Constructor for EdDSA key pair. If only private key available then public key will be generate from private.
-        :param private_key: (required)
-        :param public_key: (optional)
+        Constructor for EdDSA key pair.
+        If only private key available then public key will be generate from private.
+        :param private_key in bytes (required)
+        :param public_key in bytes (optional)
         """
         super(EdDSA, self).__init__()
 
         if private_key and public_key:
             self._private_key = private_key
             self._public_key = public_key
-
-            self.private_key_as_bytes = self._private_key.to_bytes()
-            self.public_key_as_bytes = self._public_key.to_bytes()
+            self._private_key_obj = SigningKey(self._private_key)
+            self._public_key_obj = VerifyingKey(self._public_key)
 
         elif private_key:
             self._private_key = private_key
-            self._public_key = self._private_key.get_verifying_key()
+            self._private_key_obj = SigningKey(self._private_key)
 
-            self.private_key_as_bytes = self._private_key.to_bytes()
-            self.public_key_as_bytes = self._public_key.to_bytes()
+            self._public_key_obj = self._private_key_obj.get_verifying_key()
+            self._public_key = self._public_key_obj.to_bytes()
 
         elif public_key:
             self._public_key = public_key
-            self.public_key_as_bytes = self._public_key.to_bytes()
+            self._public_key_obj = VerifyingKey(self._public_key)
 
         if self._private_key:
-            self._private_key_hex = self.private_key_as_bytes.hex()
+            self._private_key_hex = self._private_key.hex()
 
-        self._public_key_hex = self.public_key_as_bytes.hex()
+        self._public_key_hex = self._public_key.hex()
 
         self._address = generate_address(
             _family_name=RemmeFamilyName.PUBLIC_KEY.value,
-            _public_key_to=self.public_key_as_bytes,
+            _public_key_to=self._public_key,
         )
         self._key_type = KeyType.EdDSA
 
@@ -61,20 +61,20 @@ class EdDSA(KeyDto, IRemmeKeys):
     def generate_key_pair():
         """
         Generate public and private key pair.
-        :return: generated key pair
+        :return: generated key pair in bytes
         """
-        return ed25519.create_keypair(entropy=os.urandom)
+        private_key_obj, public_key_obj = ed25519.create_keypair(entropy=os.urandom)
+
+        return private_key_obj.to_bytes(), public_key_obj.to_bytes()
 
     @staticmethod
     def get_address_from_public_key(public_key):
         """
         Get address from public key.
-        :param public_key
-        :return: address in blockchain generated from public key string
+        :param public_key in bytes
+        :return: address in blockchain generated from public key
         """
-        public_key_as_bytes = public_key.to_bytes()
-
-        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key_as_bytes)
+        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key)
 
     def sign(self, data, rsa_signature_padding=None):
         """
@@ -83,10 +83,10 @@ class EdDSA(KeyDto, IRemmeKeys):
         :param rsa_signature_padding: not used in EdDSA
         :return: hex string for signature
         """
-        if self._private_key is None:
+        if self._private_key_obj is None:
             raise Exception('Private key is not provided!')
 
-        return self._private_key.sign(msg=data.encode()).hex()
+        return self._private_key_obj.sign(msg=data.encode()).hex()
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
@@ -97,7 +97,7 @@ class EdDSA(KeyDto, IRemmeKeys):
         :return: none: in case signature is correct
         """
         try:
-            signature_verified = self._public_key.verify(
+            signature_verified = self._public_key_obj.verify(
                 sig=bytes.fromhex(signature),
                 msg=data.encode(),
             )
