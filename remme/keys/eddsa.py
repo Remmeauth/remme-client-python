@@ -32,27 +32,29 @@ class EdDSA(KeyDto, IRemmeKeys):
             self._private_key = private_key
             self._public_key = public_key
 
-            self._private_key_as_bytes = self._private_key.to_bytes()
-            self._public_key_as_bytes = self._public_key.to_bytes()
+            self.private_key_as_bytes = self._private_key.to_bytes()
+            self.public_key_as_bytes = self._public_key.to_bytes()
 
         elif private_key:
             self._private_key = private_key
             self._public_key = self._private_key.get_verifying_key()
 
-            self._private_key_as_bytes = self._private_key.to_bytes()
-            self._public_key_as_bytes = self._public_key.to_bytes()
+            self.private_key_as_bytes = self._private_key.to_bytes()
+            self.public_key_as_bytes = self._public_key.to_bytes()
 
         elif public_key:
             self._public_key = public_key
-            self._public_key_as_bytes = self._public_key.to_bytes()
+            self.public_key_as_bytes = self._public_key.to_bytes()
 
         if self._private_key:
-            self._private_key_hex = self._private_key_as_bytes.hex()
+            self._private_key_hex = self.private_key_as_bytes.hex()
 
-        self._public_key_hex = self._public_key_as_bytes.hex()
+        self._public_key_hex = self.public_key_as_bytes.hex()
 
-        self._public_key_base64 = dict_to_base64(self._public_key_hex).decode()
-        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value, self._public_key_base64)
+        self._address = generate_address(
+            _family_name=RemmeFamilyName.PUBLIC_KEY.value,
+            _public_key_to=self.public_key_as_bytes,
+        )
         self._key_type = KeyType.EdDSA
 
     @staticmethod
@@ -61,8 +63,7 @@ class EdDSA(KeyDto, IRemmeKeys):
         Generate public and private key pair.
         :return: generated key pair
         """
-        private_key, public_key = ed25519.create_keypair(entropy=os.urandom)
-        return private_key, public_key
+        return ed25519.create_keypair(entropy=os.urandom)
 
     @staticmethod
     def get_address_from_public_key(public_key):
@@ -72,10 +73,8 @@ class EdDSA(KeyDto, IRemmeKeys):
         :return: address in blockchain generated from public key string
         """
         public_key_as_bytes = public_key.to_bytes()
-        public_key_hex = public_key_as_bytes.hex()
-        public_key_base64 = dict_to_base64(public_key_hex).decode()
 
-        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key_base64)
+        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key_as_bytes)
 
     def sign(self, data, rsa_signature_padding=None):
         """
@@ -87,8 +86,7 @@ class EdDSA(KeyDto, IRemmeKeys):
         if self._private_key is None:
             raise Exception('Private key is not provided!')
 
-        signature = self._private_key.sign(msg=data.encode())
-        return signature.hex()
+        return self._private_key.sign(msg=data.encode()).hex()
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
