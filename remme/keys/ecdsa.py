@@ -1,19 +1,15 @@
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import (
-    ec,
-    utils,
+import secp256k1
+from sawtooth_signing.secp256k1 import (
+    __CTX__,
+    Secp256k1PrivateKey,
+    Secp256k1PublicKey,
 )
 
 from remme.enums.key_type import KeyType
 from remme.enums.remme_family_name import RemmeFamilyName
 from remme.keys.interface import IRemmeKeys
 from remme.models.key_dto import KeyDto
-from remme.remme_utils import (
-    dict_to_base64,
-    generate_address,
-)
+from remme.remme_utils import generate_address
 
 
 class ECDSA(KeyDto, IRemmeKeys):
@@ -21,14 +17,14 @@ class ECDSA(KeyDto, IRemmeKeys):
     ECDSA (secp256k1) class implementation.
 
     References:
-        - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ec/
+        - https://github.com/hyperledger/sawtooth-core/
     """
 
     def __init__(self, private_key, public_key):
         """
         Constructor for ECDSA key pair. If only private key available then public key will be generate from private.
-        :param private_key: (required)
-        :param public_key: (optional)
+        :param private_key in bytes (required)
+        :param public_key in bytes (optional)
         """
         super(ECDSA, self).__init__()
 
@@ -36,54 +32,50 @@ class ECDSA(KeyDto, IRemmeKeys):
             self._private_key = private_key
             self._public_key = public_key
 
-            self.private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
-            self.public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
+            self._private_key_obj = self._private_key_bytes_to_object(private_key=self._private_key)
+            self._public_key_obj = self._public_key_bytes_to_object(public_key=self._public_key)
 
         elif private_key:
             self._private_key = private_key
-            self._public_key = self._private_key.public_key()
 
-            self.private_key_as_bytes = self.private_key_to_bytes(private_key=self._private_key)
-            self.public_key_as_bytes = self.public_key_to_bytes(public_key=self._public_key)
+            self._private_key_obj = self._private_key_bytes_to_object(private_key=self._private_key)
+            self._public_key_obj = Secp256k1PublicKey(self._private_key_obj.secp256k1_private_key.pubkey)
+
+            self._public_key = self._public_key_obj.as_bytes()
 
         elif public_key:
             self._public_key = public_key
-            self.public_key_as_bytes = self.public_key_to_bytes(public_key=public_key)
+            self._public_key_obj = self._public_key_bytes_to_object(public_key=self._public_key)
 
         if self._private_key:
-            self._private_key_hex = self.private_key_as_bytes.hex()
+            self._private_key_hex = self._private_key.hex()
 
-        self._public_key_hex = self.public_key_as_bytes.hex()
+        self._public_key_hex = self._public_key.hex()
 
-        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value, self.public_key_as_bytes)
+        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value, self._public_key)
         self._key_type = KeyType.ECDSA
 
     @staticmethod
     def generate_key_pair():
         """
         Generate public and private key pair.
-        :return: generated key pair
+        :return: generated key pair in bytes
         """
-        private_key = ec.generate_private_key(
-            curve=ec.SECP256K1,
-            backend=default_backend(),
-        )
-        public_key = private_key.public_key()
+        private_key_obj = Secp256k1PrivateKey.new_random()
+        public_key_obj = Secp256k1PublicKey(private_key_obj.secp256k1_private_key.pubkey)
 
-        return private_key, public_key
+        return private_key_obj.as_bytes(), public_key_obj.as_bytes()
 
     @staticmethod
     def get_address_from_public_key(public_key):
         """
         Get address from public key.
-        :param public_key
+        :param public_key in bytes
         :return: address in blockchain generated from public key string
         """
-        public_key_as_bytes = ECDSA.public_key_to_bytes(public_key=public_key)
-
         return generate_address(
             _family_name=RemmeFamilyName.PUBLIC_KEY.value,
-            _public_key_to=public_key_as_bytes,
+            _public_key_to=public_key,
         )
 
     def sign(self, data, rsa_signature_padding=None):
@@ -96,15 +88,10 @@ class ECDSA(KeyDto, IRemmeKeys):
         if self._private_key is None:
             raise Exception('Private key is not provided!')
 
-        chosen_hash = hashes.SHA256()
-        hasher = hashes.Hash(chosen_hash, default_backend())
-        hasher.update(data.encode('utf-8'))
-        digest = hasher.finalize()
+        signature = self._private_key_obj.secp256k1_private_key.ecdsa_sign(data.encode())
+        signature = self._private_key_obj.secp256k1_private_key.ecdsa_serialize_compact(signature)
 
-        return self._private_key.sign(
-            digest,
-            ec.ECDSA(utils.Prehashed(chosen_hash)),
-        ).hex()
+        return signature.hex()
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
@@ -112,52 +99,33 @@ class ECDSA(KeyDto, IRemmeKeys):
         :param data: data string which will be verified
         :param signature: hex string of signature
         :param rsa_signature_padding: not used in ECDSA
-        :return: none: in case signature is correct
+        :return: true: in case signature is correct
         """
         try:
-            chosen_hash = hashes.SHA256()
-            hasher = hashes.Hash(chosen_hash, default_backend())
-            hasher.update(data.encode('utf-8'))
-            digest = hasher.finalize()
+            if isinstance(signature, str):
+                signature = bytes.fromhex(signature)
 
-            signature_verified = self._public_key.verify(
-                bytes.fromhex(signature),
-                digest,
-                ec.ECDSA(utils.Prehashed(chosen_hash)),
-            )
+            sig = self._public_key_obj.secp256k1_public_key.ecdsa_deserialize_compact(signature)
 
-            if signature_verified is None:
-                print('Signature verified successfully!')
+            return self._public_key_obj.secp256k1_public_key.ecdsa_verify(data.encode(), sig)
 
-        except InvalidSignature:
-            print('ERROR: Payload and/or signature failed verification!')
+        except Exception:
+            return False
 
     @staticmethod
-    def public_key_to_bytes(public_key, compressed=False):
+    def _public_key_bytes_to_object(public_key):
         """
-        Public key object to bytes.
-        :param public_key
-        :param compressed: 0x02 and 0x03 = compressed, 0x04 = uncompressed
-        :return: bytes
+        Public key bytes to object.
+        :param public_key in bytes
+        :return: object
         """
-        x_numbers = public_key.public_numbers().x
-        y_numbers = public_key.public_numbers().y
-
-        x_bytes = x_numbers.to_bytes(32, 'big')
-        y_bytes = y_numbers.to_bytes(32, 'big')
-
-        if compressed:
-            compression_byte = b'\x03' if y_numbers & 1 else b'\x02'
-            return compression_byte + x_bytes
-
-        else:
-            return b'\x04' + x_bytes + y_bytes
+        return Secp256k1PublicKey(secp256k1.PublicKey(public_key, raw=True, ctx=__CTX__))
 
     @staticmethod
-    def private_key_to_bytes(private_key):
+    def _private_key_bytes_to_object(private_key):
         """
-        Private key object to bytes.
-        :param private_key
-        :return: bytes
+        Private key bytes to object.
+        :param private_key in bytes
+        :return: object
         """
-        return private_key.private_numbers().private_value.to_bytes(32, 'big')
+        return Secp256k1PrivateKey(secp256k1.PrivateKey(private_key, ctx=__CTX__))
