@@ -7,3 +7,5 @@ from enum import Enum
 class KeyType(Enum):
 
     RSA = 0
+
+    EdDSA = 0

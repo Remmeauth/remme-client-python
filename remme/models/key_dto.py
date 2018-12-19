@@ -7,7 +7,7 @@ from remme.enums.remme_family_name import RemmeFamilyName
 
 class KeyDto:
 
-    _family_name = RemmeFamilyName.PublicKey
+    _family_name = RemmeFamilyName.PUBLIC_KEY
 
     def __init__(self, address=None, private_key=None, public_key=None, private_key_hex=None, public_key_hex=None,
                  private_key_pem=None, public_key_pem=None, public_key_base64=None, key_type=None):
