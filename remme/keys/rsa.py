@@ -61,7 +61,8 @@ class RSA(KeyDto, IRemmeKeys):
         self._address = generate_address(RemmeFamilyName.PUBLIC_KEY, self._public_key_pem)
         self._key_type = KeyType.RSA
 
-    def generate_key_pair(self, options=None):
+    @staticmethod
+    def generate_key_pair(options=None):
         """
         Generate public and private key pair.
         :param options _rsa_key_size can be specified (optional)
@@ -70,7 +71,7 @@ class RSA(KeyDto, IRemmeKeys):
         if options is not None:
             return rsa.generate_private_key(public_exponent=65537, key_size=options, backend=default_backend())
 
-        return rsa.generate_private_key(public_exponent=65537, key_size=self._rsa_key_size, backend=default_backend())
+        return rsa.generate_private_key(public_exponent=65537, key_size=RSA._rsa_key_size, backend=default_backend())
 
     @staticmethod
     def get_address_from_public_key(public_key):
