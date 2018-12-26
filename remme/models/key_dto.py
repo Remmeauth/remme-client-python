@@ -1,7 +1,6 @@
 """
 Key DTO for different kind of keys.
 """
-from remme.enums.key_type import KeyType
 from remme.enums.remme_family_name import RemmeFamilyName
 
 
@@ -62,7 +61,7 @@ class KeyDto:
         :return: {string}
         """
         if not self._private_key_hex:
-            raise Exception(f"Don't supported for this key type: {self._key_type} or didn't provide private key.")
+            raise Exception(f"Don't supported for this key type: {self._key_type.name} or didn't provide private key.")
 
         return self._private_key_hex
 
@@ -74,7 +73,7 @@ class KeyDto:
         :return: {string}
         """
         if not self._public_key_hex:
-            raise Exception(f"Don't supported for this key type: {self._key_type}.")
+            raise Exception(f"Don't supported for this key type: {self._key_type.name}.")
 
         return self._public_key_hex
 
@@ -86,7 +85,7 @@ class KeyDto:
         :return: {string}
         """
         if not self._private_key_pem:
-            raise Exception(f"Don't supported for this key type: {self._key_type} or didn't provide private key.")
+            raise Exception(f"Don't supported for this key type: {self._key_type.name} or didn't provide private key.")
 
         return self._private_key_pem
 
@@ -98,18 +97,9 @@ class KeyDto:
         :return: {string}
         """
         if not self._public_key_pem:
-            raise Exception(f"Don't supported for this key type: {self._key_type}.")
+            raise Exception(f"Don't supported for this key type: {self._key_type.name}.")
 
         return self._public_key_pem
-
-    @property
-    def public_key_base64(self):
-        """
-        Return base 64 of public key.
-
-        :return: {string}
-        """
-        return self._public_key_base64
 
     @property
     def key_type(self):
@@ -118,7 +108,7 @@ class KeyDto:
 
         :return: {string}
         """
-        return KeyType[self._key_type]
+        return self._key_type
 
     @property
     def family_name(self):

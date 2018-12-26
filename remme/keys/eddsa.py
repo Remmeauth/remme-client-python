@@ -58,13 +58,17 @@ class EdDSA(KeyDto, IRemmeKeys):
         self._key_type = KeyType.EdDSA
 
     @staticmethod
-    def generate_key_pair():
+    def generate_key_pair(seed=None):
         """
         Generate public and private key pair.
+        :param seed: bytes
         :return: generated key pair in bytes
         """
-        private_key_obj, public_key_obj = ed25519.create_keypair(entropy=os.urandom)
+        if seed:
+            private_key_obj, public_key_obj = ed25519.SigningKey(seed), ed25519.VerifyingKey(seed)
+            return private_key_obj.to_bytes(), public_key_obj.to_bytes()
 
+        private_key_obj, public_key_obj = ed25519.create_keypair(entropy=os.urandom)
         return private_key_obj.to_bytes(), public_key_obj.to_bytes()
 
     @staticmethod

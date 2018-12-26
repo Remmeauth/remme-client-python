@@ -1,11 +1,10 @@
 """
 Available RSA padding for signature.
 """
-from enum import Enum, auto
+from enum import Enum
 
 
 class RsaSignaturePadding(Enum):
 
-    EMPTY = auto()
-    PSS = auto()
-    PKCS1v15 = auto()
+    PSS = 0
+    PKCS1v15 = 1
