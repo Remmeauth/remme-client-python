@@ -6,7 +6,8 @@ from remme.remme_token import RemmeToken
 from remme.remme_account import RemmeAccount
 from remme.remme_api import RemmeAPI
 from remme.remme_transaction_service import RemmeTransactionService
-from remme.remme_public_key_storage import RemmePublicKeyStorage
+from remme.public_key_storage import RemmePublicKeyStorage
+# from remme.remme_public_key_storage import RemmePublicKeyStorage
 from remme.remme_websocket_events import RemmeWebSocketEvents
 
 __author__ = 'dethline'

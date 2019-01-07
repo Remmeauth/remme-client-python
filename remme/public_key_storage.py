@@ -1,8 +1,7 @@
-import binascii
+from datetime import datetime, timedelta
 
 from remme.enums.remme_family_name import RemmeFamilyName
 from remme.enums.remme_methods import RemmeMethods
-from remme.enums.rsa_signature_padding import RsaSignaturePadding
 from remme.models.public_key_info import PublicKeyInfo
 from remme.models.public_key_request import PublicKeyRequest
 from remme.protos.pub_key_pb2 import (
@@ -17,6 +16,86 @@ from remme.remme_utils import (
     sha512_hexdigest,
     validate_address,
 )
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import (
+    hashes,
+    serialization,
+)
+from cryptography.hazmat.primitives.asymmetric import (
+    padding,
+    rsa,
+)
+
+CURRENT_TIMESTAMP = int(datetime.now().timestamp())
+CURRENT_TIMESTAMP_PLUS_YEAR = int(CURRENT_TIMESTAMP + timedelta(365).total_seconds())
+
+
+def is_address(address):
+    try:
+        assert isinstance(address, str)
+        assert len(address) == 70
+        int(address, 16)
+        return True
+    except (AssertionError, ValueError):
+        return False
+
+
+def make_address(appendix):
+    _prefix = sha512_hexdigest(RemmeFamilyName.PUBLIC_KEY.value)[:6]
+    address = _prefix + appendix
+    if not is_address(address):
+        raise Exception('{} is not a valid address'.format(address))
+    return address
+
+
+def make_address_from_data(data):
+    appendix = sha512_hexdigest(data)[:64]
+    return make_address(appendix)
+
+
+def generate_rsa_keys():
+    private_key = rsa.generate_private_key(
+        public_exponent=65537, key_size=2048, backend=default_backend(),
+    )
+    public_key = private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    )
+    return private_key, public_key
+
+
+def generate_message(data):
+    return sha512_hexdigest(data)
+
+
+def generate_rsa_signature(data, private_key):
+    try:
+        data = data.encode('utf-8')
+    except AttributeError:
+        pass
+    return private_key.sign(data, padding.PKCS1v15(), hashes.SHA512())
+
+
+def generate_entity_hash(message):
+    return message.encode('utf-8')
+
+
+def generate_rsa_payload(cert_public_key, cert_private_key, message):
+
+    entity_hash = generate_entity_hash(message)
+    entity_hash_signature = generate_rsa_signature(entity_hash, cert_private_key)
+
+    return NewPubKeyPayload(
+        entity_hash=entity_hash,
+        entity_hash_signature=entity_hash_signature,
+        valid_from=CURRENT_TIMESTAMP,
+        valid_to=CURRENT_TIMESTAMP_PLUS_YEAR,
+        rsa=NewPubKeyPayload.RSAConfiguration(
+            padding=NewPubKeyPayload.RSAConfiguration.Padding.Value('PKCS1v15'),
+            key=cert_public_key,
+        ),
+        hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA512')
+    )
 
 
 class RemmePublicKeyStorage:
@@ -105,7 +184,7 @@ class RemmePublicKeyStorage:
 
         raise Exception('This public key was not found.')
 
-    async def store(self, data, keys, valid_from, valid_to, rsa_signature_padding=RsaSignaturePadding.PSS):
+    async def store(self, data, valid_from, valid_to):
         """
         Store public key with its data into REMChain.
         Send transaction to chain.
@@ -132,52 +211,45 @@ class RemmePublicKeyStorage:
         :param keys: instance of key class
         :param valid_from: timestamp
         :param valid_to: timestamp
-        :param rsa_signature_padding: RsaSignaturePadding.PSS by default
         :return: information about storing public key to REMChain
         """
-        message = sha512_hexdigest(data=data)
-        entity_hash = binascii.unhexlify(message)
-        entity_hash_signature = keys.sign(
-            data=message,
-            rsa_signature_padding=rsa_signature_padding,
-        ).decode('hex')
+        message = generate_message(data)
 
-        entity_type = NewPubKeyPayload.EntityType.PERSONAL.value
-        public_key_type = NewPubKeyPayload.PubKeyType.RSA.value
+        cert_private_key, cert_public_key = generate_rsa_keys()
 
-        payload = NewPubKeyPayload(
-            public_key=keys.public_key,
-            public_key_type=public_key_type,
-            entity_type=entity_type,
-            entity_hash=entity_hash,
-            entity_hash_signature=entity_hash_signature,
-            valid_from=valid_from,
-            valid_to=valid_to,
-        ).SerializeToString()
+        cert_public_key_to_store_address = make_address_from_data(cert_public_key)
 
-        public_key_address = keys.address
-        storage_public_key_address = generate_settings_address('remme.settings.storage_pub_key')
-        setting_address = generate_settings_address('remme.economy_enabled')
-        storage_address = generate_address(
-            _family_name=self._remme_account.family_name,
-            _public_key_to=storage_public_key_address,
+        new_pub_key_payload = generate_rsa_payload(
+            cert_private_key=cert_private_key,
+            cert_public_key=cert_public_key,
+            message=message,
         )
 
+        storage_public_key_address = make_address_from_data('remme.settings.storage_pub_key')
+        setting_address = make_address_from_data('remme.economy_enabled')
+        storage_address = generate_address(self._remme_account.family_name, storage_public_key_address)
+
         payload_bytes = self._generate_transaction_payload(
-            method=PubKeyMethod.Method.STORE,
-            data=payload,
+            method=PubKeyMethod.STORE,
+            data=new_pub_key_payload.SerializeToString(),
         )
 
         inputs = [
-            public_key_address,
+            cert_public_key,
             storage_public_key_address,
             setting_address,
             storage_address,
+            cert_public_key_to_store_address,
+            make_address_from_data(self._remme_account.public_key_hex),
         ]
 
         outputs = [
-            public_key_address,
+            cert_public_key,
+            storage_public_key_address,
+            setting_address,
             storage_address,
+            cert_public_key_to_store_address,
+            make_address_from_data(self._remme_account.public_key_hex),
         ]
 
         return await self._create_and_send_transaction(
@@ -223,13 +295,13 @@ class RemmePublicKeyStorage:
         revoke_response = await remme.public_key_storage.revoke(public_key_address)
         ```
         :param public_key_address: string
-        :return:
+        :return: information about revoked public key
         """
         validate_address(address=public_key_address)
 
         revoke_payload = RevokePubKeyPayload(address=public_key_address).SerializeToString()
         payload_bytes = self._generate_transaction_payload(
-            method=PubKeyMethod.Method.REVOKE,
+            method=PubKeyMethod.REVOKE,
             data=revoke_payload,
         )
 

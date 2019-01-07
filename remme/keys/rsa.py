@@ -55,10 +55,20 @@ class RSA(KeyDto, IRemmeKeys):
         if self._private_key:
             self._private_key_pem = private_key_to_pem(self._private_key)
 
+        # self._private_key_numbers = self._private_key.private_numbers()
+        #
+        # print('private numbers >> ', self._private_key_numbers.p)
+        # print()
+        #
+        # print(dir(self._public_key.public_numbers().n))
+        # self._public_key_numbers = self._public_key.public_numbers().n
+        # print('public numbers >> ', self._public_key_numbers)
+
         self._public_key_pem = public_key_to_pem(self._public_key)
 
         self._public_key_base64 = dict_to_base64(self._public_key_pem)
-        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY, self._public_key_pem)
+
+        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key_to_pem(public_key=self._public_key))
         self._key_type = KeyType.RSA
 
     @staticmethod
