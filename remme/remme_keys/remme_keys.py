@@ -1,11 +1,10 @@
 from remme.enums.key_type import KeyType
-from remme.keys.ecdsa import ECDSA
-from remme.keys.eddsa import EdDSA
-from remme.keys.interface import IRemmeKeys
-from remme.keys.rsa import RSA
+from remme.remme_keys.ecdsa import ECDSA
+from remme.remme_keys.eddsa import EdDSA
+from remme.remme_keys.rsa import RSA
 
 
-class RemmeKeys(IRemmeKeys):
+class RemmeKeys:
     """
     Class that works with different types of keys.
     For now it is RSA, ECDSA (secp256k1), EdDSA (ed25519).
@@ -21,7 +20,7 @@ class RemmeKeys(IRemmeKeys):
         ```python
         from remme.enums.key_type import KeyType
 
-        keys = RemmeKeys.genarate_key_pair(KeyType.RSA)  # KeyType.EdDSA, KeyType.ECDSA also work.
+        keys = RemmeKeys.generate_key_pair(KeyType.RSA)  # KeyType.EdDSA, KeyType.ECDSA also work.
         ```
         :param key_type: KeyType
         :param options: integer

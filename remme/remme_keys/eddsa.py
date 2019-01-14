@@ -1,3 +1,4 @@
+import hashlib
 import os
 
 import ed25519
@@ -5,10 +6,11 @@ from ed25519 import SigningKey, VerifyingKey
 
 from remme.enums.key_type import KeyType
 from remme.enums.remme_family_name import RemmeFamilyName
-from remme.keys.interface import IRemmeKeys
+from remme.remme_keys.interface import IRemmeKeys
 from remme.models.key_dto import KeyDto
 from remme.remme_utils import (
     generate_address,
+    utf8_to_bytes,
 )
 
 
@@ -90,7 +92,10 @@ class EdDSA(KeyDto, IRemmeKeys):
         if self._private_key_obj is None:
             raise Exception('Private key is not provided!')
 
-        return self._private_key_obj.sign(msg=data.encode()).hex()
+        if isinstance(data, str):
+            data = utf8_to_bytes(data)
+
+        return self._private_key_obj.sign(msg=hashlib.sha256(data).digest())
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
@@ -100,14 +105,15 @@ class EdDSA(KeyDto, IRemmeKeys):
         :param rsa_signature_padding: not used in EdDSA
         :return: none: in case signature is correct
         """
-        try:
-            signature_verified = self._public_key_obj.verify(
-                sig=bytes.fromhex(signature),
-                msg=data.encode(),
-            )
+        if isinstance(data, str):
+            data = utf8_to_bytes(data)
 
-            if signature_verified is None:
-                return 'Signature verified successfully!'
+        try:
+            self._public_key_obj.verify(
+                sig=signature,
+                msg=hashlib.sha256(data).digest(),
+            )
+            return True
 
         except ed25519.BadSignatureError:
-            print('ERROR: Payload and/or signature failed verification!')
+            return False

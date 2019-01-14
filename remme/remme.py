@@ -1,12 +1,13 @@
+from remme.remme_account import RemmeAccount
+from remme.remme_api import RemmeAPI
 from remme.remme_atomic_swap import RemmeSwap
 from remme.remme_batch import RemmeBatch
 from remme.remme_blockchain_info import RemmeBlockchainInfo
 from remme.remme_certificate import RemmeCertificate
-from remme.remme_token import RemmeToken
-from remme.remme_account import RemmeAccount
-from remme.remme_api import RemmeAPI
-from remme.remme_transaction_service import RemmeTransactionService
+from remme.remme_keys.remme_keys import RemmeKeys
 from remme.remme_public_key_storage import RemmePublicKeyStorage
+from remme.remme_token import RemmeToken
+from remme.remme_transaction_service import RemmeTransactionService
 from remme.remme_websocket_events import RemmeWebSocketEvents
 
 __author__ = 'dethline'
@@ -43,6 +44,7 @@ class Remme:
 
         self._api = RemmeAPI(self._network_config)
         self.account = RemmeAccount(self._private_key_hex)
+        self.keys = RemmeKeys()
 
         self.transaction_service = RemmeTransactionService(self._api, self.account)
         self.public_key_storage = RemmePublicKeyStorage(self._api, self.account, self.transaction_service)

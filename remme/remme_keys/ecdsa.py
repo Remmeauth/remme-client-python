@@ -1,15 +1,21 @@
+import binascii
+
 import secp256k1
 from sawtooth_signing.secp256k1 import (
     __CTX__,
+    Secp256k1Context,
     Secp256k1PrivateKey,
     Secp256k1PublicKey,
 )
 
 from remme.enums.key_type import KeyType
 from remme.enums.remme_family_name import RemmeFamilyName
-from remme.keys.interface import IRemmeKeys
+from remme.remme_keys.interface import IRemmeKeys
 from remme.models.key_dto import KeyDto
-from remme.remme_utils import generate_address
+from remme.remme_utils import (
+    generate_address,
+    utf8_to_bytes,
+)
 
 
 class ECDSA(KeyDto, IRemmeKeys):
@@ -88,10 +94,11 @@ class ECDSA(KeyDto, IRemmeKeys):
         if self._private_key is None:
             raise Exception('Private key is not provided!')
 
-        signature = self._private_key_obj.secp256k1_private_key.ecdsa_sign(data.encode())
-        signature = self._private_key_obj.secp256k1_private_key.ecdsa_serialize_compact(signature)
+        if isinstance(data, str):
+            data = utf8_to_bytes(data)
 
-        return signature.hex()
+        sig = Secp256k1Context().sign(message=data, private_key=self._private_key_obj)
+        return bytes.fromhex(sig)
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
@@ -101,13 +108,14 @@ class ECDSA(KeyDto, IRemmeKeys):
         :param rsa_signature_padding: not used in ECDSA
         :return: true: in case signature is correct
         """
+        if isinstance(data, str):
+            data = utf8_to_bytes(data)
+
         try:
-            if isinstance(signature, str):
-                signature = bytes.fromhex(signature)
+            if isinstance(signature, bytes):
+                signature = binascii.hexlify(signature).decode('utf-8')
 
-            sig = self._public_key_obj.secp256k1_public_key.ecdsa_deserialize_compact(signature)
-
-            return self._public_key_obj.secp256k1_public_key.ecdsa_verify(data.encode(), sig)
+            return Secp256k1Context().verify(signature, data, self._public_key_obj)
 
         except Exception:
             return False

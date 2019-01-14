@@ -8,6 +8,12 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
 from remme.enums.remme_patterns import RemmePatterns
+from remme.enums.rsa_signature_padding import RsaSignaturePadding
+from remme.protos.pub_key_pb2 import NewPubKeyPayload
+
+ZERO_ADDRESS = '0' * 70
+
+HEX = re.compile(r'^[0-9a-f]+$')
 
 
 def validate_amount(amount):
@@ -89,6 +95,24 @@ def hex_to_bytes(message):
     raise Exception("Invalid type of message given. Expected hex string or bytes.")
 
 
+def create_nonce():
+    hash_o = hashlib.sha512(str(math.floor(1000 * random.random())).encode('UTF-8'))
+    result = hash_o.hexdigest()
+    return result
+
+
+def sha512_hexdigest(data):
+    return hashlib.sha512(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
+
+
+def sha256_hexdigest(data):
+    return hashlib.sha256(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
+
+
+def is_hex(data):
+    return HEX.search(data) is not None
+
+
 def generate_address(_family_name, _public_key_to):
     return "" + sha512_hexdigest(_family_name)[:6] + sha512_hexdigest(_public_key_to)[:64]
 
@@ -103,6 +127,31 @@ def generate_settings_address(key):
 
 def public_key_address(value):
     return {'public_key_address': value}
+
+
+def public_key_to_der(public_key):
+    """
+    Convert public key object to DER format.
+    :param public_key
+    :return: DER bytes format
+    """
+    return public_key.public_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+
+
+def private_key_to_der(private_key):
+    """
+    Convert private key object to DER format.
+    :param private_key
+    :return: DER bytes format
+    """
+    return private_key.private_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
 
 
 def public_key_to_pem(public_key):
@@ -127,6 +176,31 @@ def private_key_to_pem(private_key):
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.NoEncryption()
+    )
+
+
+def private_key_der_to_object(private_key):
+    """
+    Convert private key in DER format to RSA object.
+    :param private_key: RSA private key in bytes
+    :return: private key object
+    """
+    return serialization.load_der_private_key(
+        data=private_key,
+        password=None,
+        backend=default_backend(),
+    )
+
+
+def public_key_der_to_object(public_key):
+    """
+    Convert public key in DER format to RSA object.
+    :param public_key: RSA public key in bytes
+    :return: public key object
+    """
+    return serialization.load_der_public_key(
+        data=public_key,
+        backend=default_backend(),
     )
 
 
@@ -155,23 +229,10 @@ def public_key_pem_to_object(public_key):
     )
 
 
-def create_nonce():
-    hash_o = hashlib.sha512(str(math.floor(1000 * random.random())).encode('UTF-8'))
-    result = hash_o.hexdigest()
-    return result
+def get_padding(padding):
 
+    if padding == RsaSignaturePadding.PSS:
+        return NewPubKeyPayload.RSAConfiguration.Padding.Value('PSS')
 
-def sha512_hexdigest(data):
-    return hashlib.sha512(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
-
-
-def sha256_hexdigest(data):
-    return hashlib.sha256(data.encode('utf-8') if isinstance(data, str) else data).hexdigest()
-
-
-def is_hex(data):
-    try:
-        int(data, 16)
-        return True
-    except ValueError:
-        return False
+    if padding == RsaSignaturePadding.PKCS1v15:
+        return NewPubKeyPayload.RSAConfiguration.Padding.Value('PKCS1v15')
