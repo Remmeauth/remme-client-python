@@ -1,27 +1,22 @@
+from remme.enums.key_type import KeyType
 from remme.enums.remme_family_name import RemmeFamilyName
 from remme.enums.remme_methods import RemmeMethods
 from remme.enums.rsa_signature_padding import RsaSignaturePadding
-from remme.models.public_key_info import PublicKeyInfo
 from remme.protos.pub_key_pb2 import (
     PubKeyMethod,
     RevokePubKeyPayload,
 )
 from remme.protos.transaction_pb2 import TransactionPayload
 from remme.remme_utils import (
+    ZERO_ADDRESS,
     generate_address,
     generate_ecdsa_payload,
     generate_eddsa_payload,
     generate_rsa_payload,
     generate_settings_address,
     public_key_address,
-    public_key_to_der,
     validate_address,
 )
-from remme.remme_keys.rsa import RSA
-from remme.remme_keys.ecdsa import ECDSA
-from remme.remme_keys.eddsa import EdDSA
-
-ZERO_ADDRESS = '0' * 70
 
 
 class RemmePublicKeyStorage:
@@ -108,7 +103,7 @@ class RemmePublicKeyStorage:
 
         if info.get('error') is None:
             info['address'] = generate_address(self._family_name, address)
-            return PublicKeyInfo(data=info)
+            return info
 
         raise Exception('This public key was not found.')
 
@@ -143,33 +138,27 @@ class RemmePublicKeyStorage:
         :param rsa_signature_padding: RsaSignaturePadding.PSS by default
         :return: information about storing public key to REMChain
         """
-        if isinstance(keys, RSA):
-            public_key = public_key_to_der(keys.public_key)
+        if keys.type == KeyType.RSA:
             new_pub_key_payload = generate_rsa_payload(
                 message=data,
                 keys=keys,
-                public_key=public_key,
                 valid_from=valid_from,
                 valid_to=valid_to,
                 rsa_signature_padding=rsa_signature_padding,
             )
 
-        elif isinstance(keys, EdDSA):
-            public_key = keys.public_key
+        elif keys.type == KeyType.EdDSA:
             new_pub_key_payload = generate_eddsa_payload(
                 message=data,
                 keys=keys,
-                public_key=public_key,
                 valid_from=valid_from,
                 valid_to=valid_to,
             )
 
-        elif isinstance(keys, ECDSA):
-            public_key = keys.public_key
+        elif keys.type == KeyType.ECDSA:
             new_pub_key_payload = generate_ecdsa_payload(
                 message=data,
                 keys=keys,
-                public_key=public_key,
                 valid_from=valid_from,
                 valid_to=valid_to,
             )
@@ -182,17 +171,17 @@ class RemmePublicKeyStorage:
             data=new_pub_key_payload.SerializeToString(),
         )
 
-        storage_public_key_address = generate_address(self._family_name, public_key)
+        public_key_address = keys.address
         economy_enabled_address = generate_settings_address("remme.economy_enabled")
 
         inputs = [
-            storage_public_key_address,
+            public_key_address,
             economy_enabled_address,
             ZERO_ADDRESS,
         ]
 
         outputs = [
-            storage_public_key_address,
+            public_key_address,
             ZERO_ADDRESS,
         ]
 

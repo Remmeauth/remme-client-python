@@ -11,6 +11,10 @@ from remme.enums.remme_patterns import RemmePatterns
 from remme.enums.rsa_signature_padding import RsaSignaturePadding
 from remme.protos.pub_key_pb2 import NewPubKeyPayload
 
+ZERO_ADDRESS = '0' * 70
+
+HEX = re.compile(r'^[0-9a-f]+$')
+
 
 def validate_amount(amount):
     """
@@ -106,11 +110,7 @@ def sha256_hexdigest(data):
 
 
 def is_hex(data):
-    try:
-        int(data, 16)
-        return True
-    except ValueError:
-        return False
+    return HEX.search(data) is not None
 
 
 def generate_address(_family_name, _public_key_to):
@@ -141,6 +141,18 @@ def public_key_to_der(public_key):
     )
 
 
+def private_key_to_der(private_key):
+    """
+    Convert private key object to DER format.
+    :param private_key
+    :return: DER bytes format
+    """
+    return private_key.private_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+
+
 def public_key_to_pem(public_key):
     """
     Convert public key object to PEM format.
@@ -163,6 +175,31 @@ def private_key_to_pem(private_key):
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.NoEncryption()
+    )
+
+
+def private_key_der_to_object(private_key):
+    """
+    Convert private key in DER format to RSA object.
+    :param private_key: RSA private key in bytes
+    :return: private key object
+    """
+    return serialization.load_pem_private_key(
+        data=private_key,
+        password=None,
+        backend=default_backend(),
+    )
+
+
+def public_key_der_to_object(public_key):
+    """
+    Convert public key in DER format to RSA object.
+    :param public_key: RSA public key in bytes
+    :return: public key object
+    """
+    return serialization.load_pem_public_key(
+        data=public_key,
+        backend=default_backend(),
     )
 
 
@@ -200,17 +237,8 @@ def get_padding(padding):
         return NewPubKeyPayload.RSAConfiguration.Padding.Value('PKCS1v15')
 
 
-def get_hashing_algorithm(padding):
-    if padding == RsaSignaturePadding.PSS:
-        return NewPubKeyPayload.HashingAlgorithm.Value('SHA256')
+def generate_rsa_payload(message, keys, valid_from, valid_to, rsa_signature_padding=RsaSignaturePadding.PSS):
 
-    if padding == RsaSignaturePadding.PKCS1v15:
-        return  NewPubKeyPayload.HashingAlgorithm.Value('SHA512')
-
-
-def generate_rsa_payload(
-        message, keys, public_key, valid_from, valid_to, rsa_signature_padding=RsaSignaturePadding.PSS
-):
     entity_hash = message.encode('utf-8')
     entity_hash_signature = keys.sign(data=entity_hash, rsa_signature_padding=rsa_signature_padding)
 
@@ -221,13 +249,13 @@ def generate_rsa_payload(
         valid_to=valid_to,
         rsa=NewPubKeyPayload.RSAConfiguration(
             padding=get_padding(padding=rsa_signature_padding),
-            key=public_key,
+            key=keys.public_key,
         ),
-        hashing_algorithm=get_hashing_algorithm(padding=rsa_signature_padding),
+        hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA256'),
     )
 
 
-def generate_eddsa_payload(message, keys, public_key, valid_from, valid_to):
+def generate_eddsa_payload(message, keys, valid_from, valid_to):
 
     entity_hash = message.encode('utf-8')
     entity_hash_signature = keys.sign(data=entity_hash)
@@ -238,13 +266,13 @@ def generate_eddsa_payload(message, keys, public_key, valid_from, valid_to):
         valid_from=valid_from,
         valid_to=valid_to,
         ed25519=NewPubKeyPayload.Ed25519Configuration(
-            key=public_key,
+            key=keys.public_key,
         ),
         hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA512'),
     )
 
 
-def generate_ecdsa_payload(message, keys, public_key, valid_from, valid_to):
+def generate_ecdsa_payload(message, keys, valid_from, valid_to):
 
     entity_hash = message.encode('utf-8')
     entity_hash_signature = keys.sign(data=entity_hash)
@@ -255,7 +283,7 @@ def generate_ecdsa_payload(message, keys, public_key, valid_from, valid_to):
         valid_from=valid_from,
         valid_to=valid_to,
         ecdsa=NewPubKeyPayload.ECDSAConfiguration(
-            key=public_key,
+            key=keys.public_key,
             ec=NewPubKeyPayload.ECDSAConfiguration.EC.Value('SECP256k1'),
         ),
         hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA256'),

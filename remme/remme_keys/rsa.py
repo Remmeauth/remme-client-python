@@ -15,10 +15,11 @@ from remme.enums.rsa_signature_padding import RsaSignaturePadding
 from remme.remme_keys.interface import IRemmeKeys
 from remme.models.key_dto import KeyDto
 from remme.remme_utils import (
-    dict_to_base64,
     generate_address,
-    private_key_to_pem,
-    public_key_to_pem,
+    private_key_to_der,
+    public_key_to_der,
+    private_key_der_to_object,
+    public_key_der_to_object,
     utf8_to_bytes,
 )
 
@@ -36,28 +37,33 @@ class RSA(KeyDto, IRemmeKeys):
     def __init__(self, private_key, public_key):
         """
         Constructor for RSA key pair. If only private key available then public key will be generate from private.
-        :param private_key: (required)
-        :param public_key: (optional)
+        :param private_key: bytes (required)
+        :param public_key: bytes (optional)
         """
         super(RSA, self).__init__()
 
         if private_key and public_key:
             self._private_key = private_key
             self._public_key = public_key
+            self._private_key_obj = private_key_der_to_object(private_key=self._private_key)
+            self._public_key_obj = public_key_der_to_object(public_key=self._public_key)
 
         elif private_key:
             self._private_key = private_key
-            self._public_key = self._private_key.public_key()
+            self._private_key_obj = private_key_der_to_object(private_key=self._private_key)
+            self._public_key_obj = self._private_key_obj.public_key()
+            self._public_key = public_key_to_der(public_key=self._public_key_obj)
 
         elif public_key:
             self._public_key = public_key
+            self._public_key_obj = public_key_der_to_object(public_key=self._public_key)
 
         if self._private_key:
-            self._private_key_pem = private_key_to_pem(self._private_key)
+            self._private_key_hex = self._private_key.hex()
 
-        self._public_key_pem = public_key_to_pem(self._public_key)
+        self._public_key_hex = self._public_key.hex()
 
-        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value,  self._public_key_pem)
+        self._address = generate_address(RemmeFamilyName.PUBLIC_KEY.value,  self._public_key)
         self._key_type = KeyType.RSA
 
     @staticmethod
@@ -69,21 +75,21 @@ class RSA(KeyDto, IRemmeKeys):
         """
         if options is not None:
             private_key = rsa.generate_private_key(public_exponent=65537, key_size=options, backend=default_backend())
-            return private_key, private_key.public_key()
+            return private_key_to_der(private_key), public_key_to_der(private_key.public_key())
 
         private_key = rsa.generate_private_key(
             public_exponent=65537, key_size=RSA._rsa_key_size, backend=default_backend(),
         )
-        return private_key, private_key.public_key()
+        return private_key_to_der(private_key), public_key_to_der(private_key.public_key())
 
     @staticmethod
     def get_address_from_public_key(public_key):
         """
         Get address from public key.
-        :param public_key object
-        :return: address in blockchain generated from public key PEM string
+        :param public_key: bytes
+        :return: address in blockchain generated from public key DER format
         """
-        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key_to_pem(public_key=public_key))
+        return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key)
 
     def sign(self, data, rsa_signature_padding=None):
         """
@@ -103,7 +109,7 @@ class RSA(KeyDto, IRemmeKeys):
             if rsa_signature_padding == RsaSignaturePadding.PSS:
                 prehashed_msg = hashlib.sha256(data).digest()
 
-                return self._private_key.sign(
+                return self._private_key_obj.sign(
                     data=prehashed_msg,
                     padding=padding.PSS(
                         mgf=padding.MGF1(hashes.SHA256()),
@@ -115,10 +121,10 @@ class RSA(KeyDto, IRemmeKeys):
             if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
                 prehashed_msg = hashlib.sha512(data).digest()
 
-                return self._private_key.sign(
+                return self._private_key_obj.sign(
                     data=prehashed_msg,
                     padding=padding.PKCS1v15(),
-                    algorithm=utils.Prehashed(hashes.SHA512()),
+                    algorithm=utils.Prehashed(hashes.SHA256()),
                 )
 
         else:
@@ -141,7 +147,7 @@ class RSA(KeyDto, IRemmeKeys):
                 try:
                     prehashed_msg = hashlib.sha256(data).digest()
 
-                    signature_verified = self._public_key.verify(
+                    self._public_key_obj.verify(
                         signature=signature,
                         data=prehashed_msg,
                         padding=padding.PSS(
@@ -150,30 +156,26 @@ class RSA(KeyDto, IRemmeKeys):
                         ),
                         algorithm=utils.Prehashed(hashes.SHA256()),
                     )
-
-                    if signature_verified is None:
-                        return True
+                    return True
 
                 except InvalidSignature:
-                    print('ERROR: Payload and/or signature failed verification!')
+                    return False
 
             if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
 
                 try:
                     prehashed_msg = hashlib.sha512(data).digest()
 
-                    signature_verified = self._public_key.verify(
+                    self._public_key_obj.verify(
                         signature=signature,
                         data=prehashed_msg,
                         padding=padding.PKCS1v15(),
-                        algorithm=utils.Prehashed(hashes.SHA512()),
+                        algorithm=utils.Prehashed(hashes.SHA256()),
                     )
-
-                    if signature_verified is None:
-                        return True
+                    return True
 
                 except InvalidSignature:
-                    print('ERROR: Payload and/or signature files failed verification!')
+                    return False
 
         else:
             raise Exception('RSA signature padding is not provided!')
