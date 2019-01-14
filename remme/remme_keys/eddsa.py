@@ -95,7 +95,7 @@ class EdDSA(KeyDto, IRemmeKeys):
         if isinstance(data, str):
             data = utf8_to_bytes(data)
 
-        return self._private_key_obj.sign(msg=hashlib.sha512(data).digest())
+        return self._private_key_obj.sign(msg=hashlib.sha256(data).digest())
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """
@@ -109,13 +109,11 @@ class EdDSA(KeyDto, IRemmeKeys):
             data = utf8_to_bytes(data)
 
         try:
-            signature_verified = self._public_key_obj.verify(
+            self._public_key_obj.verify(
                 sig=signature,
-                msg=hashlib.sha512(data).digest(),
+                msg=hashlib.sha256(data).digest(),
             )
-
-            if signature_verified is None:
-                return True
+            return True
 
         except ed25519.BadSignatureError:
-            print('ERROR: Payload and/or signature failed verification!')
+            return False

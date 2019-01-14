@@ -3,6 +3,7 @@ from remme.enums.remme_family_name import RemmeFamilyName
 from remme.enums.remme_methods import RemmeMethods
 from remme.enums.rsa_signature_padding import RsaSignaturePadding
 from remme.protos.pub_key_pb2 import (
+    NewPubKeyPayload,
     PubKeyMethod,
     RevokePubKeyPayload,
 )
@@ -10,10 +11,8 @@ from remme.protos.transaction_pb2 import TransactionPayload
 from remme.remme_utils import (
     ZERO_ADDRESS,
     generate_address,
-    generate_ecdsa_payload,
-    generate_eddsa_payload,
-    generate_rsa_payload,
     generate_settings_address,
+    get_padding,
     public_key_address,
     validate_address,
 )
@@ -138,33 +137,45 @@ class RemmePublicKeyStorage:
         :param rsa_signature_padding: RsaSignaturePadding.PSS by default
         :return: information about storing public key to REMChain
         """
-        if keys.type == KeyType.RSA:
-            new_pub_key_payload = generate_rsa_payload(
-                message=data,
-                keys=keys,
-                valid_from=valid_from,
-                valid_to=valid_to,
-                rsa_signature_padding=rsa_signature_padding,
-            )
+        entity_hash = data.encode('utf-8')
+        entity_hash_signature = keys.sign(data=entity_hash, rsa_signature_padding=rsa_signature_padding)
 
-        elif keys.type == KeyType.EdDSA:
-            new_pub_key_payload = generate_eddsa_payload(
-                message=data,
-                keys=keys,
-                valid_from=valid_from,
-                valid_to=valid_to,
-            )
+        new_pub_key_payload = NewPubKeyPayload(
+            entity_hash=entity_hash,
+            entity_hash_signature=entity_hash_signature,
+            valid_from=valid_from,
+            valid_to=valid_to,
+            hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA256'),
+        )
 
-        elif keys.type == KeyType.ECDSA:
-            new_pub_key_payload = generate_ecdsa_payload(
-                message=data,
-                keys=keys,
-                valid_from=valid_from,
-                valid_to=valid_to,
-            )
+        if keys.key_type == KeyType.RSA:
 
-        else:
-            raise Exception('Key type does not exist.')
+            new_pub_key_payload_rsa = NewPubKeyPayload(
+                rsa=NewPubKeyPayload.RSAConfiguration(
+                    padding=get_padding(padding=rsa_signature_padding),
+                    key=keys.public_key,
+                ),
+            )
+            new_pub_key_payload.MergeFrom(new_pub_key_payload_rsa)
+
+        if keys.key_type == KeyType.EdDSA:
+
+            new_pub_key_payload_eddsa = NewPubKeyPayload(
+                ed25519=NewPubKeyPayload.Ed25519Configuration(
+                    key=keys.public_key,
+                ),
+            )
+            new_pub_key_payload.MergeFrom(new_pub_key_payload_eddsa)
+
+        if keys.key_type == KeyType.ECDSA:
+
+            new_pub_key_payload_ecdsa = NewPubKeyPayload(
+                ecdsa=NewPubKeyPayload.ECDSAConfiguration(
+                    key=keys.public_key,
+                    ec=NewPubKeyPayload.ECDSAConfiguration.EC.Value('SECP256k1'),
+                ),
+            )
+            new_pub_key_payload.MergeFrom(new_pub_key_payload_ecdsa)
 
         payload_bytes = self._generate_transaction_payload(
             method=PubKeyMethod.STORE,

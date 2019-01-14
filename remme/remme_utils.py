@@ -149,7 +149,8 @@ def private_key_to_der(private_key):
     """
     return private_key.private_bytes(
         encoding=serialization.Encoding.DER,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
     )
 
 
@@ -184,7 +185,7 @@ def private_key_der_to_object(private_key):
     :param private_key: RSA private key in bytes
     :return: private key object
     """
-    return serialization.load_pem_private_key(
+    return serialization.load_der_private_key(
         data=private_key,
         password=None,
         backend=default_backend(),
@@ -197,7 +198,7 @@ def public_key_der_to_object(public_key):
     :param public_key: RSA public key in bytes
     :return: public key object
     """
-    return serialization.load_pem_public_key(
+    return serialization.load_der_public_key(
         data=public_key,
         backend=default_backend(),
     )
@@ -235,56 +236,3 @@ def get_padding(padding):
 
     if padding == RsaSignaturePadding.PKCS1v15:
         return NewPubKeyPayload.RSAConfiguration.Padding.Value('PKCS1v15')
-
-
-def generate_rsa_payload(message, keys, valid_from, valid_to, rsa_signature_padding=RsaSignaturePadding.PSS):
-
-    entity_hash = message.encode('utf-8')
-    entity_hash_signature = keys.sign(data=entity_hash, rsa_signature_padding=rsa_signature_padding)
-
-    return NewPubKeyPayload(
-        entity_hash=entity_hash,
-        entity_hash_signature=entity_hash_signature,
-        valid_from=valid_from,
-        valid_to=valid_to,
-        rsa=NewPubKeyPayload.RSAConfiguration(
-            padding=get_padding(padding=rsa_signature_padding),
-            key=keys.public_key,
-        ),
-        hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA256'),
-    )
-
-
-def generate_eddsa_payload(message, keys, valid_from, valid_to):
-
-    entity_hash = message.encode('utf-8')
-    entity_hash_signature = keys.sign(data=entity_hash)
-
-    return NewPubKeyPayload(
-        entity_hash=entity_hash,
-        entity_hash_signature=entity_hash_signature,
-        valid_from=valid_from,
-        valid_to=valid_to,
-        ed25519=NewPubKeyPayload.Ed25519Configuration(
-            key=keys.public_key,
-        ),
-        hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA512'),
-    )
-
-
-def generate_ecdsa_payload(message, keys, valid_from, valid_to):
-
-    entity_hash = message.encode('utf-8')
-    entity_hash_signature = keys.sign(data=entity_hash)
-
-    return NewPubKeyPayload(
-        entity_hash=entity_hash,
-        entity_hash_signature=entity_hash_signature,
-        valid_from=valid_from,
-        valid_to=valid_to,
-        ecdsa=NewPubKeyPayload.ECDSAConfiguration(
-            key=keys.public_key,
-            ec=NewPubKeyPayload.ECDSAConfiguration.EC.Value('SECP256k1'),
-        ),
-        hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA256'),
-    )

@@ -71,7 +71,7 @@ class RSA(KeyDto, IRemmeKeys):
         """
         Generate public and private key pair.
         :param options _rsa_key_size can be specified (optional)
-        :return: generated key pair
+        :return: generated key pair in bytes
         """
         if options is not None:
             private_key = rsa.generate_private_key(public_exponent=65537, key_size=options, backend=default_backend())
@@ -119,7 +119,7 @@ class RSA(KeyDto, IRemmeKeys):
                 )
 
             if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
-                prehashed_msg = hashlib.sha512(data).digest()
+                prehashed_msg = hashlib.sha256(data).digest()
 
                 return self._private_key_obj.sign(
                     data=prehashed_msg,
@@ -144,6 +144,7 @@ class RSA(KeyDto, IRemmeKeys):
         if rsa_signature_padding:
 
             if rsa_signature_padding == RsaSignaturePadding.PSS:
+
                 try:
                     prehashed_msg = hashlib.sha256(data).digest()
 
@@ -164,7 +165,7 @@ class RSA(KeyDto, IRemmeKeys):
             if rsa_signature_padding == RsaSignaturePadding.PKCS1v15:
 
                 try:
-                    prehashed_msg = hashlib.sha512(data).digest()
+                    prehashed_msg = hashlib.sha256(data).digest()
 
                     self._public_key_obj.verify(
                         signature=signature,
