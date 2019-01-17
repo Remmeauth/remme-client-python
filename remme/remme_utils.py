@@ -4,6 +4,7 @@ import math
 import random
 import re
 
+from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
@@ -236,3 +237,27 @@ def get_padding(padding):
 
     if padding == RsaSignaturePadding.PKCS1v15:
         return NewPubKeyPayload.RSAConfiguration.Padding.Value('PKCS1v15')
+
+
+def certificate_to_pem(certificate):
+    """
+    Convert certificate object to PEM format.
+    :param certificate: object
+    :return: certificate in PEM format: string
+    """
+    try:
+        return certificate.public_bytes(encoding=serialization.Encoding.PEM)
+    except Exception:
+        return "Given certificate is not a valid"
+
+
+def certificate_from_pem(certificate):
+    """
+    Convert certificate in PEM format to certificate object.
+    :param certificate: string
+    :return: certificate: object
+    """
+    try:
+        return x509.load_pem_x509_certificate(certificate, default_backend())
+    except Exception:
+        return "Given certificate is not a valid"

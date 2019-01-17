@@ -34,7 +34,7 @@ class RSA(KeyDto, IRemmeKeys):
 
     _rsa_key_size = 2048
 
-    def __init__(self, private_key, public_key):
+    def __init__(self, private_key=None, public_key=None):
         """
         Constructor for RSA key pair. If only private key available then public key will be generate from private.
         :param private_key: bytes (required)

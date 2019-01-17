@@ -3,7 +3,8 @@ from remme.remme_api import RemmeAPI
 from remme.remme_atomic_swap import RemmeSwap
 from remme.remme_batch import RemmeBatch
 from remme.remme_blockchain_info import RemmeBlockchainInfo
-from remme.remme_certificate import RemmeCertificate
+# from remme.remme_certificate import RemmeCertificate
+from remme.certificate.certificate import RemmeCertificate
 from remme.remme_keys.remme_keys import RemmeKeys
 from remme.remme_public_key_storage import RemmePublicKeyStorage
 from remme.remme_token import RemmeToken

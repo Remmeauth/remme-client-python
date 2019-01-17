@@ -1,25 +1,12 @@
+"""
+Base model for creating certificate.
+"""
+
 
 class CreateCertificateDto:
-    common_name = None
-    email = None
-    country_name = None
-    locality_name = None
-    postal_address = None
-    postal_code = None
-    street_address = None
-    state_name = None
-    name = None
-    surname = None
-    pseudonym = None
-    generation_qualifier = None
-    title = None
-    serial = None
-    business_category = None
-    validity = None
-    valid_after = None
 
-    def __init__(self, common_name, serial, validity, email=None, country_name=None, locality_name=None,
-                 postal_address=None, postal_code=None, street_address=None, state_name=None, name=None, surname=None,
+    def __init__(self, common_name, email=None, name=None, surname=None, country_name=None, serial=None, validity=None,
+                 locality_name=None, postal_address=None, postal_code=None, street_address=None, state_name=None,
                  pseudonym=None, generation_qualifier=None, title=None, business_category=None, valid_after=None):
         self.common_name = common_name
         self.email = email
