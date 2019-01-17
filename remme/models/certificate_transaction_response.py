@@ -3,6 +3,10 @@ Base class for response on certificate creation.
 """
 from remme.models.base_transaction_response import BaseTransactionResponse
 from remme.remme_keys.rsa import RSA
+from remme.remme_utils import (
+    private_key_to_der,
+    public_key_to_der,
+)
 
 
 class CertificateTransactionResponse(BaseTransactionResponse):
@@ -14,8 +18,8 @@ class CertificateTransactionResponse(BaseTransactionResponse):
         )
         self._certificate = certificate
         self._keys = RSA(
-            private_key=self._certificate.private_key,
-            public_key=self._certificate.public_key,
+            private_key=private_key_to_der(self._certificate.private_key),
+            public_key=public_key_to_der(self._certificate.public_key()),
         )
 
     def sign(self, data, rsa_signature_padding=None):

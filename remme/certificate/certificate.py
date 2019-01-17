@@ -1,15 +1,16 @@
 import math
+from datetime import datetime, timedelta
 
 from cryptography import x509
 from cryptography.x509 import NameOID
-
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
 
 from remme.enums.rsa_signature_padding import RsaSignaturePadding
 from remme.models.certificate_transaction_response import CertificateTransactionResponse
 from remme.certificate.interface import IRemmeCertificate
+from remme.certificate.x509_certificate_builder import X509CertificateBuilder
 from remme.remme_keys.rsa import RSA
-from remme.remme_keys.remme_keys import RemmeKeys
-from remme.enums.key_type import KeyType
 from remme.remme_utils import (
     certificate_from_pem,
     certificate_to_pem,
@@ -18,20 +19,16 @@ from remme.remme_utils import (
     private_key_der_to_object,
     public_key_der_to_object,
 )
-from remme.certificate.x509_certificate_builder import X509CertificateBuilder
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from datetime import datetime, timedelta
 
 
-class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
+class RemmeCertificate(IRemmeCertificate):
     """
     Class for working with X509 certificate.
     """
 
     _rsa_key_size = 2048
 
-    def __init__(self, remme_public_key_storage, **kwargs):
+    def __init__(self, remme_public_key_storage):
         """
         Usage without remme main package.
         @example
@@ -43,7 +40,6 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
         certificate = RemmeCertificate(public_key_storage)
         ```
         """
-        super(RemmeCertificate, self).__init__(private_key=None, **kwargs)
         self._remme_public_key_storage = remme_public_key_storage
 
     @staticmethod
@@ -96,23 +92,24 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
             'serial': str(datetime.now())
         }
 
+        private_key, public_key = keys
+
         subject = issuer = self._create_subject(data)
 
-        cert_builder = X509CertificateBuilder(
-            private_key=private_key_der_to_object(keys.private_key),
+        certificate_builder = X509CertificateBuilder(
+            private_key=private_key_der_to_object(private_key),
             issuer_name=issuer, subject_name=subject,
-            public_key=public_key_der_to_object(keys.public_key),
+            public_key=public_key_der_to_object(public_key),
             serial_number=x509.random_serial_number(),
             not_valid_before=datetime.utcnow(),
             not_valid_after=datetime.utcnow() + timedelta(days=10 * 365)
         )
 
-        print('cert_builder', cert_builder)
-        print('cert_builder dir', dir(cert_builder))
-
-        certificate = cert_builder.sign(
-            private_key=cert_builder.private_key, algorithm=hashes.SHA256(), backend=default_backend(),
+        certificate = certificate_builder.sign(
+            private_key=certificate_builder.private_key, algorithm=hashes.SHA256(), backend=default_backend(),
         )
+
+        certificate.private_key = certificate_builder.private_key
 
         return certificate
 
@@ -132,10 +129,10 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
         )
         ```
         :param certificate_data_to_create:
-        :return:
+        :return: certificate: object
         """
         return self._create_certificate(
-            keys=RemmeKeys.construct(KeyType.RSA),
+            keys=RSA.generate_key_pair(),
             certificate_data_to_create=certificate_data_to_create,
         )
 
@@ -186,14 +183,17 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
         if type(certificate) == str:
             certificate = certificate_from_pem(certificate=certificate)
 
-        certificate_pem = certificate_to_pem(certificate=certificate).decode("utf-8")
+        certificate_pem = certificate_to_pem(certificate=certificate).decode('utf-8')
 
         valid_from = math.floor(int(certificate.not_valid_before.strftime("%s")) / 1000)
         valid_to = math.floor(int(certificate.not_valid_after.strftime("%s")) / 1000)
 
         batch_response = await self._remme_public_key_storage.store(
             data=certificate_pem,
-            keys=self.keys,
+            keys=RSA(
+                private_key=private_key_to_der(certificate.private_key),
+                public_key=public_key_to_der(certificate.public_key()),
+            ),
             rsa_signature_padding=RsaSignaturePadding.PSS,
             valid_from=valid_from,
             valid_to=valid_to,
@@ -203,7 +203,7 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
             node_address=batch_response.node_address,
             ssl_mode=batch_response.ssl_mode,
             batch_id=batch_response.batch_id,
-            certificate=self.keys,
+            certificate=certificate,
         )
 
     def check(self, certificate):
@@ -220,7 +220,7 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
             certificate = certificate_from_pem(certificate=certificate)
 
         address = RSA.get_address_from_public_key(
-            public_key_to_der(public_key=certificate.public_key),
+            public_key_to_der(public_key=certificate.public_key()),
         )
 
         check_result = self._remme_public_key_storage.check(address=address)
@@ -246,8 +246,6 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
         address = RSA.get_address_from_public_key(
             public_key_to_der(public_key=certificate.public_key()),
         )
-        print(address)
-        print(self.keys.address)
 
         check_result = await self._remme_public_key_storage.get_info(public_key_address=address)
         return check_result
@@ -274,14 +272,13 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
         address = RSA.get_address_from_public_key(
             public_key_to_der(public_key=certificate.public_key()),
         )
-        print(address)
-        print(self.keys.address)
 
         return self._remme_public_key_storage.revoke(public_key_address=address)
 
     def sign(self, certificate, data, rsa_signature_padding=None):
         """
         Sign data with a certificate's private key and output DigestInfo DER-encoded bytes (default for PSS).
+        :param certificate: object
         :param data: string
         :param rsa_signature_padding: RsaSignaturePadding
         :return: signature
@@ -289,18 +286,17 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
         if type(certificate) == str:
             certificate = certificate_from_pem(certificate=certificate)
 
-        # if certificate.private_key is None:
-        #     raise Exception('Your certificate does not have private key.')
+        if certificate.private_key is None:
+            raise Exception('Your certificate does not have private key.')
 
-        # keys = RSA(
-        #     private_key=private_key_to_der(certificate.private_key),
-        # )
+        keys = RSA(private_key=private_key_to_der(certificate.private_key))
 
-        return self.private_key.sign(data=data, rsa_signature_padding=rsa_signature_padding)
+        return keys.sign(data=data, rsa_signature_padding=rsa_signature_padding)
 
     def verify(self, certificate, data, signature, rsa_signature_padding=None):
         """
         Verify data with a public key (default for PSS).
+        :param certificate: object
         :param data: string
         :param signature: string
         :param rsa_signature_padding: RsaSignaturePadding
@@ -309,11 +305,9 @@ class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
         if type(certificate) == str:
             certificate = certificate_from_pem(certificate=certificate)
 
-        # if certificate.private_key is None:
-        #     raise Exception('Your certificate does not have private key.')
+        if certificate.private_key is None:
+            raise Exception('Your certificate does not have private key.')
 
-        keys = RSA(
-            public_key=public_key_to_der(certificate.public_key()),
-        )
+        keys = RSA(public_key=public_key_to_der(certificate.public_key()))
 
         return keys.verify(data=data, signature=signature, rsa_signature_padding=rsa_signature_padding)
