@@ -18,25 +18,20 @@ from remme.remme_utils import (
     private_key_der_to_object,
     public_key_der_to_object,
 )
-
+from remme.certificate.x509_certificate_builder import X509CertificateBuilder
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from datetime import datetime, timedelta
 
 
-class RemmeCertificate(IRemmeCertificate):
+class RemmeCertificate(X509CertificateBuilder, IRemmeCertificate):
     """
     Class for working with X509 certificate.
     """
 
     _rsa_key_size = 2048
 
-    keys = RemmeKeys.construct(KeyType.RSA)
-
-    private_key = private_key_der_to_object(keys.private_key)
-    public_key = public_key_der_to_object(keys.public_key)
-
-    def __init__(self, remme_public_key_storage):
+    def __init__(self, remme_public_key_storage, **kwargs):
         """
         Usage without remme main package.
         @example
@@ -48,6 +43,7 @@ class RemmeCertificate(IRemmeCertificate):
         certificate = RemmeCertificate(public_key_storage)
         ```
         """
+        super(RemmeCertificate, self).__init__(private_key=None, **kwargs)
         self._remme_public_key_storage = remme_public_key_storage
 
     @staticmethod
@@ -88,7 +84,7 @@ class RemmeCertificate(IRemmeCertificate):
 
         return x509.Name(name_attributes)
 
-    def _create_certificate(self, private_key, public_key, certificate_data_to_create=None):
+    def _create_certificate(self, keys, certificate_data_to_create=None):
 
         data = {
             'common_name': "user_name",
@@ -102,17 +98,23 @@ class RemmeCertificate(IRemmeCertificate):
 
         subject = issuer = self._create_subject(data)
 
-        cert_builder = x509.CertificateBuilder(
+        cert_builder = X509CertificateBuilder(
+            private_key=private_key_der_to_object(keys.private_key),
             issuer_name=issuer, subject_name=subject,
-            public_key=public_key,
+            public_key=public_key_der_to_object(keys.public_key),
             serial_number=x509.random_serial_number(),
             not_valid_before=datetime.utcnow(),
             not_valid_after=datetime.utcnow() + timedelta(days=10 * 365)
         )
 
-        return cert_builder.sign(
-            private_key=private_key, algorithm=hashes.SHA256(), backend=default_backend(),
+        print('cert_builder', cert_builder)
+        print('cert_builder dir', dir(cert_builder))
+
+        certificate = cert_builder.sign(
+            private_key=cert_builder.private_key, algorithm=hashes.SHA256(), backend=default_backend(),
         )
+
+        return certificate
 
     def create(self, certificate_data_to_create=None):
         """
@@ -133,8 +135,7 @@ class RemmeCertificate(IRemmeCertificate):
         :return:
         """
         return self._create_certificate(
-            private_key=self.private_key,
-            public_key=self.public_key,
+            keys=RemmeKeys.construct(KeyType.RSA),
             certificate_data_to_create=certificate_data_to_create,
         )
 
