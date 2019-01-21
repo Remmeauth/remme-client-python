@@ -8,8 +8,8 @@ from cryptography.hazmat.primitives import hashes
 
 from remme.enums.rsa_signature_padding import RsaSignaturePadding
 from remme.models.certificate_transaction_response import CertificateTransactionResponse
-from remme.certificate.interface import IRemmeCertificate
-from remme.certificate.x509_certificate_builder import X509CertificateBuilder
+from remme.remme_certificate.interface import IRemmeCertificate
+from remme.remme_certificate.x509_certificate_builder import X509CertificateBuilder
 from remme.remme_keys.rsa import RSA
 from remme.remme_utils import (
     certificate_from_pem,
@@ -23,7 +23,36 @@ from remme.remme_utils import (
 
 class RemmeCertificate(IRemmeCertificate):
     """
-    Class for working with X509 certificate.
+    Class for working with certificates, such as create, store, revoke, check, get_info.
+    @example
+    ```python
+    remme = Remme()
+    certificate_transaction_result = await remme.certificate.create_and_store({
+        common_name='user_name',
+        email='user@email.com',
+        name='John',
+        surname='Smith',
+        country_name='US',
+        validity=360,
+        serial=str(datetime.now())
+    })
+
+    async for response in certificate_transaction_result.connect_to_web_socket():
+        print('store', response)
+        if response.status === 'COMMITTED':
+            certificate_transaction_result.close_web_socket()
+            status = await remme.certificate.check(certificate_transaction_result.certificate)
+            print('status:', status) # True
+            info = await remme.certificate.get_info(certificate_transaction_result.certificate)
+            print('info:', info)
+            revoke = await remme.certificate.revoke(certificate_transaction_result.certificate)
+            async for res in revoke.connect_to_web_socket():
+                print('revoke', response)
+                if response.status === 'COMMITTED':
+                    revoke.close_web_socket()
+                    status = await remme.certificate.check(certificate_transaction_result.certificate)
+                    print(status) # False
+    ```
     """
 
     _rsa_key_size = 2048
@@ -44,6 +73,10 @@ class RemmeCertificate(IRemmeCertificate):
 
     @staticmethod
     def get_params():
+        """
+        Get name attributes for subject creation.
+        :return: name attributes: dict
+        """
         return {
             'country_name': NameOID.COUNTRY_NAME,
             'state_name': NameOID.STATE_OR_PROVINCE_NAME,
@@ -63,13 +96,11 @@ class RemmeCertificate(IRemmeCertificate):
         }
 
     def _create_subject(self, certificate_data_to_create):
-
-        # if certificate_data_to_create.common_name is None:
-        #     raise Exception('Attribute `common_name` must have a value.')
-        #
-        # if certificate_data_to_create.validity is None:
-        #     raise Exception('Attribute `validity` must have a value.')
-
+        """
+        Create subject for certificate.
+        :param certificate_data_to_create: dict
+        :return: subject
+        """
         parameters = self.get_params()
 
         name_attributes = []
@@ -80,29 +111,37 @@ class RemmeCertificate(IRemmeCertificate):
 
         return x509.Name(name_attributes)
 
-    def _create_certificate(self, keys, certificate_data_to_create=None):
-
-        data = {
-            'common_name': "user_name",
-            'email': "user@email.com",
-            'name': "John",
-            'surname': "Smith",
-            'country_name': "US",
-            'validity': 360,
-            'serial': str(datetime.now())
-        }
-
+    def _create_certificate(self, keys, certificate_data_to_create):
+        """
+        Create certificate and sign it.
+        :param keys: RSA private and public key: bytes
+        :param certificate_data_to_create: dict
+        :return: signed certificate object
+        """
         private_key, public_key = keys
 
-        subject = issuer = self._create_subject(data)
+        if certificate_data_to_create.get('common_name') is None:
+            raise Exception('Attribute `common_name` must have a value.')
+
+        if 'validity_after' in certificate_data_to_create:
+            not_valid_before = datetime.utcnow() + timedelta(days=certificate_data_to_create.get('validity_after'))
+        else:
+            not_valid_before = datetime.utcnow()
+
+        if 'validity' in certificate_data_to_create:
+            not_valid_after = not_valid_before + timedelta(days=certificate_data_to_create.get('validity'))
+        else:
+            not_valid_after = not_valid_before + timedelta(days=365)
+
+        subject = issuer = self._create_subject(certificate_data_to_create)
 
         certificate_builder = X509CertificateBuilder(
             private_key=private_key_der_to_object(private_key),
             issuer_name=issuer, subject_name=subject,
             public_key=public_key_der_to_object(public_key),
             serial_number=x509.random_serial_number(),
-            not_valid_before=datetime.utcnow(),
-            not_valid_after=datetime.utcnow() + timedelta(days=10 * 365)
+            not_valid_before=not_valid_before,
+            not_valid_after=not_valid_after,
         )
 
         certificate = certificate_builder.sign(
@@ -113,23 +152,23 @@ class RemmeCertificate(IRemmeCertificate):
 
         return certificate
 
-    def create(self, certificate_data_to_create=None):
+    def create(self, **certificate_data_to_create):
         """
         Create certificate.
         @example
         ```python
         certificate = remme.certificate.create(
-            common_name: "user_name",
-            email: "user@email.com",
-            name: "John",
-            surname: "Smith",
-            country_name: "US",
-            validity: 360,
-            serial: str(datetime.now())
+            common_name='user_name',
+            email='user@email.com',
+            name='John',
+            surname='Smith',
+            country_name='US',
+            validity=360,
+            serial=str(datetime.now())
         )
         ```
-        :param certificate_data_to_create:
-        :return: certificate: object
+        :param certificate_data_to_create: dict
+        :return: signed certificate object
         """
         return self._create_certificate(
             keys=RSA.generate_key_pair(),
@@ -144,16 +183,16 @@ class RemmeCertificate(IRemmeCertificate):
         ```python
         remme = Remme()
         certificate_transaction_result = remme.certificate.create_and_store(
-            common_name: "user_name",
-            email: "user@email.com",
-            name: "John",
-            surname: "Smith",
-            country_name: "US",
-            validity: 360,
-            serial: str(datetime.now())
+            common_name='user_name',
+            email='user@email.com',
+            name='John',
+            surname='Smith',
+            country_name='US',
+            validity=360,
+            serial=str(datetime.now())
         )
         ```
-        :return:
+        :return: information about storing public key to REMChain
         """
         certificate = self.create(certificate_data_to_create=certificate_data_to_create)
         return self.store(certificate=certificate)
@@ -167,18 +206,18 @@ class RemmeCertificate(IRemmeCertificate):
         ```python
         remme = Remme()
         certificate = remme.certificate.create(
-            common_name: "user_name",
-            email: "user@email.com",
-            name: "John",
-            surname: "Smith",
-            country_name: "US",
-            validity: 360,
-            serial: str(datetime.now())
+            common_name='user_name',
+            email='user@email.com',
+            name='John',
+            surname='Smith',
+            country_name='US',
+            validity=360,
+            serial=str(datetime.now())
         )
         store_response = remme.certificate.store(certificate)
         ```
-        :param certificate:
-        :return:
+        :param certificate: object
+        :return: information about storing public key to REMChain
         """
         if type(certificate) == str:
             certificate = certificate_from_pem(certificate=certificate)
@@ -225,7 +264,7 @@ class RemmeCertificate(IRemmeCertificate):
 
         check_result = self._remme_public_key_storage.check(address=address)
 
-        if check_result is None:
+        if check_result is not None:
             return check_result
         else:
             raise Exception('This certificate was not found.')
@@ -238,7 +277,7 @@ class RemmeCertificate(IRemmeCertificate):
         remme = Remme()
         info = remme.certificate.get_info(certificate)
         ```
-        :return:
+        :return: information about public key
         """
         if type(certificate) == str:
             certificate = certificate_from_pem(certificate=certificate)
@@ -248,12 +287,11 @@ class RemmeCertificate(IRemmeCertificate):
         )
 
         check_result = await self._remme_public_key_storage.get_info(public_key_address=address)
-        return check_result
-        #
-        # if check_result is not None:
-        #     return check_result
-        # else:
-        #     raise Exception('This certificate was not found.')
+
+        if check_result is not None:
+            return check_result
+        else:
+            raise Exception('This certificate was not found.')
 
     def revoke(self, certificate):
         """
@@ -263,8 +301,8 @@ class RemmeCertificate(IRemmeCertificate):
         ```python
         remme = Remme()
         revoke_response = remme.certificate.revoke(certificate)
-        :param certificate:
-        :return:
+        :param certificate: object
+        :return: information about revoked public key
         """
         if type(certificate) == str:
             certificate = certificate_from_pem(certificate=certificate)
