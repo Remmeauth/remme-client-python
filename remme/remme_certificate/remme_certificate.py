@@ -78,21 +78,21 @@ class RemmeCertificate(IRemmeCertificate):
         :return: name attributes: dict
         """
         return {
+            'common_name': NameOID.COMMON_NAME,
+            'email': NameOID.EMAIL_ADDRESS,
             'country_name': NameOID.COUNTRY_NAME,
-            'state_name': NameOID.STATE_OR_PROVINCE_NAME,
-            'street_address': NameOID.STREET_ADDRESS,
+            'locality_name': NameOID.LOCALITY_NAME,
             'postal_address': NameOID.POSTAL_ADDRESS,
             'postal_code': NameOID.POSTAL_CODE,
-            'locality_name': NameOID.LOCALITY_NAME,
-            'common_name': NameOID.COMMON_NAME,
+            'street_address': NameOID.STREET_ADDRESS,
+            'state_name': NameOID.STATE_OR_PROVINCE_NAME,
             'name': NameOID.GIVEN_NAME,
             'surname': NameOID.SURNAME,
             'pseudonym': NameOID.PSEUDONYM,
-            'business_category': NameOID.BUSINESS_CATEGORY,
+            'generation_qualifier': NameOID.GENERATION_QUALIFIER,
             'title': NameOID.TITLE,
-            'email': NameOID.EMAIL_ADDRESS,
             'serial': NameOID.SERIAL_NUMBER,
-            'generation_qualifier': NameOID.GENERATION_QUALIFIER
+            'business_category': NameOID.BUSINESS_CATEGORY,
         }
 
     def _create_subject(self, certificate_data_to_create):
@@ -101,6 +101,12 @@ class RemmeCertificate(IRemmeCertificate):
         :param certificate_data_to_create: dict
         :return: subject
         """
+        if certificate_data_to_create.get('common_name') is None:
+            raise Exception('Attribute `common_name` must have a value.')
+
+        if certificate_data_to_create.get('validity') is None:
+            raise Exception('Attribute `validity` must have a value.')
+
         parameters = self.get_params()
 
         name_attributes = []
@@ -120,8 +126,7 @@ class RemmeCertificate(IRemmeCertificate):
         """
         private_key, public_key = keys
 
-        if certificate_data_to_create.get('common_name') is None:
-            raise Exception('Attribute `common_name` must have a value.')
+        subject = issuer = self._create_subject(certificate_data_to_create)
 
         if 'validity_after' in certificate_data_to_create:
             not_valid_before = datetime.utcnow() + timedelta(days=certificate_data_to_create.get('validity_after'))
@@ -133,11 +138,10 @@ class RemmeCertificate(IRemmeCertificate):
         else:
             not_valid_after = not_valid_before + timedelta(days=365)
 
-        subject = issuer = self._create_subject(certificate_data_to_create)
-
         certificate_builder = X509CertificateBuilder(
             private_key=private_key_der_to_object(private_key),
-            issuer_name=issuer, subject_name=subject,
+            issuer_name=issuer,
+            subject_name=subject,
             public_key=public_key_der_to_object(public_key),
             serial_number=x509.random_serial_number(),
             not_valid_before=not_valid_before,
