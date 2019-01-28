@@ -6,7 +6,7 @@ from enum import Enum
 
 class RemmeEvents(Enum):
 
-    Blocks = 'blocks',
-    Batch = 'batch',
-    Transfer = 'transfer',
+    Blocks = 'blocks'
+    Batch = 'batch'
+    Transfer = 'transfer'
     AtomicSwap = 'atomic_swap'
