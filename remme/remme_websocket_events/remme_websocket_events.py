@@ -1,6 +1,6 @@
 from remme.remme_websocket import RemmeWebSocket
+from remme.remme_websocket.models.remme_request_params import RemmeRequestParams
 from remme.remme_websocket_events.interface import IRemmeWebSocketsEvents
-from remme.remme_websocket_events.remme_request_params import RemmeRequestParams
 
 
 class RemmeWebSocketEvents(RemmeWebSocket, IRemmeWebSocketsEvents):

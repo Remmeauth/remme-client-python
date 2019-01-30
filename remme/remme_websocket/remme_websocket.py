@@ -4,12 +4,13 @@ from random import random
 from aiohttp import ClientSession
 
 from remme.enums.batch_status import BatchStatus
-from remme.enums.remme_events import RemmeEvents
 from remme.remme_utils import sha256_hexdigest
-from remme.remme_websocket_events.websocket_methods import RemmeWebSocketMethods
+from remme.remme_websocket.interface import IRemmeWebSocket
+from remme.remme_websocket.models.remme_events import RemmeEvents
+from remme.remme_websocket.models.remme_websocket_methods import RemmeWebSocketMethods
 
 
-class RemmeWebSocket:
+class RemmeWebSocket(IRemmeWebSocket):
     """
     Class that work with sockets. Class can be used for inheritance.
     This class is used for response on transaction sending.

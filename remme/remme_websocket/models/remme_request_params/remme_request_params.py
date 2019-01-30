@@ -1,8 +1,8 @@
-from remme.enums.remme_events import RemmeEvents
-from remme.remme_websocket_events.remme_request_params.events.atomic_swap import WebSocketsAtomicSwapEventRequestParams
-from remme.remme_websocket_events.remme_request_params.events.batch import WebSocketsBatchEventRequestParams
-from remme.remme_websocket_events.remme_request_params.events.blocks import WebSocketsBlocksEventRequestParams
-from remme.remme_websocket_events.remme_request_params.events.transfer import WebSocketsTransferEventRequestParams
+from remme.remme_websocket.models.remme_events import RemmeEvents
+from remme.remme_websocket.models.remme_request_params.events.atomic_swap import WebSocketsAtomicSwapEventRequestParams
+from remme.remme_websocket.models.remme_request_params.events.batch import WebSocketsBatchEventRequestParams
+from remme.remme_websocket.models.remme_request_params.events.blocks import WebSocketsBlocksEventRequestParams
+from remme.remme_websocket.models.remme_request_params.events.transfer import WebSocketsTransferEventRequestParams
 
 SUPPORTED_NODE_EVENTS = [
     RemmeEvents.AtomicSwap.value,
