@@ -1,11 +1,10 @@
 import json
-from random import random
 
 from aiohttp import ClientSession
 
 from remme.enums.batch_status import BatchStatus
-from remme.remme_utils import sha256_hexdigest
 from remme.remme_websocket.interface import IRemmeWebSocket
+from remme.remme_websocket.models.json_rpc_request import JsonRpcRequest
 from remme.remme_websocket.models.remme_events import RemmeEvents
 from remme.remme_websocket.models.remme_websocket_methods import RemmeWebSocketMethods
 
@@ -86,15 +85,9 @@ class RemmeWebSocket(IRemmeWebSocket):
         if not self.data:
             raise Exception("Data for subscribe was not provided.")
 
-        query = {
-            "jsonrpc": "2.0",
-            "method":
-                RemmeWebSocketMethods.Subscribe.value if is_subscribe else RemmeWebSocketMethods.Unsubscribe.value,
-            "params": self.data,
-            "id": sha256_hexdigest(float.hex(random() * 1000).lstrip('0x')),
-        }
+        method = RemmeWebSocketMethods.Subscribe.value if is_subscribe else RemmeWebSocketMethods.Unsubscribe.value
 
-        return json.dumps(query)
+        return json.dumps(JsonRpcRequest(method=method, params=self.data).get_query())
 
     async def connect_to_web_socket(self):
         """
