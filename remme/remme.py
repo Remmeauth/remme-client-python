@@ -8,9 +8,13 @@ from remme.remme_keys.remme_keys import RemmeKeys
 from remme.remme_public_key_storage import RemmePublicKeyStorage
 from remme.remme_token import RemmeToken
 from remme.remme_transaction_service import RemmeTransactionService
-from remme.remme_websocket_events import RemmeWebSocketEvents
+from remme.remme_websocket_events.remme_websocket_events import RemmeWebSocketEvents
 
-__author__ = 'dethline'
+DEFAULT_NETWORK_CONFIG = {
+    'node_address': "localhost",
+    'node_port': "8080",
+    'ssl_mode': False,
+}
 
 
 class Remme:
@@ -33,14 +37,12 @@ class Remme:
 
     def __init__(self, private_key_hex="", network_config=None):
         """
-        :param private_key_hex: The hex of private key. Which is used for creating account in library
+        :param private_key_hex: hex of private key, which is used for creating account in library
         which would sign transactions.
-        :param network_config: The config of network.
+        :param network_config: config of network.
         """
-        default_network_config = {'node_address': "localhost", 'node_port': "8080", 'ssl_mode': False}
-
         self._private_key_hex = private_key_hex
-        self._network_config = default_network_config if network_config is None else network_config
+        self._network_config = DEFAULT_NETWORK_CONFIG if network_config is None else network_config
 
         self._api = RemmeAPI(self._network_config)
         self.account = RemmeAccount(self._private_key_hex)
