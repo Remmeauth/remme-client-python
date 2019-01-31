@@ -1,9 +1,11 @@
 import base64
+import codecs
 import hashlib
 import math
 import random
 import re
 
+import sha3
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -112,6 +114,20 @@ def sha256_hexdigest(data):
 
 def is_hex(data):
     return HEX.search(data) is not None
+
+
+def remove_0x_prefix(value):
+    if value.startswith('0x'):
+        return value[2:]
+    return value
+
+
+def web3_hash(data):
+    if len(data) % 2:
+        data = '0x0' + remove_0x_prefix(data)
+
+    data = codecs.decode(remove_0x_prefix(data), 'hex')
+    return sha3.keccak_256(data).hexdigest()
 
 
 def generate_address(_family_name, _public_key_to):

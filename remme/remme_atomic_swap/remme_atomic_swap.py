@@ -19,6 +19,7 @@ from remme.remme_utils import (
     generate_address,
     generate_settings_address,
 )
+from remme.remme_websocket.models.swap_info import SwapInfo
 
 ATOMIC_SWAP_METHODS = [
     AtomicSwapMethod.INIT,
@@ -30,6 +31,21 @@ ATOMIC_SWAP_METHODS = [
 class RemmeSwap(IRemmeSwap):
     """
     Main class for working with Atomic Swap.
+    ```python
+    swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
+    secret_key = '039eaa877ff63694f8f09c8034403f8b5165a7418812a642396d5d539f90b170'
+    secret_lock = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
+    receiver_address = '112007484def48e1c6b77cf784aeabcac51222e48ae14f3821697f4040247ba01558b1'
+    sender_address_non_local = '0xe6ca0e7c974f06471759e9a05d18b538c5ced11e'
+    init = await remme.swap.init(
+        receiver_address=receiver_address,
+        sender_address_non_local=sender_address_non_local,
+        amount=100,
+        swap_id=swap_id,
+        secret_lock_by_solicitor=secret_lock_by_solicitor,
+        created_at=int(datetime.now().timestamp()),
+    )
+    ```
     """
 
     _family_name = RemmeFamilyName.SWAP.value
@@ -44,7 +60,7 @@ class RemmeSwap(IRemmeSwap):
         @example
         Usage without main remme package
         ```python
-        remme_api = RemmeAPI()  # see RemmeRest implementation
+        remme_api = RemmeAPI()  # see RemmeAPI implementation
         remme_account = RemmeAccount()  # see RemmeAccount implementation
         remme_transaction = RemmeTransactionService(remme_api, remme_account)  # see RemmeTransactionService implementation
         remme_swap = RemmeSwap(remme_api, remme_transaction)
@@ -56,13 +72,19 @@ class RemmeSwap(IRemmeSwap):
         self._remme_transaction_service = remme_transaction_service
 
     def _get_addresses(self, method, swap_id, receiver_address=None):
-
-        addresses = [generate_address(_family_name=self._family_name, _public_key_to=swap_id)]
+        """
+        Get addresses for inputs and outputs.
+        :param method: AtomicSwapMethod
+        :param swap_id: string
+        :param receiver_address: string (optional)
+        :return: inputs and outputs (lists)
+        """
+        addresses = generate_address(_family_name=self._family_name, _public_key_to=swap_id)
 
         inputs, outputs = None, None
 
         if method not in ATOMIC_SWAP_METHODS:
-            inputs = outputs = addresses
+            inputs = outputs = [addresses]
 
         if method == AtomicSwapMethod.INIT:
             inputs = [
@@ -84,6 +106,7 @@ class RemmeSwap(IRemmeSwap):
                 self._block_info_namespace_address,
                 self._block_info_config_address,
             ]
+            outputs = [addresses]
 
         if method == AtomicSwapMethod.CLOSE:
             inputs = [
@@ -114,7 +137,9 @@ class RemmeSwap(IRemmeSwap):
 
     @staticmethod
     def _check_parameters(**parameters):
-
+        """
+        Check parameters such as swap_id, secret_lock (optional), secret_key (optional).
+        """
         for key, value in parameters.items():
 
             if value is None:
@@ -130,10 +155,10 @@ class RemmeSwap(IRemmeSwap):
         @example
         ```python
         approve = await remme.swap.approve(swap_id)
-        print(approve.swap_id)
+        print(approve.batch_id)
         ```
         :param swap_id: string
-        :return:
+        :return: object
         """
         self._check_parameters(swap_id=swap_id)
 
@@ -159,15 +184,18 @@ class RemmeSwap(IRemmeSwap):
         Send transaction into REMChain.
         @example
         ```python
-        close = await remme.swap.close(swap_id)
-        print(close.swap_id)
+        close = await remme.swap.close(swap_id, secret_key)
+        print(close.batch_id)
         ```
         :param swap_id: string
         :param secret_key: string
-        :return:
+        :return: object
         """
         self._check_parameters(swap_id=swap_id, secret_key=secret_key)
-        receiver_address = await self.get_info(swap_id=swap_id)
+
+        swap_info = await self.get_info(swap_id=swap_id)
+
+        receiver_address = swap_info.receiver_address
 
         payload = AtomicSwapClosePayload(swap_id=swap_id, secret_key=secret_key).SerializeToString()
         transaction_payload = self._generate_transaction_payload(
@@ -194,10 +222,10 @@ class RemmeSwap(IRemmeSwap):
         @example
         ```python
         expire = await remme.swap.expire(swap_id)
-        print(expire.swap_id)
+        print(expire.batch_id)
         ```
         :param swap_id:
-        :return:
+        :return: object
         """
         self._check_parameters(swap_id=swap_id)
 
@@ -225,73 +253,67 @@ class RemmeSwap(IRemmeSwap):
         @example
         ```python
         info = await remme.swap.get_info(swap_id)
-        print(info)
+        print(info)  # SwapInfo
         ```
         :param swap_id: string
         :return: information about swap
         """
         self._check_parameters(swap_id=swap_id)
 
-        return await self._remme_api.send_request(
+        swap_data = await self._remme_api.send_request(
             method=RemmeMethods.ATOMIC_SWAP,
-            params=swap_id,
+            params={'swap_id': swap_id},
         )
+
+        return SwapInfo(data=swap_data)
 
     async def get_public_key(self):
         """
         Get swap public key.
         @example
         ```python
-        publicKey = await remme.swap.get_public_key()
-        print(publicKey)
+        public_key = await remme.swap.get_public_key()
+        print(public_key)
         ```
-        :return:
+        :return: swap public key
         """
         return await self._remme_api.send_request(method=RemmeMethods.ATOMIC_SWAP_PUBLIC_KEY)
 
-    async def init(self, data):
+    async def init(self, **data):
         """
         Initiation of swap.
         Send transaction into REMChain.
         @example
         ```python
         swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
+        # hash from secret key that will be provided in close
         secret_lock_by_solicitor = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
         receiver_address = '112007484def48e1c6b77cf784aeabcac51222e48ae14f3821697f4040247ba01558b1'
         sender_address_non_local = '0xe6ca0e7c974f06471759e9a05d18b538c5ced11e'
-        init = await remme.swap.init({
-            'receiver_address': receiver_address,
-            'sender_address_non_local': sender_address_non_local,
-            'amount': 100,
-            'swap_id': swap_id,
-            'secret_lock_by_solicitor': secret_lock_by_solicitor,
-            'created_at': int(datetime.now().timestamp())
-        })
+        init = await remme.swap.init(
+            receiver_address=receiver_address,
+            sender_address_non_local=sender_address_non_local,
+            amount=100,
+            swap_id=swap_id,
+            secret_lock_by_solicitor=secret_lock_by_solicitor,
+            created_at=int(datetime.now().timestamp()),
+        )
         print(init.batch_id)
         ```
         :param data: dict
-        :return:
+        :return: object
         """
-        from datetime import datetime
-
-        data = {
-            'receiver_address': '112007484def48e1c6b77cf784aeabcac51222e48ae14f3821697f4040247ba01558b1',
-            'sender_address_non_local': '0xe6ca0e7c974f06471759e9a05d18b538c5ced11e',
-            'amount': 10,
-            'swap_id': '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806',
-            'secret_lock_by_solicitor': 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68',
-            'created_at': int(datetime.now().timestamp())
-        }
-        swap_init_data = SwapInitDto(data=data).serialize_to_json()
-        swap_id = swap_init_data.get('swap_id')
+        swap_init_data = SwapInitDto(data=data)
+        swap_id = swap_init_data.swap_id
 
         payload = AtomicSwapInitPayload(
-            receiver_address=swap_init_data.get('receiver_address'),
-            sender_address_non_local=swap_init_data.get('sender_address_non_local'),
-            amount=swap_init_data.get('amount'),
+            receiver_address=swap_init_data.receiver_address,
+            sender_address_non_local=swap_init_data.sender_address_non_local,
+            amount=swap_init_data.amount,
             swap_id=swap_id,
-            secret_lock_by_solicitor=swap_init_data.get('secret_lock_by_solicitor'),
-            created_at=swap_init_data.get('created_at'),
+            secret_lock_by_solicitor=swap_init_data.secret_lock_by_solicitor,
+            email_address_encrypted_by_initiator=swap_init_data.email_address_encrypted_by_initiator,
+            created_at=swap_init_data.created_at,
         ).SerializeToString()
 
         transaction_payload = self._generate_transaction_payload(
@@ -322,8 +344,8 @@ class RemmeSwap(IRemmeSwap):
         print(setting.batch_id)
         ```
         :param swap_id: string
-        :param secret_lock: string
-        :return:
+        :param secret_lock: string - hash from secret key that will be provided in close
+        :return: object
         """
         self._check_parameters(swap_id=swap_id, secret_lock_by_solicitor=secret_lock)
 

@@ -43,21 +43,3 @@ class SwapInitDto:
 
         if self.created_at is None:
             raise Exception('The `created_at` is not specified.')
-
-    def serialize_to_json(self):
-
-        swap_data = {
-            'receiver_address': self.receiver_address,
-            'sender_address_non_local': self.sender_address_non_local,
-            'amount': self.amount,
-            'swap_id': self.swap_id,
-            'created_at': self.created_at,
-        }
-
-        if self.secret_lock_by_solicitor is not None:
-            swap_data['secret_lock_by_solicitor'] = self.secret_lock_by_solicitor
-
-        if self.email_address_encrypted_by_initiator is not None:
-            swap_data['email_address_encrypted_by_initiator'] = self.email_address_encrypted_by_initiator
-
-        return swap_data
