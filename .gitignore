@@ -5,3 +5,10 @@ docs
 poetry.lock
 remme_client.egg-info/
 remme/protos/
+
+
+
+
+
+# Stuff
+.DS_Store
