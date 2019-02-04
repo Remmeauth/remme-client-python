@@ -14,13 +14,17 @@ class WebSocketsAtomicSwapEventRequestParams:
         self.id = data.get('id')
         self.from_block = data.get('last_known_block_id')
 
-        if self.id is None or not (re.match(RemmePatterns.SWAP_ID.value, self.id) is not None) \
-                or not isinstance(self.id, str):
-            raise Exception('The `id` parameter is not correct or not provided.')
+        if self.id is not None:
 
-        if self.from_block is None or not isinstance(self.from_block, str) \
-                or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.from_block) is not None):
-            raise Exception('The `last_known_block_id` parameter is not correct or not provided.')
+            if not isinstance(self.id, str) \
+                    or not (re.match(RemmePatterns.SWAP_ID.value, self.id) is not None):
+                raise Exception('The `id` parameter is not correct.')
+
+        if self.from_block is not None:
+
+            if not isinstance(self.from_block, str) \
+                    or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.from_block) is not None):
+                raise Exception('The `last_known_block_id` parameter is not correct.')
 
     def serialize_to_json(self):
 

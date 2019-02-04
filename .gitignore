@@ -6,9 +6,9 @@ poetry.lock
 remme_client.egg-info/
 remme/protos/
 
-
-
-
+# IDE
+.idea/
+.vscode/
 
 # Stuff
 .DS_Store
