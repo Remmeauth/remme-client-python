@@ -84,7 +84,7 @@ class RemmeSwap(IRemmeSwap):
         inputs, outputs = None, None
 
         if method not in ATOMIC_SWAP_METHODS:
-            inputs = outputs = [addresses]
+            raise Exception(f'Given `{method}` is not a valid.')
 
         if method == AtomicSwapMethod.INIT:
             inputs = [
@@ -100,7 +100,7 @@ class RemmeSwap(IRemmeSwap):
                 self._zero_address,
             ]
 
-        if method == AtomicSwapMethod.EXPIRE:
+        elif method == AtomicSwapMethod.EXPIRE:
             inputs = [
                 addresses,
                 self._block_info_namespace_address,
@@ -108,7 +108,7 @@ class RemmeSwap(IRemmeSwap):
             ]
             outputs = [addresses]
 
-        if method == AtomicSwapMethod.CLOSE:
+        elif method == AtomicSwapMethod.CLOSE:
             inputs = [
                 addresses,
                 receiver_address,
@@ -145,7 +145,7 @@ class RemmeSwap(IRemmeSwap):
             if value is None:
                 raise Exception(f'The `{key}` was missing in parameters.')
 
-            if not re.search(RemmePatterns.SWAP_ID.value, value) is not None:
+            elif not re.search(RemmePatterns.SWAP_ID.value, value) is not None:
                 raise Exception(f'Given `{key}` is not a valid.')
 
     async def approve(self, swap_id):
