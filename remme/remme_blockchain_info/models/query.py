@@ -10,11 +10,13 @@ class BaseQuery:
 
     def __init__(self, query):
 
-        self.head = query.get('query')
-        self.start = query.get('start')
-        self.family_name = query.get('family_name')
-        self.limit = query.get('limit')
-        self.reverse = '' if query.get('reverse') else 'false'
+        self.query = query
+
+        self.head = self.query.get('query')
+        self.start = self.query.get('start')
+        self.family_name = self.query.get('family_name')
+        self.limit = self.query.get('limit')
+        self.reverse = '' if self.query.get('reverse') else 'false'
 
         if self.head is not None \
                 and not (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.head) is not None):
@@ -24,8 +26,29 @@ class BaseQuery:
 
             if isinstance(self.start, str) \
                     and (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.start) is not None
-                         or re.match(r'^[a-f0-9]{64}$', self.start) is not None) \
+                         or re.match(r'^0x[a-f0-9]{16}$', self.start) is not None) \
                     or isinstance(self.start, int):
                 self.start = str(self.start)
             else:
                 raise Exception('Parameter `start` is not a valid.')
+
+    def get(self):
+        return self.query
+
+
+class StateQuery(BaseQuery):
+    """
+    StateQuery.
+    """
+
+    def __init__(self, query):
+        super(StateQuery, self).__init__(query)
+
+        self.address = query.get('address')
+
+        if isinstance(self.address, str) \
+                and not (re.match(RemmePatterns.ADDRESS.value, self.address) is not None):
+            raise Exception('Parameter `address` need to a valid.')
+
+    def get(self):
+        return self.query

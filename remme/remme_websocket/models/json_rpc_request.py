@@ -1,6 +1,6 @@
 from random import random
 
-from remme.remme_utils import sha256_hexdigest
+from remme.remme_utils.remme_utils import sha256_hexdigest
 
 
 class JsonRpcRequest:

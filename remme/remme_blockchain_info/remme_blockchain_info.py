@@ -1,3 +1,4 @@
+import base64
 import re
 
 from remme import protos
@@ -6,17 +7,66 @@ from remme.enums.remme_patterns import RemmePatterns
 from remme.remme_blockchain_info.interface import IRemmeBlockchainInfo
 from remme.remme_blockchain_info.models.block_info import BlockInfo
 from remme.remme_blockchain_info.models.network_status import NetworkStatus
-from remme.remme_blockchain_info.models.query import BaseQuery
-from remme.remme_utils.models import (
-    RemmeFamilyName,
-    RemmeNamespace,
+from remme.remme_blockchain_info.models.query import (
+    BaseQuery,
+    StateQuery,
 )
+from remme.remme_utils.models import RemmeNamespace
+from remme.remme_utils.remme_utils import get_namespace_params
 
 
 class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     """
     Main class that works with blockchain data (blocks, batches, transactions, addresses, peers).
     """
+
+    _address = {
+        RemmeNamespace.SWAP.value: get_namespace_params(
+            type='info atomic swap', parser=protos.AtomicSwapInfo,
+        ),
+        RemmeNamespace.ACCOUNT.value: get_namespace_params(
+            type='account', parser=protos.Account,
+        ),
+        RemmeNamespace.PUBLIC_KEY.value: get_namespace_params(
+            type='storage public key', parser=protos.PubKeyStorage,
+        ),
+    }
+
+    _correspond = {
+        RemmeNamespace.ACCOUNT.value: {
+            protos.AccountMethod.TRANSFER: get_namespace_params(
+                type='transfer token', parser=protos.TransferPayload,
+            ),
+            protos.AccountMethod.GENESIS: get_namespace_params(
+                type='genesis', parser=protos.GenesisPayload,
+            ),
+        },
+        RemmeNamespace.SWAP.value: {
+            protos.AtomicSwapMethod.INIT: get_namespace_params(
+                type='atomic-swap-init', parser=protos.AtomicSwapInitPayload,
+            ),
+            protos.AtomicSwapMethod.APPROVE: get_namespace_params(
+                type='atomic-swap-approve', parser=protos.AtomicSwapApprovePayload,
+            ),
+            protos.AtomicSwapMethod.EXPIRE: get_namespace_params(
+                type='atomic-swap-expire', parser=protos.AtomicSwapExpirePayload,
+            ),
+            protos.AtomicSwapMethod.SET_SECRET_LOCK: get_namespace_params(
+                type='atomic-swap-set-secret-lock', parser=protos.AtomicSwapSetSecretLockPayload,
+            ),
+            protos.AtomicSwapMethod.CLOSE: get_namespace_params(
+                type='atomic-swap-close', parser=protos.AtomicSwapClosePayload,
+            ),
+        },
+        RemmeNamespace.PUBLIC_KEY.value: {
+            protos.PubKeyMethod.STORE: get_namespace_params(
+                type='store public key', parser=protos.NewPubKeyPayload,
+            ),
+            protos.PubKeyMethod.REVOKE: get_namespace_params(
+                type='revoke public key', parser=protos.RevokePubKeyPayload,
+            ),
+        },
+    }
 
     def __init__(self, remme_api):
         """
@@ -40,82 +90,6 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         if address is None or not (re.match(RemmePatterns.ADDRESS.value, address) is not None):
             raise Exception('Given `address` is not a valid.')
 
-    def _get_address(self, namespace):
-        if namespace == RemmeNamespace.SWAP.value:
-            return {
-                'type': 'info atomic swap',
-                'parser': protos.AtomicSwapInfo,
-            }
-
-        if namespace == RemmeNamespace.ACCOUNT.value:
-            return {
-                'type': 'account',
-                'parser': protos.Account,
-            }
-
-        if namespace == RemmeNamespace.PUBLIC_KEY.value:
-            return {
-                'type': 'storage public key',
-                'parser': protos.PubKeyStorage,
-            }
-
-    def _correspond(self, family_name, method=None):
-
-        if family_name == RemmeFamilyName.ACCOUNT.value:
-
-            if method == protos.AccountMethod.TRANSFER:
-                return {
-                    'type': 'transfer token',
-                    'parser': protos.TransferPayload,
-                }
-            if method == protos.AccountMethod.GENESIS:
-                return {
-                    'type': 'genesis',
-                    'parser': protos.GenesisPayload,
-                }
-
-        if family_name == RemmeFamilyName.SWAP.value:
-
-            if method == protos.AtomicSwapMethod.INIT:
-                return {
-                    'type': 'atomic-swap-init',
-                    'parser': protos.AtomicSwapInitPayload,
-                }
-            if method == protos.AtomicSwapMethod.APPROVE:
-                return {
-                    'type': 'atomic-swap-approve',
-                    'parser': protos.AtomicSwapApprovePayload,
-                }
-            if method == protos.AtomicSwapMethod.EXPIRE:
-                return {
-                    'type': 'atomic-swap-expire',
-                    'parser': protos.AtomicSwapExpirePayload,
-                }
-            if method == protos.AtomicSwapMethod.SET_SECRET_LOCK:
-                return {
-                    'type': 'atomic-swap-set-secret-lock',
-                    'parser': protos.AtomicSwapSetSecretLockPayload,
-                }
-            if method == protos.AtomicSwapMethod.CLOSE:
-                return {
-                    'type': 'atomic-swap-close',
-                    'parser': protos.AtomicSwapClosePayload,
-                }
-
-        if family_name == RemmeFamilyName.PUBLIC_KEY.value:
-
-            if method == protos.PubKeyMethod.STORE:
-                return {
-                    'type': 'store public key',
-                    'parser': protos.NewPubKeyPayload,
-                }
-            if method == protos.PubKeyMethod.REVOKE:
-                return {
-                    'type': 'revoke public key',
-                    'parser': protos.RevokePubKeyPayload,
-                }
-
-
     async def get_blocks(self, query=None):
         """
         Get all blocks from REMChain.
@@ -123,9 +97,13 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         :param query:
         """
         if query is not None:
-            if isinstance(query, int):
-                query['start'] = f'0x("0000000000000000" + query.start.toString(16)).slice(-16)'
-            query = BaseQuery(query=query)
+
+            if isinstance(query.get('start'), int):
+
+                start = '0000000000000000' + hex(query.get('start')).lstrip('0x')[-6:]
+                query['start'] = f'0x{start}'
+
+            query = BaseQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BLOCKS,
@@ -165,7 +143,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         :param query:
         """
         if query is not None:
-            query = BaseQuery(query=query)
+            query = BaseQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BATCHES,
@@ -202,7 +180,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         :param query:
         """
         if query is not None:
-            query = BaseQuery(query=query)
+            query = StateQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.STATE,
@@ -229,7 +207,16 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         if state.get('address') is None:
             raise Exception('State should have address for parsing.')
 
-        raise Exception(f'This address {state.address} don\'t supported for parsing.')
+        if RemmeBlockchainInfo._address.get(state.get('address')[0, 6]):
+            type, parser = RemmeBlockchainInfo._address.get(state.get('address')[0, 6])
+            return {
+                # list(bytearray(state.get('data'), 'utf-8'))
+                'data': parser.decode(base64.b64decode(state.get('data'))),
+                'type': type,
+            }
+
+        else:
+            raise Exception(f'This address {state.address} don\'t supported for parsing.')
 
     async def get_transactions(self, query=None):
         """
@@ -263,10 +250,11 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         """
         family_name = transaction.get('header')
 
-        if family_name in self._correspond(family_name=family_name):
-
-            parser = ''
-            return {'payload':  1, 'type': 2}  # parser.decode(data)
+        if family_name in RemmeBlockchainInfo._correspond:
+            # list(bytearray(transaction.get('payload'), 'utf-8'))
+            method, data = protos.TransactionPayload.decode()
+            type, parser = RemmeBlockchainInfo._correspond.get(family_name).get(method)
+            return {'payload':  parser.decode(data), 'type': type}
         else:
             raise Exception(f'Family name {family_name} don\'t supported for parsing.')
 
