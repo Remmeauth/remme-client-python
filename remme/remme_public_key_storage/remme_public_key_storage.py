@@ -8,6 +8,7 @@ from remme.protos.pub_key_pb2 import (
     RevokePubKeyPayload,
 )
 from remme.protos.transaction_pb2 import TransactionPayload
+from remme.remme_public_key_storage.models.public_key_info import PublicKeyInfo
 from remme.remme_utils import (
     ZERO_ADDRESS,
     generate_address,
@@ -102,7 +103,7 @@ class RemmePublicKeyStorage:
 
         if info.get('error') is None:
             info['address'] = generate_address(self._family_name, address)
-            return info
+            return PublicKeyInfo(data=info)
 
         raise Exception('This public key was not found.')
 
