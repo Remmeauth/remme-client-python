@@ -8,7 +8,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_transactions(query=None):
         """
         Get all transactions from REMChain.
-        :param query:
+        :param query: dict
         """
         pass
 
@@ -26,7 +26,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def parse_transaction_payload(transaction):
         """
         Parse transaction payload. Take transaction and return object with payload and type.
-        :param transaction:
+        :param transaction: dict
         """
         pass
 
@@ -36,7 +36,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
         """
         Get all blocks from REMChain.
         You can specify one or more query parameters.
-        :param query:
+        :param query: dict
         """
         pass
 
@@ -54,7 +54,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_block_info(query=None):
         """
         Get information about block.
-        :param query:
+        :param query: dict
         """
         pass
 
@@ -63,7 +63,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_batches(query=None):
         """
         Get all batches from REMChain.
-        :param query:
+        :param query: dict
         """
         pass
 
@@ -78,7 +78,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def get_batches_status(batch_id):
+    def get_batch_status(batch_id):
         """
         Get status of batch.
         :param batch_id: string
@@ -90,7 +90,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_state(query=None):
         """
         Get states in REMChain.
-        :param query:
+        :param query: dict
         """
         pass
 
@@ -108,7 +108,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def parse_state_data(state):
         """
         Parse state data.
-        :param state:
+        :param state: dict
         """
         pass
 
@@ -127,3 +127,13 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
         Get network status for node.
         """
         pass
+
+    # TODO: uncomment after refactoring receipts
+    # @staticmethod
+    # @abc.abstractmethod
+    # def get_receipts(ids):
+    #     """
+    #     Get transactions receipts
+    #     :param ids: list of string
+    #     """
+    #     pass

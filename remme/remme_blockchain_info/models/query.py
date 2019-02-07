@@ -5,14 +5,14 @@ from remme.enums.remme_patterns import RemmePatterns
 
 class BaseQuery:
     """
-    BaseQuery.
+    Class for checking base query on request parameters.
     """
 
     def __init__(self, query):
 
         self.query = query
 
-        self.head = self.query.get('query')
+        self.head = self.query.get('head')
         self.start = self.query.get('start')
         self.family_name = self.query.get('family_name')
         self.limit = self.query.get('limit')
@@ -24,21 +24,27 @@ class BaseQuery:
 
         if self.start is not None:
 
-            if isinstance(self.start, str) \
+            if (isinstance(self.start, str)
                     and (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.start) is not None
-                         or re.match(r'^0x[a-f0-9]{16}$', self.start) is not None) \
+                         or re.match(r'^0x[a-f0-9]{16}$', self.start) is not None)) \
                     or isinstance(self.start, int):
                 self.start = str(self.start)
             else:
                 raise Exception('Parameter `start` is not a valid.')
 
     def get(self):
-        return self.query
+        return {
+            'head': self.head,
+            'start': self.start,
+            'family_name': self.family_name,
+            'limit': self.limit,
+            'reverse': self.reverse,
+        }
 
 
 class StateQuery(BaseQuery):
     """
-    StateQuery.
+    Class for checking state query on request parameters.
     """
 
     def __init__(self, query):
@@ -51,4 +57,6 @@ class StateQuery(BaseQuery):
             raise Exception('Parameter `address` need to a valid.')
 
     def get(self):
-        return self.query
+        get_data = super(StateQuery, self).get()
+        get_data.update({'address': self.address})
+        return get_data
