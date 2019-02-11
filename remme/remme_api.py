@@ -56,9 +56,9 @@ class RemmeAPI:
             await self._rpc_client.connect_url(url=self._request_URI)
         except Exception:
             raise Exception("Please check if your node running at {url}".format(url=self._request_URI))
-        request_data = {'method': method.value}
+        request_data = {'method': method.value, 'params': {}}
         if params:
-            request_data['params'] = params
+            request_data.update({'params': params})
         try:
             return await self._rpc_client.call(**request_data)
         finally:

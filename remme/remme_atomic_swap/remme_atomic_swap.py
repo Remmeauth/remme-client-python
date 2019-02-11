@@ -14,7 +14,7 @@ from remme.protos.atomic_swap_pb2 import (
 from remme.protos.transaction_pb2 import TransactionPayload
 from remme.remme_atomic_swap.interface import IRemmeSwap
 from remme.remme_atomic_swap.models.swap_init_dto import SwapInitDto
-from remme.remme_utils import (
+from remme.remme_utils.remme_utils import (
     ZERO_ADDRESS,
     generate_address,
     generate_settings_address,

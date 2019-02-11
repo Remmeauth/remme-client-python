@@ -298,3 +298,16 @@ def certificate_from_pem(certificate):
         return x509.load_pem_x509_certificate(certificate, default_backend())
     except Exception:
         return "Given certificate is not a valid"
+
+
+def get_namespace_params(type, parser):
+    """
+    Get namespace parameters.
+    :param type: string
+    :param parser: bytes
+    :return: dict
+    """
+    return {
+        'type': type,
+        'parser': parser,
+    }
