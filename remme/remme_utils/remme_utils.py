@@ -106,22 +106,20 @@ def create_nonce():
 
 def check_sha256(data):
 
-    if not (re.match(RemmePatterns.ADDRESS.value, data) is not None) \
-            and not (re.match(RemmePatterns.ADDRESS.value, data) is not None):
-        raise Exception('Value should be SHA-256 or SHA-512.')
+    if not (re.match(RemmePatterns.SHA256.value, data) is not None):
+        raise Exception('Value should be SHA-256.')
 
 
 def check_sha512(data):
 
-    if not (re.match(RemmePatterns.ADDRESS.value, data) is not None) \
-            and not (re.match(RemmePatterns.ADDRESS.value, data) is not None):
-        raise Exception('Value should be SHA-256 or SHA-512.')
+    if not (re.match(RemmePatterns.SHA512.value, data) is not None):
+        raise Exception('Value should be SHA-512.')
 
 
 def check_sha(data):
 
-    if not (re.match(RemmePatterns.ADDRESS.value, data) is not None) \
-            and not (re.match(RemmePatterns.ADDRESS.value, data) is not None):
+    if not (re.match(RemmePatterns.SHA256.value, data) is not None) \
+            and not (re.match(RemmePatterns.SHA512.value, data) is not None):
         raise Exception('Value should be SHA-256 or SHA-512.')
 
 

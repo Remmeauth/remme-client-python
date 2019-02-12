@@ -75,6 +75,7 @@ class RemmeTransactionService:
         ).SerializeToString()
 
         signature = self._remme_account.sign(transaction_header_bytes)
+        print('signature', signature)
 
         transaction = Transaction(
             header=transaction_header_bytes,

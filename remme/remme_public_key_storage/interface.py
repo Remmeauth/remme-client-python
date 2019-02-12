@@ -7,8 +7,7 @@ class IRemmePublicKeyStorage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def create(data):
         """
-        Initiation of swap.
-        Send transaction into REMChain.
+        Create public key payload in bytes to store with another payer, private_key and public_key.
         :param data: dict
         """
         pass
@@ -17,9 +16,9 @@ class IRemmePublicKeyStorage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def store(data):
         """
-        Initiation of swap.
-        Send transaction into REMChain.
-        :param data: dict
+        Store public key payload bytes with data into REMChain.
+        Send transaction to chain.
+        :param data: bytes
         """
         pass
 
@@ -27,8 +26,8 @@ class IRemmePublicKeyStorage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def create_and_store(data):
         """
-        Initiation of swap.
-        Send transaction into REMChain.
+        Create public key payload bytes and store public key with its data into REMChain.
+        Send transaction to chain with private key.
         :param data: dict
         """
         pass
@@ -37,8 +36,8 @@ class IRemmePublicKeyStorage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def check(public_key):
         """
-        Initiation of swap.
-        Send transaction into REMChain.
+        Check public key on validity and revocation.
+        Take address of public key.
         :param public_key: string
         """
         pass
@@ -47,8 +46,8 @@ class IRemmePublicKeyStorage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def revoke(public_key):
         """
-        Initiation of swap.
-        Send transaction into REMChain.
+        Revoke public key by address.
+        Take address of public key. Send transaction to chain.
         :param public_key: string
         """
         pass
@@ -57,8 +56,8 @@ class IRemmePublicKeyStorage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_info(public_key):
         """
-        Initiation of swap.
-        Send transaction into REMChain.
+        Get info about this public key.
+        Take address of public key.
         :param public_key: string
         """
         pass
@@ -67,8 +66,7 @@ class IRemmePublicKeyStorage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_account_public_keys(account_public_key):
         """
-        Initiation of swap.
-        Send transaction into REMChain.
+        Take account address (which describe in RemmePatterns.ADDRESS).
         :param account_public_key: string
         """
         pass

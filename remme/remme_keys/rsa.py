@@ -91,7 +91,7 @@ class RSA(KeyDto, IRemmeKeys):
         """
         return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key)
 
-    def sign(self, data, rsa_signature_padding=None):
+    def sign(self, data, rsa_signature_padding=RsaSignaturePadding.PSS):
         """
         Sign provided data with selected key implementation.
         :param data: data string which will be signed
@@ -127,10 +127,7 @@ class RSA(KeyDto, IRemmeKeys):
                     algorithm=utils.Prehashed(hashes.SHA256()),
                 )
 
-        else:
-            raise Exception('RSA signature padding is not provided!')
-
-    def verify(self, data, signature, rsa_signature_padding=None):
+    def verify(self, data, signature, rsa_signature_padding=RsaSignaturePadding.PSS):
         """
         Verify signature for selected key implementation.
         :param data: data string which will be verified
@@ -177,6 +174,3 @@ class RSA(KeyDto, IRemmeKeys):
 
                 except InvalidSignature:
                     return False
-
-        else:
-            raise Exception('RSA signature padding is not provided!')
