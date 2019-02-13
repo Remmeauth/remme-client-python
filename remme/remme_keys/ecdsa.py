@@ -104,7 +104,7 @@ class ECDSA(KeyDto, IRemmeKeys):
             data = utf8_to_bytes(data)
 
         sig = Secp256k1Context().sign(message=data, private_key=self._private_key_obj)
-        return bytes.fromhex(sig)
+        return sig
 
     def verify(self, data, signature, rsa_signature_padding=None):
         """

@@ -17,7 +17,6 @@ from remme.remme_utils import (
     generate_address,
     generate_settings_address,
     get_padding,
-    hex_to_bytes,
     public_key_address,
     sha512_hexdigest,
     validate_address,
@@ -118,9 +117,9 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
     @staticmethod
     def _construct_address_from_payload(payload):
 
-        entity_hash, entity_hash_signature = payload.entity_hash.hex(), payload.entity_hash_signature
+        entity_hash, entity_hash_signature = payload.entity_hash, payload.entity_hash_signature
 
-        check_sha(data=entity_hash)
+        check_sha(data=sha512_hexdigest(payload.entity_hash))
 
         key_type = ''
 
@@ -175,7 +174,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         if not account_key.verify(data=new_pub_key_payload.SerializeToString(), signature=signature_by_owner):
             raise Exception('Owner signature not valid.')
 
-    def create(self, data=None):
+    def create(self, data):
         """
         Create public key payload in bytes to store with another payer, private_key and public_key.
         @example
@@ -255,12 +254,6 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
             do_owner_pay=False,
         )
         ```
-        # optional !!!
-
-        rsaSignaturePadding?: RSASignaturePadding
-        signature?: string
-        doOwnerPay?: boolean
-
         :param data: dict {
             data: string
             keys: object
@@ -272,22 +265,6 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         }
         :return: payload bytes
         """
-        from remme.enums.rsa_signature_padding import RsaSignaturePadding
-        from datetime import datetime, timedelta
-        CURRENT_TIMESTAMP = int(datetime.now().timestamp())
-        CURRENT_TIMESTAMP_PLUS_YEAR = int(CURRENT_TIMESTAMP + timedelta(365).total_seconds())
-
-        keys = RemmeKeys.construct(KeyType.RSA)
-
-        data = {
-            'data': 'store_data',
-            'keys': keys,
-            'rsa_signature_padding': RsaSignaturePadding.PSS,
-            'valid_from': CURRENT_TIMESTAMP,
-            'valid_to': CURRENT_TIMESTAMP_PLUS_YEAR,
-            'do_owner_pay': False,
-        }
-
         keys = data.get('keys')
 
         public_key, key_type = keys.public_key, keys.key_type
@@ -300,7 +277,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         if not signature:
             signature = keys.sign(data=message, rsa_signature_padding=rsa_signature_padding)
 
-        entity_hash = hex_to_bytes(message)
+        entity_hash = message.encode('utf-8')
         entity_hash_signature = signature
 
         valid_from, valid_to = data.get('valid_from'), data.get('valid_to')
@@ -350,7 +327,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         new_pub_key_store_and_pay_payload = NewPubKeyStoreAndPayPayload(
             pub_key_payload=pub_key_payload,
             owner_public_key=bytes.fromhex(self._remme_account.public_key_hex),
-            signature_by_owner=signature_by_owner,
+            signature_by_owner=bytes.fromhex(signature_by_owner),
         )
 
         return new_pub_key_store_and_pay_payload.SerializeToString()

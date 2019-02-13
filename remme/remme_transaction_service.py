@@ -1,5 +1,5 @@
 from remme.remme_utils import create_nonce, sha512_hexdigest
-from base64 import b64encode
+import base64
 from sawtooth_sdk.protobuf.transaction_pb2 import TransactionHeader, Transaction
 from remme.enums.remme_methods import RemmeMethods
 from remme.models.base_transaction_response import BaseTransactionResponse
@@ -75,7 +75,6 @@ class RemmeTransactionService:
         ).SerializeToString()
 
         signature = self._remme_account.sign(transaction_header_bytes)
-        print('signature', signature)
 
         transaction = Transaction(
             header=transaction_header_bytes,
@@ -83,7 +82,7 @@ class RemmeTransactionService:
             payload=payload_bytes,
         ).SerializeToString()
 
-        return b64encode(transaction).decode('utf-8')
+        return base64.b64encode(transaction).decode('utf-8')
 
     async def send(self, payload):
         """
