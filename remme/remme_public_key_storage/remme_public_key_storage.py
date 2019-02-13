@@ -1,25 +1,29 @@
 from remme.enums.key_type import KeyType
 from remme.enums.remme_family_name import RemmeFamilyName
 from remme.enums.remme_methods import RemmeMethods
-from remme.enums.rsa_signature_padding import RsaSignaturePadding
 from remme.protos.pub_key_pb2 import (
     NewPubKeyPayload,
+    NewPubKeyStoreAndPayPayload,
     PubKeyMethod,
     RevokePubKeyPayload,
 )
 from remme.protos.transaction_pb2 import TransactionPayload
+from remme.remme_keys.remme_keys import RemmeKeys
+from remme.remme_public_key_storage.interface import IRemmePublicKeyStorage
 from remme.remme_public_key_storage.models.public_key_info import PublicKeyInfo
 from remme.remme_utils import (
     ZERO_ADDRESS,
+    check_sha,
     generate_address,
     generate_settings_address,
     get_padding,
     public_key_address,
+    sha512_hexdigest,
     validate_address,
 )
 
 
-class RemmePublicKeyStorage:
+class RemmePublicKeyStorage(IRemmePublicKeyStorage):
     """
     Class for working with public key storage.
 
@@ -29,11 +33,13 @@ class RemmePublicKeyStorage:
 
     keys = await RemmeKeys.construct(KeyType.RSA)
 
-    store_response = await remme.public_key_storage.store(
+    store_response = await remme.public_key_storage.create_and_store(
         data='store data',
         keys=keys,
         valid_from=valid_from,
         valid_to=valid_to,
+        signature=signature,
+        do_owner_pay=do_owner_pay,
     )
 
     async for msg in store_response.connect_to_web_socket():
@@ -58,6 +64,7 @@ class RemmePublicKeyStorage:
 
     _family_name = RemmeFamilyName.PUBLIC_KEY.value
     _family_version = '0.1'
+    _settings_address = generate_settings_address(key='remme.economy_enabled')
 
     def __init__(self, remme_api, remme_account, remme_transaction_service):
         """
@@ -107,41 +114,175 @@ class RemmePublicKeyStorage:
 
         raise Exception('This public key was not found.')
 
-    async def store(self, data, keys, valid_from, valid_to, rsa_signature_padding=RsaSignaturePadding.PSS):
+    @staticmethod
+    def _construct_address_from_payload(payload):
+
+        entity_hash, entity_hash_signature = payload.entity_hash, payload.entity_hash_signature
+
+        check_sha(data=sha512_hexdigest(payload.entity_hash))
+
+        key_type = ''
+
+        if payload.HasField('rsa'):
+            key_type = KeyType.RSA
+
+        elif payload.HasField('ecdsa'):
+            key_type = KeyType.ECDSA
+
+        elif payload.HasField('ed25519'):
+            key_type = KeyType.EdDSA
+
+        public_key = payload.rsa.key
+
+        keys = RemmeKeys.construct(
+            key_type=key_type,
+            public_key=public_key,
+        )
+
+        if not keys.verify(data=entity_hash, signature=entity_hash_signature):
+            raise Exception('Signature not valid.')
+
+        return keys.address
+
+    @staticmethod
+    def _verify_payload_owner(owner_public_key, signature_by_owner, pub_key_payload):
+
+        account_key = RemmeKeys.construct(
+            key_type=KeyType.ECDSA,
+            public_key=owner_public_key,
+        )
+
+        new_pub_key_payload = NewPubKeyPayload(
+            entity_hash=pub_key_payload.entity_hash,
+            entity_hash_signature=pub_key_payload.entity_hash_signature,
+            valid_from=pub_key_payload.valid_from,
+            valid_to=pub_key_payload.valid_to,
+        )
+
+        if pub_key_payload.HasField('rsa'):
+            new_pub_key_payload_rsa = NewPubKeyPayload(rsa=pub_key_payload.rsa)
+            new_pub_key_payload.MergeFrom(new_pub_key_payload_rsa)
+
+        if pub_key_payload.HasField('ed25519'):
+            new_pub_key_payload_eddsa = NewPubKeyPayload(rsa=pub_key_payload.ed25519)
+            new_pub_key_payload.MergeFrom(new_pub_key_payload_eddsa)
+
+        if pub_key_payload.HasField('ecdsa'):
+            new_pub_key_payload_ecdsa = NewPubKeyPayload(rsa=pub_key_payload.ecdsa)
+            new_pub_key_payload.MergeFrom(new_pub_key_payload_ecdsa)
+
+        if not account_key.verify(data=new_pub_key_payload.SerializeToString(), signature=signature_by_owner):
+            raise Exception('Owner signature not valid.')
+
+    def create(self, data):
         """
-        Store public key with its data into REMChain.
-        Send transaction to chain.
+        Create public key payload in bytes to store with another payer, private_key and public_key.
         @example
         ```python
-        from remme.remme import Remme
+        from remme.remme import Remme as remme
         from remme.enums.key_type import KeyType
         from remme.enums.rsa_signature_padding import RsaSignaturePadding
 
-        keys = Remme.keys.construct(KeyType.RSA)
+        keys = remme.keys.construct(KeyType.RSA)
 
-        store_response = await remme.public_key_storage.store(
+        payload_bytes = remme.public_key_storage.create(
             data='store data',
-            keys=keys,
-            valid_from=valid_from,
-            valid_to=valid_to,
+            keys,
             rsa_signature_padding=RsaSignaturePadding.PSS,
+            valid_from=int(datetime.now().timestamp()),
+            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+            do_owner_pay=False,
+        )
+        ```
+
+        Create public key payload in bytes to store with private_key.
+        @example
+        ```python
+        from remme.remme import Remme as remme
+        from remme.enums.key_type import KeyType
+        from remme.enums.rsa_signature_padding import RsaSignaturePadding
+
+        keys = remme.keys.construct(KeyType.RSA)
+
+        payload_bytes = remme.public_key_storage.create(
+            data='store data',
+            keys,
+            rsa_signature_padding=RsaSignaturePadding.PSS,
+            valid_from=int(datetime.now().timestamp()),
+            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+            do_owner_pay=True,
+        )
+        ```
+
+        Create public key payload in bytes to store with another payer with public_key and signature.
+        @example
+        ```python
+        from remme.remme import Remme as remme
+        from remme.enums.key_type import KeyType
+        from remme.enums.rsa_signature_padding import RsaSignaturePadding
+
+        private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
+
+        keys_from_private = remme.keys.construct(
+            key_type=KeyType.ECDSA,
+            private_key=private_key,
+            public_key=public_key,
         )
 
-        async for msg in store_response.connect_to_web_socket():
-            print(msg)
-            store_response.close_web_socket()
-        ```
-        :param data: string
-        :param keys: instance of key class
-        :param valid_from: timestamp
-        :param valid_to: timestamp
-        :param rsa_signature_padding: RsaSignaturePadding.PSS by default
-        :return: information about storing public key to REMChain
-        """
-        entity_hash = data.encode('utf-8')
-        entity_hash_signature = keys.sign(data=entity_hash, rsa_signature_padding=rsa_signature_padding)
+        # Sign data with private_key
 
-        new_pub_key_payload = NewPubKeyPayload(
+        data = 'test'
+        signature = keys_from_private.sign(sha512(data))
+
+        # Construct keys from public_key
+
+        keys_from_public = remme.keys.construct(
+            key_type=KeyType.ECDSA,
+            public_key=public_key,
+        )
+
+        # Create public key payload with public_key only and signature.
+        # To store keys with signature sign data should be in sha512 or sha256 format.
+
+        payload_bytes = remme.public_key_storage.create(
+            data=sha512(data),
+            keys_from_public,
+            signature,
+            rsa_signature_padding=RsaSignaturePadding.PSS,
+            valid_from=int(datetime.now().timestamp()),
+            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+            do_owner_pay=False,
+        )
+        ```
+        :param data: dict {
+            data: string
+            keys: object
+            signature: string (optional)
+            rsa_signature_padding: paddingRSA (optional)
+            valid_from: int
+            valid_to: int
+            do_owner_pay: boolean (optional)
+        }
+        :return: payload bytes
+        """
+        keys = data.get('keys')
+
+        public_key, key_type = keys.public_key, keys.key_type
+
+        signature = data.get('signature')
+        rsa_signature_padding = data.get('rsa_signature_padding')
+
+        message = data.get('data') if signature else sha512_hexdigest(data=data.get('data'))
+
+        if not signature:
+            signature = keys.sign(data=message, rsa_signature_padding=rsa_signature_padding)
+
+        entity_hash = message.encode('utf-8')
+        entity_hash_signature = signature
+
+        valid_from, valid_to = data.get('valid_from'), data.get('valid_to')
+
+        pub_key_payload = NewPubKeyPayload(
             entity_hash=entity_hash,
             entity_hash_signature=entity_hash_signature,
             valid_from=valid_from,
@@ -149,59 +290,191 @@ class RemmePublicKeyStorage:
             hashing_algorithm=NewPubKeyPayload.HashingAlgorithm.Value('SHA256'),
         )
 
-        if keys.key_type == KeyType.RSA:
+        if key_type == KeyType.RSA:
 
-            new_pub_key_payload_rsa = NewPubKeyPayload(
+            padding = get_padding(padding=rsa_signature_padding) if rsa_signature_padding else RsaSignaturePadding.PSS
+
+            pub_key_payload_rsa = NewPubKeyPayload(
                 rsa=NewPubKeyPayload.RSAConfiguration(
-                    padding=get_padding(padding=rsa_signature_padding),
-                    key=keys.public_key,
+                    padding=padding,
+                    key=public_key,
                 ),
             )
-            new_pub_key_payload.MergeFrom(new_pub_key_payload_rsa)
+            pub_key_payload.MergeFrom(pub_key_payload_rsa)
 
-        if keys.key_type == KeyType.EdDSA:
+        if key_type == KeyType.EdDSA:
 
-            new_pub_key_payload_eddsa = NewPubKeyPayload(
-                ed25519=NewPubKeyPayload.Ed25519Configuration(
-                    key=keys.public_key,
-                ),
+            pub_key_payload_eddsa = NewPubKeyPayload(
+                ed25519=NewPubKeyPayload.Ed25519Configuration(key=public_key),
             )
-            new_pub_key_payload.MergeFrom(new_pub_key_payload_eddsa)
+            pub_key_payload.MergeFrom(pub_key_payload_eddsa)
 
-        if keys.key_type == KeyType.ECDSA:
+        if key_type == KeyType.ECDSA:
 
-            new_pub_key_payload_ecdsa = NewPubKeyPayload(
+            pub_key_payload_ecdsa = NewPubKeyPayload(
                 ecdsa=NewPubKeyPayload.ECDSAConfiguration(
-                    key=keys.public_key,
+                    key=public_key,
                     ec=NewPubKeyPayload.ECDSAConfiguration.EC.Value('SECP256k1'),
                 ),
             )
-            new_pub_key_payload.MergeFrom(new_pub_key_payload_ecdsa)
+            pub_key_payload.MergeFrom(pub_key_payload_ecdsa)
+
+        if data.get('do_owner_pay'):
+            return pub_key_payload.SerializeToString()
+
+        signature_by_owner = self._remme_account.sign(pub_key_payload.SerializeToString())
+
+        new_pub_key_store_and_pay_payload = NewPubKeyStoreAndPayPayload(
+            pub_key_payload=pub_key_payload,
+            owner_public_key=bytes.fromhex(self._remme_account.public_key_hex),
+            signature_by_owner=bytes.fromhex(signature_by_owner),
+        )
+
+        return new_pub_key_store_and_pay_payload.SerializeToString()
+
+    async def store(self, data):
+        """
+        Store public key payload bytes with data into REMChain.
+        Send transaction to chain.
+        @example
+        ```python
+        # payload_bytes is the transaction payload generated from method
+        # remme.public_key_storage.create
+        from remme.remme import Remme as remme
+
+        store_response = await remme.public_key_storage.store(payload_bytes)
+
+        async for msg in store_response.connect_to_web_socket():
+            print(msg)
+            store_response.close_web_socket()
+        ```
+        :param data: payload_bytes
+        :return: information about storing public key to REMChain
+        """
+        owner_address = ''
+
+        owner_payload = NewPubKeyStoreAndPayPayload()
+        owner_payload.ParseFromString(data)
+
+        new_pub_key_payload = NewPubKeyPayload()
+        new_pub_key_payload.ParseFromString(data)
+
+        message = owner_payload if owner_payload.pub_key_payload.entity_hash else new_pub_key_payload
+
+        if isinstance(message, NewPubKeyPayload):
+            pub_key_address = self._construct_address_from_payload(payload=message)
+
+        elif isinstance(message, NewPubKeyStoreAndPayPayload):
+
+            owner_public_key = message.owner_public_key
+            signature_by_owner = message.signature_by_owner
+            pub_key_payload = message.pub_key_payload
+
+            self._verify_payload_owner(
+                owner_public_key=owner_public_key,
+                signature_by_owner=signature_by_owner,
+                pub_key_payload=pub_key_payload,
+            )
+
+            pub_key_address = self._construct_address_from_payload(payload=pub_key_payload)
+
+            owner_address = generate_address(
+                _family_name=RemmeFamilyName.ACCOUNT.value,
+                _public_key_to=owner_public_key,
+            )
+
+        else:
+            raise Exception('Invalid payload.')
+
+        inputs_and_outputs = [
+            pub_key_address,
+            ZERO_ADDRESS,
+            self._settings_address
+        ]
+
+        if owner_address:
+            inputs_and_outputs.append(owner_address)
 
         payload_bytes = self._generate_transaction_payload(
-            method=PubKeyMethod.STORE,
-            data=new_pub_key_payload.SerializeToString(),
+            method=PubKeyMethod.STORE_AND_PAY if owner_address else PubKeyMethod.STORE,
+            data=data,
         )
-
-        public_key_address = keys.address
-        economy_enabled_address = generate_settings_address("remme.economy_enabled")
-
-        inputs = [
-            public_key_address,
-            economy_enabled_address,
-            ZERO_ADDRESS,
-        ]
-
-        outputs = [
-            public_key_address,
-            ZERO_ADDRESS,
-        ]
 
         return await self._create_and_send_transaction(
-            inputs=inputs,
-            outputs=outputs,
+            inputs=inputs_and_outputs,
+            outputs=inputs_and_outputs,
             payload_bytes=payload_bytes,
         )
+
+    async def create_and_store(self, **data):
+        """
+        Create public key payload bytes and store public key with its data into REMChain.
+        Send transaction to chain with private key.
+        @example
+        ```python
+        from remme.enums.key_type import KeyType
+
+        keys = await RemmeKeys.construct(KeyType.RSA)
+
+        store_response = await remme.public_key_storage.create_and_store(
+            data='store data',
+            keys=keys,
+            valid_from=valid_from,
+            valid_to=valid_to,
+            signature=signature,
+            do_owner_pay=do_owner_pay,
+        )
+
+        async for msg in store_response.connect_to_web_socket():
+            print(msg)
+        ```
+
+        Create public key payload bytes and store public key with its data into REMChain.
+        Send transaction to chain with signature.
+        @example
+        ```python
+        from remme.remme import Remme as remme
+        from remme.enums.key_type import KeyType
+        from remme.enums.rsa_signature_padding import RsaSignaturePadding
+
+        private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
+
+        keys_from_private = remme.keys.construct(
+            key_type=KeyType.ECDSA,
+            private_key=private_key,
+            public_key=public_key,
+        )
+
+        # Sign data with private_key
+
+        data = 'test'
+        signature = keys_from_private.sign(sha512(data))
+
+        # Construct keys from public_key
+
+        keys_from_public = remme.keys.construct(
+            key_type=KeyType.ECDSA,
+            public_key=public_key,
+        )
+
+        # Create public key payload with public_key only and signature.
+        # To store keys with signature sign data should be in sha512 or sha256 format.
+
+        payload_bytes = remme.public_key_storage.create_and_store(
+            data=sha512(data),
+            keys_from_public,
+            signature,
+            rsa_signature_padding=RsaSignaturePadding.PSS,
+            valid_from=int(datetime.now().timestamp()),
+            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+            do_owner_pay=False,
+        )
+        ```
+        :param data: dict
+        :return: information about storing public key to REMChain
+        """
+        payload_bytes = self.create(data=data)
+        return await self.store(data=payload_bytes)
 
     async def check(self, address):
         """
@@ -259,7 +532,7 @@ class RemmePublicKeyStorage:
 
     async def get_account_public_keys(self, address):
         """
-        Take account address (which describe in PATTERNS.ADDRESS).
+        Take account address (which describe in RemmePatterns.ADDRESS).
         @example
         ```python
         remme = Remme()

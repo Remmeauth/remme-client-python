@@ -1,4 +1,4 @@
-from remme.remme_account import RemmeAccount
+from remme.remme_account.remme_account import RemmeAccount
 from remme.remme_api import RemmeAPI
 from remme.remme_atomic_swap.remme_atomic_swap import RemmeSwap
 from remme.remme_batch import RemmeBatch
