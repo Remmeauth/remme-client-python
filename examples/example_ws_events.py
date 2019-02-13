@@ -1,7 +1,7 @@
 import asyncio
 
 from remme import Remme
-from remme.remme_websocket.models.remme_events import RemmeEvents
+from remme.models.websocket.events import RemmeEvents
 
 
 async def example():

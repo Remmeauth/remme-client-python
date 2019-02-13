@@ -3,7 +3,7 @@ Provide tests for token utils implementation.
 """
 import pytest
 
-from remme.remme_utils import (
+from remme.utils import (
     validate_address,
     validate_amount,
     validate_public_key,

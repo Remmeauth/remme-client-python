@@ -1,4 +1,4 @@
-from remme.enums.batch_status import BatchStatus
+from remme.models.general.batch_status import BatchStatus
 from remme.remme import Remme
 import asyncio
 

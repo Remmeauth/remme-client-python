@@ -1,14 +1,14 @@
-from remme.remme_account.remme_account import RemmeAccount
-from remme.remme_api import RemmeAPI
-from remme.remme_atomic_swap.remme_atomic_swap import RemmeSwap
-from remme.remme_batch import RemmeBatch
-from remme.remme_blockchain_info.remme_blockchain_info import RemmeBlockchainInfo
-from remme.remme_certificate import RemmeCertificate
-from remme.remme_keys.remme_keys import RemmeKeys
-from remme.remme_public_key_storage.remme_public_key_storage import RemmePublicKeyStorage
-from remme.remme_token import RemmeToken
-from remme.remme_transaction_service import RemmeTransactionService
-from remme.remme_websocket_events.remme_websocket_events import RemmeWebSocketEvents
+from remme.account import RemmeAccount
+from remme.api import RemmeAPI
+from remme.atomic_swap import RemmeSwap
+from remme.batch import RemmeBatch
+from remme.blockchain_info import RemmeBlockchainInfo
+from remme.certificate import RemmeCertificate
+from remme.keys import RemmeKeys
+from remme.public_key_storage import RemmePublicKeyStorage
+from remme.token import RemmeToken
+from remme.transaction_service import RemmeTransactionService
+from remme.websocket_events import RemmeWebSocketEvents
 
 DEFAULT_NETWORK_CONFIG = {
     'node_address': "localhost",

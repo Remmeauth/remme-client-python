@@ -1,6 +1,6 @@
 import asyncio
 
-from remme.models.base_transaction_response import BaseTransactionResponse
+from remme.models.websocket.base_transaction_response import BaseTransactionResponse
 
 
 async def example():
