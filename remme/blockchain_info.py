@@ -2,15 +2,15 @@ import base64
 import re
 
 from remme import protos
-from remme.models.general.methods import RemmeMethods
-from remme.models.general.patterns import RemmePatterns
-from remme.interfaces.blockchain_info import IRemmeBlockchainInfo
 from remme.models.blockchain_info.block_info import BlockInfo
 from remme.models.blockchain_info.network_status import NetworkStatus
 from remme.models.blockchain_info.query import (
     BaseQuery,
     StateQuery,
 )
+from remme.models.general.methods import RemmeMethods
+from remme.models.general.patterns import RemmePatterns
+from remme.models.interfaces.blockchain_info import IRemmeBlockchainInfo
 from remme.models.utils import (
     RemmeFamilyName,
     RemmeNamespace,

@@ -8,10 +8,10 @@ from sawtooth_signing.secp256k1 import (
     Secp256k1PublicKey,
 )
 
+from remme.models.interfaces.keys import IRemmeKeys
+from remme.models.keys.key_dto import KeyDto
 from remme.models.keys.key_type import KeyType
 from remme.models.utils.family_name import RemmeFamilyName
-from remme.interfaces.keys import IRemmeKeys
-from remme.models.keys.key_dto import KeyDto
 from remme.utils import (
     generate_address,
     utf8_to_bytes,

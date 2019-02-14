@@ -2,8 +2,8 @@ import json
 
 from aiohttp import ClientSession
 
-from remme.interfaces.websocket import IRemmeWebSocket
 from remme.models.general.batch_status import BatchStatus
+from remme.models.interfaces.websocket import IRemmeWebSocket
 from remme.models.websocket.events import RemmeEvents
 from remme.models.websocket.json_rpc_request import JsonRpcRequest
 from remme.models.websocket.methods import RemmeWebSocketMethods

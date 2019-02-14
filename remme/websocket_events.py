@@ -1,4 +1,4 @@
-from remme.interfaces.websocket_events import IRemmeWebSocketsEvents
+from remme.models.interfaces.websocket_events import IRemmeWebSocketsEvents
 from remme.models.websocket.request_params import RemmeRequestParams
 from remme.websocket import RemmeWebSocket
 

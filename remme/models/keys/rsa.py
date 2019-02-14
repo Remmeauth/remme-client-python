@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import (
     utils,
 )
 
-from remme.interfaces.keys import IRemmeKeys
+from remme.models.interfaces.keys import IRemmeKeys
 from remme.models.keys.key_dto import KeyDto
 from remme.models.keys.key_type import KeyType
 from remme.models.keys.rsa_signature_padding import RsaSignaturePadding

@@ -4,10 +4,10 @@ import os
 import ed25519
 from ed25519 import SigningKey, VerifyingKey
 
+from remme.models.interfaces.keys import IRemmeKeys
+from remme.models.keys.key_dto import KeyDto
 from remme.models.keys.key_type import KeyType
 from remme.models.utils.family_name import RemmeFamilyName
-from remme.interfaces.keys import IRemmeKeys
-from remme.models.keys.key_dto import KeyDto
 from remme.utils import (
     generate_address,
     utf8_to_bytes,
