@@ -4,7 +4,7 @@ docs.zip
 docs
 poetry.lock
 remme_client.egg-info/
-remme/protos/
+remme/protobuf/
 
 # IDE
 .idea/

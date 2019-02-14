@@ -1,14 +1,13 @@
-from remme.remme_account.remme_account import RemmeAccount
-from remme.remme_api import RemmeAPI
-from remme.remme_atomic_swap.remme_atomic_swap import RemmeSwap
-from remme.remme_batch import RemmeBatch
-from remme.remme_blockchain_info.remme_blockchain_info import RemmeBlockchainInfo
-from remme.remme_certificate import RemmeCertificate
-from remme.remme_keys.remme_keys import RemmeKeys
-from remme.remme_public_key_storage.remme_public_key_storage import RemmePublicKeyStorage
-from remme.remme_token import RemmeToken
-from remme.remme_transaction_service import RemmeTransactionService
-from remme.remme_websocket_events.remme_websocket_events import RemmeWebSocketEvents
+from remme.account import RemmeAccount
+from remme.api import RemmeAPI
+from remme.atomic_swap import RemmeSwap
+from remme.blockchain_info import RemmeBlockchainInfo
+from remme.certificate import RemmeCertificate
+from remme.keys import RemmeKeys
+from remme.public_key_storage import RemmePublicKeyStorage
+from remme.token import RemmeToken
+from remme.transaction_service import RemmeTransactionService
+from remme.websocket_events import RemmeWebSocketEvents
 
 DEFAULT_NETWORK_CONFIG = {
     'node_address': "localhost",
@@ -21,19 +20,6 @@ class Remme:
     """
     Class representing a client for Remme.
     """
-
-    _private_key_hex = None
-    _network_config = None
-    _api = None
-    account = None
-    transaction_service = None
-    public_key_storage = None
-    certificate = None
-    token = None
-    batch = None
-    swap = None
-    blockchain_info = None
-    events = None
 
     def __init__(self, private_key_hex="", network_config=None):
         """
@@ -52,7 +38,6 @@ class Remme:
         self.public_key_storage = RemmePublicKeyStorage(self._api, self.account, self.transaction_service)
         self.certificate = RemmeCertificate(self.public_key_storage)
         self.token = RemmeToken(self._api, self.transaction_service)
-        self.batch = RemmeBatch(self._api)
         self.swap = RemmeSwap(self._api, self.transaction_service)
         self.blockchain_info = RemmeBlockchainInfo(self._api)
         self.events = RemmeWebSocketEvents(self._api.node_address, self._api.ssl_mode)
