@@ -6,7 +6,7 @@ from remme.models.general.methods import RemmeMethods
 from remme.models.general.patterns import RemmePatterns
 from remme.models.interfaces.atomic_swap import IRemmeSwap
 from remme.models.utils.family_name import RemmeFamilyName
-from remme.protos.atomic_swap_pb2 import (
+from remme.protobuf.atomic_swap_pb2 import (
     AtomicSwapApprovePayload,
     AtomicSwapClosePayload,
     AtomicSwapExpirePayload,
@@ -14,7 +14,7 @@ from remme.protos.atomic_swap_pb2 import (
     AtomicSwapMethod,
     AtomicSwapSetSecretLockPayload,
 )
-from remme.protos.transaction_pb2 import TransactionPayload
+from remme.protobuf.transaction_pb2 import TransactionPayload
 from remme.utils import (
     ZERO_ADDRESS,
     generate_address,

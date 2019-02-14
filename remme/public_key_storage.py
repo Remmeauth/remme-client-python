@@ -4,13 +4,13 @@ from remme.models.interfaces.public_key_storage import IRemmePublicKeyStorage
 from remme.models.keys.key_type import KeyType
 from remme.models.public_key_storage.public_key_info import PublicKeyInfo
 from remme.models.utils.family_name import RemmeFamilyName
-from remme.protos.pub_key_pb2 import (
+from remme.protobuf.pub_key_pb2 import (
     NewPubKeyPayload,
     NewPubKeyStoreAndPayPayload,
     PubKeyMethod,
     RevokePubKeyPayload,
 )
-from remme.protos.transaction_pb2 import TransactionPayload
+from remme.protobuf.transaction_pb2 import TransactionPayload
 from remme.utils import (
     ZERO_ADDRESS,
     check_sha,

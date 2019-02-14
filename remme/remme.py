@@ -1,7 +1,6 @@
 from remme.account import RemmeAccount
 from remme.api import RemmeAPI
 from remme.atomic_swap import RemmeSwap
-from remme.batch import RemmeBatch
 from remme.blockchain_info import RemmeBlockchainInfo
 from remme.certificate import RemmeCertificate
 from remme.keys import RemmeKeys
@@ -22,19 +21,6 @@ class Remme:
     Class representing a client for Remme.
     """
 
-    _private_key_hex = None
-    _network_config = None
-    _api = None
-    account = None
-    transaction_service = None
-    public_key_storage = None
-    certificate = None
-    token = None
-    batch = None
-    swap = None
-    blockchain_info = None
-    events = None
-
     def __init__(self, private_key_hex="", network_config=None):
         """
         :param private_key_hex: hex of private key, which is used for creating account in library
@@ -52,7 +38,6 @@ class Remme:
         self.public_key_storage = RemmePublicKeyStorage(self._api, self.account, self.transaction_service)
         self.certificate = RemmeCertificate(self.public_key_storage)
         self.token = RemmeToken(self._api, self.transaction_service)
-        self.batch = RemmeBatch(self._api)
         self.swap = RemmeSwap(self._api, self.transaction_service)
         self.blockchain_info = RemmeBlockchainInfo(self._api)
         self.events = RemmeWebSocketEvents(self._api.node_address, self._api.ssl_mode)

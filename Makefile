@@ -14,4 +14,4 @@
 # ------------------------------------------------------------------------
 
 build_protobuf:
-	protoc -I=./remme-protobuf --python_out=./remme/protos ./remme-protobuf/*.proto
+	protoc -I=./remme-protobuf --python_out=./remme/protobuf ./remme-protobuf/*.proto

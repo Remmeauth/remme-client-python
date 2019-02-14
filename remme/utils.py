@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives import serialization
 
 from remme.models.general.patterns import RemmePatterns
 from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
-from remme.protos.pub_key_pb2 import NewPubKeyPayload
+from remme.protobuf.pub_key_pb2 import NewPubKeyPayload
 
 ZERO_ADDRESS = '0' * 70
 

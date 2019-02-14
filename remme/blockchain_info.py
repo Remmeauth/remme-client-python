@@ -1,7 +1,7 @@
 import base64
 import re
 
-from remme import protos
+from remme import protobuf
 from remme.models.blockchain_info.block_info import BlockInfo
 from remme.models.blockchain_info.network_status import NetworkStatus
 from remme.models.blockchain_info.query import (
@@ -25,48 +25,48 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
 
     _address = {
         RemmeNamespace.SWAP.value: get_namespace_params(
-            type='info atomic swap', parser=protos.AtomicSwapInfo(),
+            type='info atomic swap', parser=protobuf.AtomicSwapInfo(),
         ),
         RemmeNamespace.ACCOUNT.value: get_namespace_params(
-            type='account', parser=protos.Account(),
+            type='account', parser=protobuf.Account(),
         ),
         RemmeNamespace.PUBLIC_KEY.value: get_namespace_params(
-            type='storage public key', parser=protos.PubKeyStorage(),
+            type='storage public key', parser=protobuf.PubKeyStorage(),
         ),
     }
 
     _correspond = {
         RemmeFamilyName.ACCOUNT.value: {
-            protos.AccountMethod.TRANSFER: get_namespace_params(
-                type='transfer token', parser=protos.TransferPayload(),
+            protobuf.AccountMethod.TRANSFER: get_namespace_params(
+                type='transfer token', parser=protobuf.TransferPayload(),
             ),
-            protos.AccountMethod.GENESIS: get_namespace_params(
-                type='genesis', parser=protos.GenesisPayload(),
+            protobuf.AccountMethod.GENESIS: get_namespace_params(
+                type='genesis', parser=protobuf.GenesisPayload(),
             ),
         },
         RemmeFamilyName.SWAP.value: {
-            protos.AtomicSwapMethod.INIT: get_namespace_params(
-                type='atomic-swap-init', parser=protos.AtomicSwapInitPayload(),
+            protobuf.AtomicSwapMethod.INIT: get_namespace_params(
+                type='atomic-swap-init', parser=protobuf.AtomicSwapInitPayload(),
             ),
-            protos.AtomicSwapMethod.APPROVE: get_namespace_params(
-                type='atomic-swap-approve', parser=protos.AtomicSwapApprovePayload(),
+            protobuf.AtomicSwapMethod.APPROVE: get_namespace_params(
+                type='atomic-swap-approve', parser=protobuf.AtomicSwapApprovePayload(),
             ),
-            protos.AtomicSwapMethod.EXPIRE: get_namespace_params(
-                type='atomic-swap-expire', parser=protos.AtomicSwapExpirePayload(),
+            protobuf.AtomicSwapMethod.EXPIRE: get_namespace_params(
+                type='atomic-swap-expire', parser=protobuf.AtomicSwapExpirePayload(),
             ),
-            protos.AtomicSwapMethod.SET_SECRET_LOCK: get_namespace_params(
-                type='atomic-swap-set-secret-lock', parser=protos.AtomicSwapSetSecretLockPayload(),
+            protobuf.AtomicSwapMethod.SET_SECRET_LOCK: get_namespace_params(
+                type='atomic-swap-set-secret-lock', parser=protobuf.AtomicSwapSetSecretLockPayload(),
             ),
-            protos.AtomicSwapMethod.CLOSE: get_namespace_params(
-                type='atomic-swap-close', parser=protos.AtomicSwapClosePayload(),
+            protobuf.AtomicSwapMethod.CLOSE: get_namespace_params(
+                type='atomic-swap-close', parser=protobuf.AtomicSwapClosePayload(),
             ),
         },
         RemmeFamilyName.PUBLIC_KEY.value: {
-            protos.PubKeyMethod.STORE: get_namespace_params(
-                type='store public key', parser=protos.NewPubKeyPayload(),
+            protobuf.PubKeyMethod.STORE: get_namespace_params(
+                type='store public key', parser=protobuf.NewPubKeyPayload(),
             ),
-            protos.PubKeyMethod.REVOKE: get_namespace_params(
-                type='revoke public key', parser=protos.RevokePubKeyPayload(),
+            protobuf.PubKeyMethod.REVOKE: get_namespace_params(
+                type='revoke public key', parser=protobuf.RevokePubKeyPayload(),
             ),
         },
     }
