@@ -1,5 +1,11 @@
+"""
+Main namespace. Which include all interaction with our client for developers.
+"""
 from remme.account import RemmeAccount
-from remme.api import RemmeAPI
+from remme.api import (
+    RemmeAPI,
+    DEFAULT_NETWORK_CONFIG,
+)
 from remme.atomic_swap import RemmeSwap
 from remme.blockchain_info import RemmeBlockchainInfo
 from remme.certificate import RemmeCertificate
@@ -9,35 +15,91 @@ from remme.token import RemmeToken
 from remme.transaction_service import RemmeTransactionService
 from remme.websocket_events import RemmeWebSocketEvents
 
-DEFAULT_NETWORK_CONFIG = {
-    'node_address': "localhost",
-    'node_port': "8080",
-    'ssl_mode': False,
-}
-
 
 class Remme:
     """
     Class representing a client for Remme.
     """
 
-    def __init__(self, private_key_hex="", network_config=None):
+    keys = RemmeKeys()
+
+    def __init__(self, private_key_hex='', network_config=None):
         """
         :param private_key_hex: hex of private key, which is used for creating account in library
         which would sign transactions.
         :param network_config: config of network.
         """
-        self._private_key_hex = private_key_hex
-        self._network_config = DEFAULT_NETWORK_CONFIG if network_config is None else network_config
+        self.private_key_hex = private_key_hex
+        self.network_config = network_config if network_config else DEFAULT_NETWORK_CONFIG
 
-        self._api = RemmeAPI(self._network_config)
-        self.account = RemmeAccount(self._private_key_hex)
-        self.keys = RemmeKeys()
+        self._remme_api = RemmeAPI(self.network_config)
+        self._account = RemmeAccount(self.private_key_hex)
 
-        self.transaction_service = RemmeTransactionService(self._api, self.account)
-        self.public_key_storage = RemmePublicKeyStorage(self._api, self.account, self.transaction_service)
+        self.transaction = RemmeTransactionService(self._remme_api, self._account)
+        self.public_key_storage = RemmePublicKeyStorage(self._remme_api, self._account, self.transaction)
         self.certificate = RemmeCertificate(self.public_key_storage)
-        self.token = RemmeToken(self._api, self.transaction_service)
-        self.swap = RemmeSwap(self._api, self.transaction_service)
-        self.blockchain_info = RemmeBlockchainInfo(self._api)
-        self.events = RemmeWebSocketEvents(self._api.node_address, self._api.ssl_mode)
+        self.token = RemmeToken(self._remme_api, self.transaction)
+        self.swap = RemmeSwap(self._remme_api, self.transaction)
+        self.blockchain_info = RemmeBlockchainInfo(self._remme_api)
+
+    @property
+    def account(self):
+        """
+        Get information about current account.
+        @example
+        ```python
+        print(remme.account)
+        ```
+
+        Provide an account which sign the transactions that send to our nodes.
+        For account use ECDSA (secp256k1) key pair.
+        @example
+        ```python
+        account = Remme.generate_account()
+        remme.account = account
+        ```
+        """
+        return self._account
+
+    @account.setter
+    def account(self, remme_account):
+
+        if not remme_account:
+            raise Exception('Account is missing in attributes. Please give the account.')
+
+        if not remme_account.private_key_hex or not remme_account.sign or not remme_account.public_key_hex:
+            raise Exception('Given remme_account is not a valid.')
+
+        self._account = remme_account
+
+    @staticmethod
+    def generate_account():
+        """
+        Generate a new account.
+        @example
+        ```python
+        account = Remme.generate_account()
+        print(account)
+        """
+        return RemmeAccount()
+
+    @property
+    def events(self):
+        """
+        This properties hold implementation of RemmeWebSocketEvents,
+        which get a possibility to listen events from validator about transactions.
+        @example
+        Subscribe to event.
+        ```python
+        remme.events.subscribe(
+            events=RemmeEvents.AtomicSwap.value,
+            last_known_block_id=last_known_block_id <-- also can be set if you know it.
+        )
+        ```
+
+        Unsubscribe.
+        ```python
+        remme.events.unsubscribe()
+        ```
+        """
+        return RemmeWebSocketEvents(self._remme_api.network_config)

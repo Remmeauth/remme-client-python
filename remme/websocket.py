@@ -7,6 +7,7 @@ from remme.models.interfaces.websocket import IRemmeWebSocket
 from remme.models.websocket.events import RemmeEvents
 from remme.models.websocket.json_rpc_request import JsonRpcRequest
 from remme.models.websocket.methods import RemmeWebSocketMethods
+from remme.utils import validate_node_config
 
 
 class RemmeWebSocket(IRemmeWebSocket):
@@ -36,8 +37,8 @@ class RemmeWebSocket(IRemmeWebSocket):
     But you also can use your class for work with WebSockets. Just inherit it from RemmeWebSocket, like this:
     ```python
     class MySocketConnection(RemmeWebSocket):
-         def __init__(node_address, ssl_mode, data):
-             super(MySocketConnection, self).__init__(node_address, ssl_mode)
+         def __init__(network_config, data):
+             super(MySocketConnection, self).__init__(network_config)
              self.data = data
 
     web_socket = MySocketConnection(
@@ -55,26 +56,26 @@ class RemmeWebSocket(IRemmeWebSocket):
 
     _session, _socket, data = None, None, None
 
-    def __init__(self, node_address, ssl_mode):
+    def __init__(self, network_config):
         """
         Implement RemmeWebSocket by providing node address and ssl mode.
         @example
         ```python
-        remme_web_socket = remme_events(node_address, ssl_mode)
+        remme_web_socket = remme_events(network_config)
         ```
-        :param node_address: string
-        :param ssl_mode: boolean
+        :param network_config: dict
         """
-        self._node_address = node_address
-        self._ssl_mode = ssl_mode
+        validate_node_config(network_config=network_config)
+        self._network_config = network_config
 
     def _get_subscribe_url(self):
         """
         Get subscribe url.
         :return: network url in string format
         """
-        protocol = "wss://" if self._ssl_mode else "ws://"
-        return protocol + self._node_address
+        node_address, ssl_mode = self._network_config.get('node_address'), self._network_config.get('ssl_mode')
+        protocol = 'wss://' if ssl_mode else 'ws://'
+        return f'{protocol}{node_address}'
 
     def _get_socket_query(self, is_subscribe=True):
         """
