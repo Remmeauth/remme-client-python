@@ -179,7 +179,7 @@ class RemmeCertificate(IRemmeCertificate):
             certificate_data_to_create=certificate_data_to_create,
         )
 
-    def create_and_store(self, certificate_data_to_create=None):
+    async def create_and_store(self, certificate_data_to_create=None):
         """
         Method that creates certificate and stores it in to REMChain.
         Send transaction to chain.
@@ -199,7 +199,7 @@ class RemmeCertificate(IRemmeCertificate):
         :return: information about storing public key to REMChain
         """
         certificate = self.create(certificate_data_to_create=certificate_data_to_create)
-        return self.store(certificate=certificate)
+        return await self.store(certificate=certificate)
 
     async def store(self, certificate):
         """
@@ -249,7 +249,7 @@ class RemmeCertificate(IRemmeCertificate):
             certificate=certificate,
         )
 
-    def check(self, certificate):
+    async def check(self, certificate):
         """
         Check certificate's public key on validity and revocation.
         @example
@@ -266,9 +266,9 @@ class RemmeCertificate(IRemmeCertificate):
             public_key_to_der(public_key=certificate.public_key()),
         )
 
-        check_result = self._remme_public_key_storage.check(address=address)
+        check_result = await self._remme_public_key_storage.check(address=address)
 
-        if check_result is not None:
+        if check_result:
             return check_result
         else:
             raise Exception('This certificate was not found.')
@@ -297,7 +297,7 @@ class RemmeCertificate(IRemmeCertificate):
         else:
             raise Exception('This certificate was not found.')
 
-    def revoke(self, certificate):
+    async def revoke(self, certificate):
         """
         Revoke certificate's public key into REMChain.
         Send transaction to chain.
@@ -315,7 +315,7 @@ class RemmeCertificate(IRemmeCertificate):
             public_key_to_der(public_key=certificate.public_key()),
         )
 
-        return self._remme_public_key_storage.revoke(public_key_address=address)
+        return await self._remme_public_key_storage.revoke(public_key_address=address)
 
     def sign(self, certificate, data, rsa_signature_padding=None):
         """

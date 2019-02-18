@@ -42,7 +42,7 @@ class RemmeWebSocketEvents(RemmeWebSocket, IRemmeWebSocketsEvents):
         References:
             Available types for subscribing - https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
         ```python
-        remme_events.subscribe(events=RemmeEvents.AtomicSwap.value)
+        remme.events.subscribe(events=RemmeEvents.AtomicSwap.value)
         ```
         :param data: dict
         """
