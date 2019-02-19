@@ -1,5 +1,5 @@
 """
-Provide tests for Remme account implementation.
+Provide tests for Remme keys implementation.
 """
 import pytest
 import re
