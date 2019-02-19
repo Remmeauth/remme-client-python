@@ -28,7 +28,7 @@ class RemmeAccount(ECDSA):
     ```
     """
 
-    def __init__(self, private_key_hex):
+    def __init__(self, private_key_hex=None):
         """
         Get private key, create signer by using private key,
         generate public key from private key and generate account address by using public key and family name.
