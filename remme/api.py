@@ -1,81 +1,137 @@
+from random import random
 import aiohttp_json_rpc
 
 from remme.models.general.methods import RemmeMethods
+from remme.models.interfaces.api import IRemmeAPI
+from remme.utils import validate_node_config
+
+DEFAULT_NETWORK_CONFIG = {
+    'node_address': 'localhost:8080',
+    'ssl_mode': False,
+}
 
 
-class RemmeAPI:
+class RemmeAPI(IRemmeAPI):
     """
-     Main class that send requests to our REMME protocol
-     Check JSON-RPC API specification:
-     https://remmeio.atlassian.net/wiki/spaces/WikiREMME/pages/292814862/RPC+API+specification.
-     @param {string} node_address
-     @param {string | int} node_port
-     @param {boolean} ssl_mode
+    Main class that send requests to our REMME protocol.
 
-     @example
-     ```python
-        from remme.remme import Remme
+    References:
+        JSON-RPC API specification - https://remmeio.atlassian.net/wiki/spaces/WikiREMME/pages/292814862/RPC+API+specification.
 
-        network_config = {
-            'node_address': "localhost",
-            'node_port': "8080",
+    @example
+    ```python
+    from remme.api import RemmeAPI
+    from remme.models.general.methods import RemmeMethods
+
+    remme_api = await RemmeAPI({
+        'node_address': 'localhost:8080',
+        'ssl_mode': False
+    })
+
+    response = await remme_api.send_request(RemmeMethods.FETCH_BLOCK)
+    print('response')
+    ```
+    @param network_config: dict {
+        node_address: string
+        ssl_mode: boolean
+    }
+    """
+
+    def __init__(self, network_config=DEFAULT_NETWORK_CONFIG):
+        """
+        Constructor can implement with different sets of params.
+        By default params for constructor are:
+            node_address: 'localhost:8080'
+            ssl_mode: False
+
+        @example
+        Implementation with all params.
+        ```python
+        from remme.api import RemmeAPI
+        remme_api = await RemmeAPI({
+            'node_address': 'localhost:8080',
             'ssl_mode': False
-        }
-     ```
-        remme = Remme(network_config=network_config)
-        result = await remme._api.send_request(RemmeMethods.SOME_REMME_METHOD)
-        print(f"result {result}")
-    """
+        })
+        ```
 
-    _node_address = None
-    _ssl_mode = None
-    _rpc_client = None
-    _request_URI = None
+        Implementation with one param.
+        ```python
+        from remme.api import RemmeAPI
+        remme_api = await RemmeAPI({
+            'node_address': 'localhost:8080',
+        })
+        ```
 
-    def __init__(self, network_config):
+        Implementation without params.
+        ```python
+        from remme.api import RemmeAPI
+        remme_api = await RemmeAPI()
+        ```
+        :param network_config: dict
         """
-        :param network_config: {dict}
-        """
-        self._node_address = network_config['node_address'] + ":" + network_config['node_port']
-        self._ssl_mode = network_config['ssl_mode']
-        self._request_URI = ('https://' if self.ssl_mode else 'http://') + self._node_address
+        if not network_config.get('node_address'):
+            network_config['node_address'] = 'localhost:8080'
+
+        if not network_config.get('ssl_mode'):
+            network_config['ssl_mode'] = False
+
+        validate_node_config(network_config=network_config)
+        self._network_config = network_config
+
         self._rpc_client = aiohttp_json_rpc.JsonRpcClient()
+
+    def _get_url_for_request(self):
+
+        node_address, ssl_mode = self._network_config.get('node_address'), self._network_config.get('ssl_mode')
+        return f'{"https://" if ssl_mode else "http://"}{node_address}'
+
+    @staticmethod
+    def _get_request_config(method, payload={}):
+
+        options = {
+            'method': method.value,
+            'params': payload,
+            'id': round(random() * 100),
+        }
+
+        if payload:
+            options.update({'params': payload})
+
+        return options
+
+    @property
+    def network_config(self):
+        """
+        Return network config object which contain domain name, port and ssl.
+        :return: dict
+        """
+        return self._network_config
 
     async def send_request(self, method, params=None):
         """
         Make and send request with given method and payload.
         Create url from given network config
-        Get JSON-RPC method and create request config in correspond to this spec https://www.jsonrpc.org/specification.
-        :param method: {RemmeMethods}
-        :param params: {dict}
-        :return: {Promise}
+        Get JSON-RPC method and create request config in correspond specification.
+
+        References:
+            - https://www.jsonrpc.org/specification.
+
+        :param method: enum
+        :param params: dict
+        :return: promise
         """
         if not isinstance(method, RemmeMethods):
-            raise Exception("Invalid RPC method given.")
+            raise Exception('Invalid RPC method given.')
+
+        url = self._get_url_for_request()
+        request_data = self._get_request_config(method=method, payload=params)
+
         try:
-            await self._rpc_client.connect_url(url=self._request_URI)
+            await self._rpc_client.connect_url(url=url)
         except Exception:
-            raise Exception("Please check if your node running at {url}".format(url=self._request_URI))
-        request_data = {'method': method.value, 'params': {}}
-        if params:
-            request_data.update({'params': params})
+            raise Exception(f'Please check if your node running at {url}.')
+
         try:
             return await self._rpc_client.call(**request_data)
         finally:
             await self._rpc_client.disconnect()
-
-    @property
-    def node_address(self):
-        """
-        Get node address that was provided by user
-        :return: {string}
-        """
-        return self._node_address
-
-    @property
-    def ssl_mode(self):
-        """
-        Get ssl mode that was provided by user
-        :return: {string}
-        """
-        return self._ssl_mode

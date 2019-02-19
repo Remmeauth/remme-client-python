@@ -488,9 +488,11 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         :param address: string
         :return: boolean
         """
-        is_valid = self._get_info_by_public_key(address=address)
-
-        return is_valid
+        try:
+            await self._get_info_by_public_key(address=address)
+            return True
+        except Exception:
+            return False
 
     async def get_info(self, public_key_address):
         """

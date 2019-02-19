@@ -2,7 +2,7 @@
 Base class for response on certificate creation.
 """
 from remme.models.keys.rsa import RSA
-from remme.models.websocket.base_transaction_response import BaseTransactionResponse
+from remme.models.transaction_service.base_transaction_response import BaseTransactionResponse
 from remme.utils import (
     private_key_to_der,
     public_key_to_der,

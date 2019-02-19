@@ -38,7 +38,7 @@ def test_validate_amount_with_negative_number():
     Case: validate amount with negative number.
     Expect: amount is not valid for operations error message.
     """
-    expected_result = 'Given amount is not valid for operations.'
+    expected_result = 'Given amount must be higher than 0.'
 
     with pytest.raises(Exception) as error:
         validate_amount(amount=-10)

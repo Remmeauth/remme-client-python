@@ -6,41 +6,43 @@ from remme.websocket import RemmeWebSocket
 class RemmeWebSocketEvents(RemmeWebSocket, IRemmeWebSocketsEvents):
     """
     Class for subscribing to events from WebSocket.
-    Available types for subscribing is covered in
-    https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
+
+    References:
+        Available types for subscribing - https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
     @example
     ```python
     from remme.enums.remme_events import RemmeEvents
     from remme.remme_websocket_events import RemmeWebSocketEvents
-    remme_events = RemmeWebSocketsEvents(
-        node_address='localhost:8080',
-        ssl_mode=False,
-    )
+
+    remme_events = RemmeWebSocketsEvents({
+        'node_address'='localhost:8080',
+        'ssl_mode'=False,
+    })
     remme_events.subscribe(events=RemmeEvents.AtomicSwap)
     ```
     """
 
-    def __init__(self, node_address, ssl_mode):
+    def __init__(self, network_config):
         """
         Implementation of RemmeWebSocketsEvents.
         ```python
-        remme_events = RemmeWebSocketsEvents(
-            node_address='localhost:8080',
-            ssl_mode=False,
-        )
+        remme_events = RemmeWebSocketsEvents({
+            'node_address'='localhost:8080',
+            'ssl_mode'=False,
+        })
         ```
-        :param node_address: string
-        :param ssl_mode: boolean
+        :param network_config: dict
         """
-        super(RemmeWebSocketEvents, self).__init__(node_address=node_address, ssl_mode=ssl_mode)
+        super(RemmeWebSocketEvents, self).__init__(network_config=network_config)
 
     async def subscribe(self, **data):
         """
         Subscribing to events from WebSocket.
-        Available types for subscribing is covered in
-        https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
+
+        References:
+            Available types for subscribing - https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
         ```python
-        remme_events.subscribe(events=RemmeEvents.AtomicSwap.value)
+        remme.events.subscribe(events=RemmeEvents.AtomicSwap.value)
         ```
         :param data: dict
         """

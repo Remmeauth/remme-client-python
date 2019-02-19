@@ -23,11 +23,14 @@ def validate_amount(amount):
     """
     Validate amount.
     """
+    if not amount:
+        raise Exception('Amount was not provided, please set the amount.')
+
     if not isinstance(amount, int):
         raise Exception('Given amount is not in integer type.')
 
     if amount <= 0:
-        raise Exception('Given amount is not valid for operations.')
+        raise Exception('Given amount must be higher than 0.')
 
 
 def validate_public_key(public_key):
@@ -56,10 +59,6 @@ def validate_address(address):
 
     if not re.match(pattern=RemmePatterns.ADDRESS.value, string=address):
         raise Exception('Given address is not in hexadecimal string format.')
-
-
-def is_valid_batch_id(_batch_id):
-    return re.match(RemmePatterns.HEADER_SIGNATURE.value, _batch_id) is not None
 
 
 def bytes_to_hex(_bytes):
@@ -121,6 +120,17 @@ def check_sha(data):
     if not (re.match(RemmePatterns.SHA256.value, data) is not None) \
             and not (re.match(RemmePatterns.SHA512.value, data) is not None):
         raise Exception('Value should be SHA-256 or SHA-512.')
+
+
+def validate_node_config(network_config):
+
+    node_address, ssl_mode = network_config.get('node_address'), network_config.get('ssl_mode')
+
+    if not (re.match(RemmePatterns.NODE_ADDRESS.value, node_address) is not None):
+        raise Exception('You try construct with invalid `node_address`.')
+
+    elif not isinstance(ssl_mode, bool):
+        raise Exception('You try construct with invalid `ssl_mode`.')
 
 
 def sha512_hexdigest(data):

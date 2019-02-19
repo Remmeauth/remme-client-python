@@ -1,4 +1,5 @@
 from remme.models.general.methods import RemmeMethods
+from remme.models.interfaces.token import IRemmeToken
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.protobuf.account_pb2 import AccountMethod, TransferPayload
 from remme.protobuf.transaction_pb2 import TransactionPayload
@@ -9,13 +10,13 @@ from remme.utils import (
 )
 
 
-class RemmeToken:
+class RemmeToken(IRemmeToken):
     """
     Class that work with tokens. Transfer them and getting balance by address.
-
     @example
     ```python
-    some_remme_address = '1120077f88b0b798347b3f52751bb99fa8cabaf926c5a1dad2d975d7b966a85b3a9c21'
+    some_account_public_key_in_hex = '02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13'
+    some_remme_address = generate_address(RemmeFamilyName.ACCOUNT.value, some_account_public_key_in_hex)
 
     receiver_balance = await remme.token.get_balance(some_remme_address)
     print(f'Account {some_remme_address} as receiver, balance - {receiver_balance} REM')
@@ -24,7 +25,7 @@ class RemmeToken:
     print(f'Account {remme.account.address} as sender, balance - {balance} REM')
 
     transaction_result = await remme.token.transfer(some_remme_address, 10)
-    print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
+    print(f'Sending tokens...Batch_id: {transaction_result.batch_id}')
 
     async for batch_info in transaction_result.connect_to_web_socket():
         if batch_info.status == BatchStatus.COMMITTED.value:
@@ -37,9 +38,21 @@ class RemmeToken:
     _family_name = RemmeFamilyName.ACCOUNT.value
     _family_version = '0.1'
 
-    def __init__(self, api, transaction_service):
-        self.api = api
-        self.transaction_service = transaction_service
+    def __init__(self, remme_api, remme_transaction):
+        """
+        @example
+        Usage without remme main package.
+        ```python
+        remme_api = RemmeAPI() # See RemmeAPI implementation
+        remme_account = RemmeAccount() # See RemmeAccount implementation
+        remme_transaction = RemmeTransactionService(remme_api, remmeAccount)
+        remme_token = RemmeToken(remme_api, remme_transaction)
+        ```
+        :param remme_api: RemmeAPI
+        :param remme_transaction: RemmeTransactionService
+        """
+        self._remme_api = remme_api
+        self._remme_transaction = remme_transaction
 
         self.transfer_payload = TransferPayload()
         self.transaction_payload = TransactionPayload()
@@ -47,19 +60,17 @@ class RemmeToken:
     async def get_balance(self, address):
         """
         Get balance on given account address.
-
         @example
         ```python
         balance = await remme.token.get_balance(remme.account.address)
-        print(f'Account {remme.account.address} as sender, balance - {balance} REM')
+        print(f'Account {remme.account.address} as sender, balance - {balance} REM.')
         ```
-
-        :param address: {string}
-        :return: {integer}
+        :param address: string
+        :return: amount (integer)
         """
         validate_address(address=address)
 
-        return await self.api.send_request(
+        return await self._remme_api.send_request(
             method=RemmeMethods.TOKEN,
             params=public_key_address(value=address),
         )
@@ -68,10 +79,10 @@ class RemmeToken:
         """
         Transfer tokens from signed address (remme.account.address) to given address.
         Send transaction to REMChain.
-
         @example
         ```python
-        some_remme_address = '1120077f88b0b798347b3f52751bb99fa8cabaf926c5a1dad2d975d7b966a85b3a9c21'
+        some_account_public_key_in_hex = '02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13'
+        some_remme_address = generate_address(RemmeFamilyName.ACCOUNT.value, some_account_public_key_in_hex)
 
         transaction_result = await remme.token.transfer(some_remme_address, 10)
         print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
@@ -83,9 +94,9 @@ class RemmeToken:
                 await transaction_result.close_web_socket()
         ```
 
-        :param address_to: {string}
-        :param amount: {integer}
-        :return: {string}
+        :param address_to: string
+        :param amount: integer
+        :return: transaction result
         """
         validate_address(address=address_to)
         validate_amount(amount=amount)
@@ -96,7 +107,7 @@ class RemmeToken:
         self.transaction_payload.method = AccountMethod.TRANSFER
         self.transaction_payload.data = self.transfer_payload.SerializeToString()
 
-        payload = await self.transaction_service.create(
+        payload = await self._remme_transaction.create(
             family_name=self._family_name,
             family_version=self._family_version,
             inputs=[address_to],
@@ -104,4 +115,4 @@ class RemmeToken:
             payload_bytes=self.transaction_payload.SerializeToString(),
         )
 
-        return await self.transaction_service.send(payload=payload)
+        return await self._remme_transaction.send(payload=payload)
