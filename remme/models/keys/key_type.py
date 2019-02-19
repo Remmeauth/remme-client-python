@@ -6,6 +6,6 @@ from enum import Enum
 
 class KeyType(Enum):
 
-    RSA = "rsa"
-    ECDSA = "ecdsa"
-    EdDSA = "ed25519"
+    RSA = 'rsa'
+    ECDSA = 'ecdsa'
+    EdDSA = 'ed25519'

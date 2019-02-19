@@ -30,7 +30,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
 
     @example
     ```python
-    from remme.enums.key_type import KeyType
+    from remme.models.keys.key_type import KeyType
 
     keys = await RemmeKeys.construct(KeyType.RSA)
 
@@ -180,9 +180,9 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         Create public key payload in bytes to store with another payer, private_key and public_key.
         @example
         ```python
-        from remme.remme import Remme as remme
-        from remme.enums.key_type import KeyType
-        from remme.enums.rsa_signature_padding import RsaSignaturePadding
+        from remme import Remme as remme
+        from remme.models.keys.key_type import KeyType
+        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
         keys = remme.keys.construct(KeyType.RSA)
 
@@ -199,9 +199,9 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         Create public key payload in bytes to store with private_key.
         @example
         ```python
-        from remme.remme import Remme as remme
-        from remme.enums.key_type import KeyType
-        from remme.enums.rsa_signature_padding import RsaSignaturePadding
+        from remme import Remme as remme
+        from remme.models.keys.key_type import KeyType
+        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
         keys = remme.keys.construct(KeyType.RSA)
 
@@ -218,9 +218,9 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         Create public key payload in bytes to store with another payer with public_key and signature.
         @example
         ```python
-        from remme.remme import Remme as remme
-        from remme.enums.key_type import KeyType
-        from remme.enums.rsa_signature_padding import RsaSignaturePadding
+        from remme import Remme as remme
+        from remme.models.keys.key_type import KeyType
+        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
         private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
 
@@ -341,7 +341,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         ```python
         # payload_bytes is the transaction payload generated from method
         # remme.public_key_storage.create
-        from remme.remme import Remme as remme
+        from remme import Remme as remme
 
         store_response = await remme.public_key_storage.store(payload_bytes)
 
@@ -413,7 +413,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         Send transaction to chain with private key.
         @example
         ```python
-        from remme.enums.key_type import KeyType
+        from remme.models.keys.key_type import KeyType
 
         keys = await RemmeKeys.construct(KeyType.RSA)
 
@@ -434,9 +434,9 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         Send transaction to chain with signature.
         @example
         ```python
-        from remme.remme import Remme as remme
-        from remme.enums.key_type import KeyType
-        from remme.enums.rsa_signature_padding import RsaSignaturePadding
+        from remme import Remme as remme
+        from remme.models.keys.key_type import KeyType
+        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
         private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
 

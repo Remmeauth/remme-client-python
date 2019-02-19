@@ -11,7 +11,7 @@ class RemmeWebSocketEvents(RemmeWebSocket, IRemmeWebSocketsEvents):
         Available types for subscribing - https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
     @example
     ```python
-    from remme.enums.remme_events import RemmeEvents
+    from remme.models.websocket.events.RemmeEvents
     from remme.remme_websocket_events import RemmeWebSocketEvents
 
     remme_events = RemmeWebSocketsEvents({

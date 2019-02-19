@@ -243,8 +243,7 @@ class RemmeCertificate(IRemmeCertificate):
         )
 
         return CertificateTransactionResponse(
-            node_address=batch_response.node_address,
-            ssl_mode=batch_response.ssl_mode,
+            network_config=batch_response.network_config,
             batch_id=batch_response.batch_id,
             certificate=certificate,
         )
