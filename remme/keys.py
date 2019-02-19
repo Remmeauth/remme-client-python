@@ -35,8 +35,6 @@ class RemmeKeys:
         if key_type == KeyType.EdDSA:
             return EdDSA.generate_key_pair(seed=options)
 
-        raise Exception(f'Unsupported key type {key_type.name}')
-
     @staticmethod
     def get_address_from_public_key(key_type, public_key):
         """
@@ -62,8 +60,6 @@ class RemmeKeys:
 
         if key_type == KeyType.EdDSA:
             return EdDSA.get_address_from_public_key(public_key=public_key)
-
-        raise Exception(f'Unsupported key type {key_type.name}')
 
     @staticmethod
     def construct(key_type=KeyType.RSA, private_key=None, public_key=None):
@@ -114,5 +110,3 @@ class RemmeKeys:
 
         if key_type == KeyType.EdDSA:
             return EdDSA(private_key=private_key, public_key=public_key)
-
-        raise Exception(f'Unsupported key type {key_type.name}')

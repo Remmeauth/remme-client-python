@@ -2,6 +2,7 @@ from remme.keys import RemmeKeys
 from remme.models.general.methods import RemmeMethods
 from remme.models.interfaces.public_key_storage import IRemmePublicKeyStorage
 from remme.models.keys.key_type import KeyType
+from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 from remme.models.public_key_storage.public_key_info import PublicKeyInfo
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.protobuf.pub_key_pb2 import (
