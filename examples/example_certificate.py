@@ -17,8 +17,13 @@ async def example():
         validity=360,
         serial=str(datetime.now())
     )
+
     async for response in certificate_transaction_result.connect_to_web_socket():
-        print("connected")
+        print('connected')
+        print('certificate', response)
+        print(f'Certificate was saved on REMchain at block number: {response.block_number}')
+        certificate_status = remme.certificate.check(certificate_transaction_result.certificate)
+        print(f'Certificate is_valid = {certificate_status}')
         await certificate_transaction_result.close_web_socket()
 
 
