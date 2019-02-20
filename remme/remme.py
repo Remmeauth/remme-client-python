@@ -42,6 +42,8 @@ class Remme:
         self.swap = RemmeSwap(self._remme_api, self.transaction)
         self.blockchain_info = RemmeBlockchainInfo(self._remme_api)
 
+        self._events = RemmeWebSocketEvents(self._remme_api.network_config)
+
     @property
     def account(self):
         """
@@ -102,4 +104,4 @@ class Remme:
         remme.events.unsubscribe()
         ```
         """
-        return RemmeWebSocketEvents(self._remme_api.network_config)
+        return self._events

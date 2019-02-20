@@ -4,9 +4,13 @@ from aiohttp import ClientSession
 
 from remme.models.general.batch_status import BatchStatus
 from remme.models.interfaces.websocket import IRemmeWebSocket
+from remme.models.websocket.batch_info import BatchInfoDto
+from remme.models.websocket.block_info import BlockInfoDto
 from remme.models.websocket.events import RemmeEvents
 from remme.models.websocket.json_rpc_request import JsonRpcRequest
 from remme.models.websocket.methods import RemmeWebSocketMethods
+from remme.models.websocket.swap_info import SwapInfo
+from remme.models.websocket.transfer_info import TransferInfoDto
 from remme.utils import validate_node_config
 
 
@@ -68,6 +72,17 @@ class RemmeWebSocket(IRemmeWebSocket):
         validate_node_config(network_config=network_config)
         self._network_config = network_config
 
+    def _map(self, event, data):
+
+        events_data = {
+            RemmeEvents.Batch.value: BatchInfoDto(data=data),
+            RemmeEvents.Blocks.value: BlockInfoDto(data=data),
+            RemmeEvents.AtomicSwap.value: SwapInfo(data=data),
+            RemmeEvents.Transfer.value: TransferInfoDto(data=data),
+        }
+
+        return events_data.get(event)
+
     def _get_subscribe_url(self):
         """
         Get subscribe url.
@@ -117,12 +132,16 @@ class RemmeWebSocket(IRemmeWebSocket):
             if error:
                 raise Exception(error)
 
-            if not isinstance(result, str):
+            if isinstance(result, str) and result == 'SUBSCRIBED':
+                yield response
+
+            else:
+
                 if result.get('event_type') == RemmeEvents.Batch.value \
                         and result.get('attributes').get('status') == BatchStatus.INVALID.value:
                     raise Exception(result.get('attributes'))
 
-            yield response
+                yield self._map(result.get('event_type'), result.get('attributes'))
 
     async def close_web_socket(self):
         """

@@ -1,6 +1,10 @@
 import asyncio
+import os
+import sys
 
-from remme import Remme
+sys.path.insert(0, os.path.realpath('./'))
+
+from remme.remme import Remme
 from remme.models.websocket.events import RemmeEvents
 
 
@@ -11,14 +15,19 @@ async def example():
             network_config={'node_address': "localhost:8080", 'ssl_mode': False}
         )
 
-    await remme.token.transfer('112007db8a00c010402e2e3a7d03491323e761e0ea612481c518605648ceeb5ed454f8', 10)
-
     # subscribe
     events = await remme.events.subscribe(event_type=RemmeEvents.Blocks.value)
 
     count = 0
     async for msg in events:
-        print(msg)
+
+        if isinstance(msg, dict):
+            print(msg)
+
+        else:
+            print('id:', msg.id)
+            print('timestamp:', msg.timestamp)
+
         print("connected")
         print("handle some messages")
 
