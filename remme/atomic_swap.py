@@ -1,11 +1,11 @@
 import re
 
-from remme.models.atomic_swap.swap_info import SwapInfo
 from remme.models.atomic_swap.swap_init_dto import SwapInitDto
 from remme.models.general.methods import RemmeMethods
 from remme.models.general.patterns import RemmePatterns
 from remme.models.interfaces.atomic_swap import IRemmeSwap
 from remme.models.utils.family_name import RemmeFamilyName
+from remme.models.websocket.swap_info import SwapInfo
 from remme.protobuf.atomic_swap_pb2 import (
     AtomicSwapApprovePayload,
     AtomicSwapClosePayload,
