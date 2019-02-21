@@ -1,7 +1,10 @@
 from remme.models.general.methods import RemmeMethods
 from remme.models.interfaces.token import IRemmeToken
 from remme.models.utils.family_name import RemmeFamilyName
-from remme.protobuf.account_pb2 import AccountMethod, TransferPayload
+from remme.protobuf.account_pb2 import (
+    AccountMethod,
+    TransferPayload,
+)
 from remme.protobuf.transaction_pb2 import TransactionPayload
 from remme.utils import (
     public_key_address,

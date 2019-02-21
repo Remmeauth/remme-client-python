@@ -1,4 +1,5 @@
 from random import random
+
 import aiohttp_json_rpc
 
 from remme.models.general.methods import RemmeMethods

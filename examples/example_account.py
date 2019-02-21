@@ -1,15 +1,13 @@
 import asyncio
 
-from remme.remme import Remme
+from remme import Remme
 
 
 async def example():
     """
     Generate new account and set it to Remme client.
     """
-    sender_private_key_hex = "ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9"
-
-    remme = Remme(private_key_hex=sender_private_key_hex)
+    remme = Remme(private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8')
 
     public_key_hex = remme.account.public_key_hex
     print(f'Public key hex: {public_key_hex}')

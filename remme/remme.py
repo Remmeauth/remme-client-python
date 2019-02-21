@@ -26,8 +26,8 @@ class Remme:
     def __init__(self, private_key_hex='', network_config=None):
         """
         :param private_key_hex: hex of private key, which is used for creating account in library
-        which would sign transactions.
-        :param network_config: config of network.
+        which would sign transactions (string)
+        :param network_config: config of network (dict)
         """
         self.private_key_hex = private_key_hex
         self.network_config = network_config if network_config else DEFAULT_NETWORK_CONFIG

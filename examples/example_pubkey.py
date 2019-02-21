@@ -1,69 +1,39 @@
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
-
-from remme.models.general.batch_status import BatchStatus
-from remme.remme import Remme
 import asyncio
 from datetime import datetime, timedelta
 
-# variant with extracting keys from file
-#
-# private_key_file = open("test_rsa_private.key", "rb")
-# public_key_file = open("test_rsa_public.key", "rb")
-# data = {
-#     "data": "store data",
-#     "private_key": private_key_file.read(),
-#     "public_key": public_key_file.read(),
-#     "valid_from": int(datetime.utcnow().strftime("%s")),
-#     "valid_to": int((datetime.utcnow() + timedelta(days=365)).strftime("%s"))
-# }
+from remme import Remme
+from remme.models.keys.key_type import KeyType
+from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
 
 async def example():
-    private_key_hex = "7f752a99bbaf6755dc861bb4a7bb19acb913948d75f3b718ff4545d01d9d4ff5"
-    node_private_key = "4c0393f24225443678543642d5a48ac0534b894ab82ae5f118d330fd2f56dae4"
-    remme = Remme(private_key_hex=node_private_key)
 
-    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
+    remme = Remme(private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8')
 
-    # check balance before transaction
-    balance = await remme.token.get_balance(remme.account.address)
-    print(f'balance is : {balance} REM\n')
+    keys = remme.keys.construct(KeyType.RSA)
 
-    data = {
-        "data": "store data",
-        "private_key": private_key,
-        "public_key": private_key.public_key(),
-        "valid_from": int(datetime.utcnow().strftime("%s")),
-        "valid_to": int((datetime.utcnow() + timedelta(days=365)).strftime("%s"))
-    }
-    pubkey_storage_transaction_result = await remme.public_key_storage.store(**data)
+    current_timestamp = int(datetime.now().timestamp())
+    current_timestamp_plus_year = int(current_timestamp + timedelta(365).total_seconds())
 
-    batch_status = await remme.batch.get_status(pubkey_storage_transaction_result.batch_id)
-    print(f"batch status {batch_status}\n")
+    pubkey_transaction_result = await remme.public_key_storage.create_and_store(
+        data='some',
+        keys=keys,
+        rsa_signature_padding=RsaSignaturePadding.PSS,
+        valid_from=current_timestamp,
+        valid_to=current_timestamp_plus_year,
+        do_owner_pay=False,
+    )
 
-    async for response in pubkey_storage_transaction_result.connect_to_web_socket():
-        print("connected")
-
-        print(f"response status :{response.status}")
-        batch_status = await remme.batch.get_status(pubkey_storage_transaction_result.batch_id)
-        print(f"batch status {batch_status}\n")
-
-        if response.status == BatchStatus.INVALID.value:
-            print(f"Error occurs : {response.invalid_transactions}")
-            await pubkey_storage_transaction_result.close_web_socket()
-            break
-
-        if response.status == BatchStatus.COMMITTED.value:
-            print("Batch COMMITTED")
-
-            # check public key in chain
-
-            # revoke public key in chain
-
-            # check public key in chain
-
-            await pubkey_storage_transaction_result.close_web_socket()
+    async for response in pubkey_transaction_result.connect_to_web_socket():
+        print('connected')
+        print(response)
+        info = await remme.public_key_storage.get_info(keys.address)
+        print('info', info)
+        is_valid = await remme.public_key_storage.check(keys.address)
+        print('is_valid:', is_valid)
+        public_key_addresses = await remme.public_key_storage.get_account_public_keys(remme.account.address)
+        print('list_public_key_addresses:', public_key_addresses)
+        await pubkey_transaction_result.close_web_socket()
 
 
 loop = asyncio.get_event_loop()

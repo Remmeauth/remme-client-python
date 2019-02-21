@@ -28,7 +28,7 @@ class KeyDto:
         References:
             - https://docs.remme.io/remme-core/docs/family-account.html#addressing
 
-        :return: {string}
+        :return: string
         """
         return self._address
 
@@ -37,7 +37,7 @@ class KeyDto:
         """
         Return private key.
 
-        :return: {string}
+        :return: string
         """
         if not self._private_key:
             raise Exception("You didn't provide a private key.")
@@ -49,7 +49,7 @@ class KeyDto:
         """
         Return public key.
 
-        :return: {string}
+        :return: string
         """
         return self._public_key
 
@@ -58,7 +58,7 @@ class KeyDto:
         """
         Return private key in hex format.
 
-        :return: {string}
+        :return: string
         """
         if not self._private_key_hex:
             raise Exception(f"Don't supported for this key type: {self._key_type.name} or didn't provide private key.")
@@ -70,7 +70,7 @@ class KeyDto:
         """
         Return public key in hex format.
 
-        :return: {string}
+        :return: string
         """
         if not self._public_key_hex:
             raise Exception(f"Don't supported for this key type: {self._key_type.name}.")
@@ -82,7 +82,7 @@ class KeyDto:
         """
         Return private key in pem format.
 
-        :return: {string}
+        :return: string
         """
         if not self._private_key_pem:
             raise Exception(f"Don't supported for this key type: {self._key_type.name} or didn't provide private key.")
@@ -94,7 +94,7 @@ class KeyDto:
         """
         Return public key in pem format.
 
-        :return: {string}
+        :return: string
         """
         if not self._public_key_pem:
             raise Exception(f"Don't supported for this key type: {self._key_type.name}.")
@@ -106,7 +106,7 @@ class KeyDto:
         """
         Return key type.
 
-        :return: {string}
+        :return: string
         """
         return self._key_type
 
@@ -115,6 +115,6 @@ class KeyDto:
         """
         Return family name.
 
-        :return: {RemmeFamilyName}
+        :return: RemmeFamilyName
         """
         return self._family_name

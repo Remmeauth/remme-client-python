@@ -11,10 +11,10 @@ from remme.utils import (
 
 class CertificateTransactionResponse(BaseTransactionResponse):
 
-    def __init__(self, node_address, ssl_mode, batch_id, certificate=None):
+    def __init__(self, network_config, batch_id, certificate=None):
 
         super(CertificateTransactionResponse, self).__init__(
-            node_address=node_address, ssl_mode=ssl_mode, batch_id=batch_id,
+            network_config=network_config, batch_id=batch_id,
         )
         self._certificate = certificate
         self._keys = RSA(
@@ -27,7 +27,7 @@ class CertificateTransactionResponse(BaseTransactionResponse):
         Sign data with a certificate's private key and output DigestInfo DER-encoded bytes (default for PSS).
         :param data: string
         :param rsa_signature_padding: RsaSignaturePadding
-        :return: hex string for signature
+        :return: hex string of signature
         """
         return self._keys.sign(
             data=data,

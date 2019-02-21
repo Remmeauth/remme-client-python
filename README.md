@@ -24,7 +24,7 @@ pip3 install remme
 #### Remme client
 
 ```python
-from remme.remme import Remme
+from remme import Remme
 
 private_key_hex = 'bcf42d0194f7f6448e6f03ca0fa1f53cc3fe7768d546cd4d028144aba654d7aa'
 network_config = {
@@ -70,7 +70,7 @@ async for response in certificate_transaction_result.connect_to_web_socket():
     print('certificate', response)
     print(f'Certificate was saved on REMchain at block number: {response.block_number}')
     certificate_status = remme.certificate.check(certificate_transaction_result.certificate)
-    print(f'Certificate is_valid = {certificate_status.valid}')
+    print(f'Certificate is_valid = {certificate_status}')
     await certificate_transaction_result.close_web_socket()
 ```
 
