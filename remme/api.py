@@ -16,59 +16,59 @@ class RemmeAPI(IRemmeAPI):
     """
     Main class that send requests to our REMME protocol.
 
-    References:
-        JSON-RPC API specification - https://remmeio.atlassian.net/wiki/spaces/WikiREMME/pages/292814862/RPC+API+specification.
+    Reference to the JSON-RPC API specification::
+        - https://bit.ly/2DZ7iOG
 
-    @example
-    ```python
-    from remme.api import RemmeAPI
-    from remme.models.general.methods import RemmeMethods
+    To use:
+        .. code-block:: python
 
-    remme_api = await RemmeAPI({
-        'node_address': 'localhost:8080',
-        'ssl_mode': False
-    })
+            from remme.api import RemmeAPI
+            from remme.models.general.methods import RemmeMethods
 
-    response = await remme_api.send_request(RemmeMethods.FETCH_BLOCK)
-    print('response')
-    ```
-    @param network_config: dict {
-        node_address: string
-        ssl_mode: boolean
-    }
+            remme_api = await RemmeAPI({
+                'node_address': 'localhost:8080',
+                'ssl_mode': False
+            })
+
+            response = await remme_api.send_request(RemmeMethods.FETCH_BLOCK)
+            print('response')
     """
 
     def __init__(self, network_config=DEFAULT_NETWORK_CONFIG):
         """
         Constructor can implement with different sets of params.
-        By default params for constructor are:
-            node_address: 'localhost:8080'
-            ssl_mode: False
 
-        @example
-        Implementation with all params.
-        ```python
-        from remme.api import RemmeAPI
-        remme_api = await RemmeAPI({
-            'node_address': 'localhost:8080',
-            'ssl_mode': False
-        })
-        ```
+        By default params for constructor are: ``node_address = 'localhost:8080'``, ``ssl_mode = False``
 
-        Implementation with one param.
-        ```python
-        from remme.api import RemmeAPI
-        remme_api = await RemmeAPI({
-            'node_address': 'localhost:8080',
-        })
-        ```
+        Args:
+            network_config (dict): node_address (string), ssl_mode (boolean)
 
-        Implementation without params.
-        ```python
-        from remme.api import RemmeAPI
-        remme_api = await RemmeAPI()
-        ```
-        :param network_config: dict
+        To use:
+            Implementation with all params.
+
+            .. code-block:: python
+
+                from remme.api import RemmeAPI
+                remme_api = await RemmeAPI({
+                    'node_address': 'localhost:8080',
+                    'ssl_mode': False
+                })
+
+            Implementation with one param.
+
+            .. code-block:: python
+
+                from remme.api import RemmeAPI
+                remme_api = await RemmeAPI({
+                    'node_address': 'localhost:8080',
+                })
+
+            Implementation without params.
+
+            .. code-block:: python
+
+                from remme.api import RemmeAPI
+                remme_api = await RemmeAPI()
         """
         if not network_config.get('node_address'):
             network_config['node_address'] = 'localhost:8080'
@@ -104,22 +104,24 @@ class RemmeAPI(IRemmeAPI):
     def network_config(self):
         """
         Return network config object which contain domain name, port and ssl.
-        :return: dict
         """
         return self._network_config
 
     async def send_request(self, method, params=None):
         """
         Make and send request with given method and payload.
-        Create url from given network config
+        Create url from given network config.
         Get JSON-RPC method and create request config in correspond specification.
 
-        References:
+        References::
             - https://www.jsonrpc.org/specification.
 
-        :param method: enum
-        :param params: dict
-        :return: promise
+        Args:
+            method (RemmeMethods): enum
+            params (dict): payload
+
+        Returns:
+            Promise.
         """
         if not isinstance(method, RemmeMethods):
             raise Exception('Invalid RPC method given.')

@@ -7,7 +7,8 @@ class BatchInfoDto:
 
     def __init__(self, data):
         """
-        :param data: dict {status: string, id: string}
+        Args:
+            data (dict): status (string), id (string
         """
         self.data = data
 

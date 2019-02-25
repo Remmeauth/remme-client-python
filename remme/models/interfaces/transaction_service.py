@@ -8,11 +8,13 @@ class IRemmeTransactionService(metaclass=abc.ABCMeta):
     def create(family_name, family_version, inputs, outputs, payload_bytes):
         """
         Create transactions.
-        :param family_name: string
-        :param family_version: string
-        :param inputs: list
-        :param outputs: list
-        :param payload_bytes: bytes
+
+        Args:
+            family_name (string): enum RemmeFamilyName
+            family_version (string): family version
+            inputs (list): list of input address
+            outputs (list): list of output address
+            payload_bytes (bytes): payload bytes
         """
         pass
 
@@ -21,6 +23,8 @@ class IRemmeTransactionService(metaclass=abc.ABCMeta):
     def send(payload):
         """
         Send transactions.
-        :param payload: string
+
+        Args:
+            payload (bytes): transaction in base64
         """
         pass

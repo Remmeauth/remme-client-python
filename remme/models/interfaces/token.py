@@ -9,8 +9,10 @@ class IRemmeToken(metaclass=abc.ABCMeta):
         """
         Transfer tokens from signed address (remme.account.address) to given address.
         Send transaction to REMChain.
-        :param address_to: string
-        :param amount: integer
+
+        Args:
+            address_to (string): given address
+            amount (integer): amount of tokens
         """
         pass
 
@@ -19,6 +21,8 @@ class IRemmeToken(metaclass=abc.ABCMeta):
     def get_balance(address):
         """
         Get balance on given account address.
-        :param address: string
+
+        Args:
+            address (string): account address
         """
         pass

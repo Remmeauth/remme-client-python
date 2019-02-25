@@ -18,7 +18,7 @@ class EdDSA(KeyDto, IRemmeKeys):
     """
     EdDSA (ed25519) class implementation.
 
-    References:
+    References::
         - https://github.com/warner/python-ed25519
     """
 
@@ -26,8 +26,10 @@ class EdDSA(KeyDto, IRemmeKeys):
         """
         Constructor for EdDSA key pair.
         If only private key available then public key will be generate from private.
-        :param private_key in bytes (required)
-        :param public_key in bytes (optional)
+
+        Args:
+            private_key (bytes): ed25519 private key
+            public_key (bytes, optional): ed25519 public key
         """
         super(EdDSA, self).__init__()
 
@@ -63,8 +65,12 @@ class EdDSA(KeyDto, IRemmeKeys):
     def generate_key_pair(seed=None):
         """
         Generate public and private key pair.
-        :param seed: bytes
-        :return: generated key pair in bytes
+
+        Args:
+            seed (bytes, optional): seed
+
+        Returns:
+            Generated key pair in bytes.
         """
         if seed:
             private_key_obj, public_key_obj = ed25519.SigningKey(seed), ed25519.VerifyingKey(seed)
@@ -77,17 +83,24 @@ class EdDSA(KeyDto, IRemmeKeys):
     def get_address_from_public_key(public_key):
         """
         Get address from public key.
-        :param public_key in bytes
-        :return: address in blockchain generated from public key
+        Args:
+            public_key (bytes): public key in bytes
+
+        Returns:
+            Address in blockchain generated from public key string.
         """
         return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key)
 
     def sign(self, data, rsa_signature_padding=None):
         """
         Sign provided data with selected key implementation.
-        :param data: data string which will be signed
-        :param rsa_signature_padding: not used in EdDSA
-        :return: hex string for signature
+
+        Args:
+            data (str): data string which will be signed
+            rsa_signature_padding (RsaSignaturePadding, optional): not used in EdDSA
+
+        Returns:
+            Hex string of signature.
         """
         if self._private_key_obj is None:
             raise Exception('Private key is not provided!')
@@ -100,10 +113,14 @@ class EdDSA(KeyDto, IRemmeKeys):
     def verify(self, data, signature, rsa_signature_padding=None):
         """
         Verify signature for selected key implementation.
-        :param data: data string which will be verified
-        :param signature: hex string of signature
-        :param rsa_signature_padding: not used in EdDSA
-        :return: none: in case signature is correct
+
+        Args:
+            data (str): data string which will be verified
+            signature (str): hex string of signature
+            rsa_signature_padding (RsaSignaturePadding, optional): not used in EdDSA
+
+        Returns:
+            Boolean ``True`` if signature is correct, or ``False`` if invalid.
         """
         if isinstance(data, str):
             data = utf8_to_bytes(data)

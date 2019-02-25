@@ -12,6 +12,12 @@ from remme.utils import (
 class CertificateTransactionResponse(BaseTransactionResponse):
 
     def __init__(self, network_config, batch_id, certificate=None):
+        """
+        Args:
+            network_config (dict): config of network (node address and ssl mode)
+            batch_id (string): batch id
+            certificate (optional): x509 certificate object
+        """
 
         super(CertificateTransactionResponse, self).__init__(
             network_config=network_config, batch_id=batch_id,
@@ -25,9 +31,13 @@ class CertificateTransactionResponse(BaseTransactionResponse):
     def sign(self, data, rsa_signature_padding=None):
         """
         Sign data with a certificate's private key and output DigestInfo DER-encoded bytes (default for PSS).
-        :param data: string
-        :param rsa_signature_padding: RsaSignaturePadding
-        :return: hex string of signature
+
+        Args:
+            data (str): data string which will be signed
+            rsa_signature_padding (RsaSignaturePadding, optional): RSA padding
+
+        Returns:
+            Hex string of signature.
         """
         return self._keys.sign(
             data=data,
@@ -37,10 +47,14 @@ class CertificateTransactionResponse(BaseTransactionResponse):
     def verify(self, data, signature, rsa_signature_padding=None):
         """
         Verify data with a public key.
-        :param data: string
-        :param signature: string
-        :param rsa_signature_padding: RsaSignaturePadding
-        :return: True: boolean
+
+        Args:
+            data (str): data string which will be verified
+            signature (str): hex string of signature
+            rsa_signature_padding (RsaSignaturePadding, optional): RSA padding
+
+        Returns:
+            Boolean ``True`` if signature is correct, or ``False`` if invalid.
         """
         return self._keys.verify(
             data=data,

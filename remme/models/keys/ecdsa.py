@@ -20,17 +20,19 @@ from remme.utils import (
 
 class ECDSA(KeyDto, IRemmeKeys):
     """
-    ECDSA (secp256k1) class implementation.
+    ``ECDSA (secp256k1)`` class implementation.
 
-    References:
+    References::
         - https://github.com/hyperledger/sawtooth-core/
     """
 
     def __init__(self, private_key=None, public_key=None):
         """
-        Constructor for ECDSA key pair. If only private key available then public key will be generate from private.
-        :param private_key in bytes (required)
-        :param public_key in bytes (optional)
+        Constructor for ``ECDSA`` key pair. If only private key available then public key will be generate from private.
+
+        Args:
+            private_key (bytes): secp256k1 private key
+            public_key (bytes, optional): secp256k1 public key
         """
         if private_key and public_key:
             self._private_key = private_key
@@ -71,7 +73,9 @@ class ECDSA(KeyDto, IRemmeKeys):
     def generate_key_pair():
         """
         Generate public and private key pair.
-        :return: generated key pair in bytes
+
+        Returns:
+            Generated key pair in bytes.
         """
         private_key_obj = Secp256k1PrivateKey.new_random()
         public_key_obj = Secp256k1PublicKey(private_key_obj.secp256k1_private_key.pubkey)
@@ -82,8 +86,12 @@ class ECDSA(KeyDto, IRemmeKeys):
     def get_address_from_public_key(public_key):
         """
         Get address from public key.
-        :param public_key in bytes
-        :return: address in blockchain generated from public key string
+
+        Args:
+            public_key (bytes): public key in bytes
+
+        Returns:
+            Address in blockchain generated from public key string.
         """
         return generate_address(
             _family_name=RemmeFamilyName.PUBLIC_KEY.value,
@@ -93,9 +101,13 @@ class ECDSA(KeyDto, IRemmeKeys):
     def sign(self, data, rsa_signature_padding=None):
         """
         Sign provided data with selected key implementation.
-        :param data: data string which will be signed
-        :param rsa_signature_padding: not used in ECDSA
-        :return: hex string for signature
+
+        Args:
+            data (str): data string which will be signed
+            rsa_signature_padding (RsaSignaturePadding, optional): not used in ECDSA
+
+        Returns:
+            Hex string of signature.
         """
         if self._private_key is None:
             raise Exception('Private key is not provided!')
@@ -109,10 +121,14 @@ class ECDSA(KeyDto, IRemmeKeys):
     def verify(self, data, signature, rsa_signature_padding=None):
         """
         Verify signature for selected key implementation.
-        :param data: data string which will be verified
-        :param signature: hex string of signature
-        :param rsa_signature_padding: not used in ECDSA
-        :return: true: in case signature is correct
+
+        Args:
+            data (str): data string which will be verified
+            signature (str): hex string of signature
+            rsa_signature_padding (RsaSignaturePadding, optional): not used in ECDSA
+
+        Returns:
+            Boolean ``True`` if signature is correct, or ``False`` if invalid.
         """
         if isinstance(data, str):
             data = utf8_to_bytes(data)
@@ -130,8 +146,12 @@ class ECDSA(KeyDto, IRemmeKeys):
     def _public_key_bytes_to_object(public_key):
         """
         Public key bytes to object.
-        :param public_key in bytes
-        :return: object
+
+        Args:
+            public_key (bytes): secp256k1 public key in bytes
+
+        Returns:
+            public key object
         """
         return Secp256k1PublicKey(secp256k1.PublicKey(public_key, raw=True, ctx=__CTX__))
 
@@ -139,7 +159,11 @@ class ECDSA(KeyDto, IRemmeKeys):
     def _private_key_bytes_to_object(private_key):
         """
         Private key bytes to object.
-        :param private_key in bytes
-        :return: object
+
+        Args:
+            private_key (bytes): secp256k1 private key in bytes
+
+        Returns:
+            private key key object
         """
         return Secp256k1PrivateKey(secp256k1.PrivateKey(private_key, ctx=__CTX__))

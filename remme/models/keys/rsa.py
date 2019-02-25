@@ -28,7 +28,7 @@ class RSA(KeyDto, IRemmeKeys):
     """
     RSA class implementation.
 
-    References:
+    References::
         - https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/
     """
 
@@ -37,8 +37,10 @@ class RSA(KeyDto, IRemmeKeys):
     def __init__(self, private_key=None, public_key=None):
         """
         Constructor for RSA key pair. If only private key available then public key will be generate from private.
-        :param private_key: bytes (required)
-        :param public_key: bytes (optional)
+
+        Args:
+            private_key (bytes): rsa private key
+            public_key (bytes, optional): rsa public key
         """
         super(RSA, self).__init__()
 
@@ -70,8 +72,12 @@ class RSA(KeyDto, IRemmeKeys):
     def generate_key_pair(options=None):
         """
         Generate public and private key pair.
-        :param options _rsa_key_size can be specified (optional)
-        :return: generated key pair in bytes
+
+        Args:
+            options (integer): _rsa_key_size can be specified
+
+        Returns:
+            Generated key pair in bytes.
         """
         if options is not None:
             private_key = rsa.generate_private_key(public_exponent=65537, key_size=options, backend=default_backend())
@@ -86,17 +92,25 @@ class RSA(KeyDto, IRemmeKeys):
     def get_address_from_public_key(public_key):
         """
         Get address from public key.
-        :param public_key: bytes
-        :return: address in blockchain generated from public key DER format
+
+        Args:
+            public_key (bytes): public key in bytes
+
+        Returns:
+            Address in blockchain generated from public key DER format.
         """
         return generate_address(RemmeFamilyName.PUBLIC_KEY.value, public_key)
 
     def sign(self, data, rsa_signature_padding=RsaSignaturePadding.PSS):
         """
         Sign provided data with selected key implementation.
-        :param data: data string which will be signed
-        :param rsa_signature_padding: RSA padding for signature (optional)
-        :return: hex string for signature
+
+        Args:
+            data (str): data string which will be signed
+            rsa_signature_padding (RsaSignaturePadding, optional): RSA padding for signature
+
+        Returns:
+            Hex string of signature.
         """
         if self._private_key is None:
             raise Exception('Private key is not provided!')
@@ -130,10 +144,14 @@ class RSA(KeyDto, IRemmeKeys):
     def verify(self, data, signature, rsa_signature_padding=RsaSignaturePadding.PSS):
         """
         Verify signature for selected key implementation.
-        :param data: data string which will be verified
-        :param signature: hex string of signature
-        :param rsa_signature_padding: RSA padding for signature (optional)
-        :return: none: in case signature is correct
+
+        Args:
+            data (str): data string which will be verified
+            signature (str): hex string of signature
+            rsa_signature_padding (RsaSignaturePadding, optional): RSA padding for signature
+
+        Returns:
+            Boolean ``True`` if signature is correct, or ``False`` if invalid.
         """
         if isinstance(data, str):
             data = utf8_to_bytes(data)

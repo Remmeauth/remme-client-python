@@ -11,10 +11,11 @@ class IRemmeAPI(metaclass=abc.ABCMeta):
         Create url from given network config
         Get JSON-RPC method and create request config in correspond specification.
 
-        References:
-            - https://www.jsonrpc.org/specification.
+        Args:
+            method (RemmeMethods): enum
+            params (dict): payload
 
-        :param method: enum
-        :param params: dict
+        References::
+            - https://www.jsonrpc.org/specification.
         """
         pass

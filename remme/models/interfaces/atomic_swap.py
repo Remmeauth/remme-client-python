@@ -9,7 +9,9 @@ class IRemmeSwap(metaclass=abc.ABCMeta):
         """
         Initiation of swap.
         Send transaction into REMChain.
-        :param data: dict
+
+        Args:
+            data (kwargs): swap data
         """
         pass
 
@@ -19,7 +21,9 @@ class IRemmeSwap(metaclass=abc.ABCMeta):
         """
         Approve swap with given id.
         Send transaction into REMChain.
-        :param swap_id: string
+
+        Args:
+            swap_id (string): swap id
         """
         pass
 
@@ -29,7 +33,9 @@ class IRemmeSwap(metaclass=abc.ABCMeta):
         """
         Expire swap with given id. Could be expired after 24h after initiation.
         Send transaction into REMChain.
-        :param swap_id: string
+
+        Args:
+            swap_id (string): swap id
         """
         pass
 
@@ -39,8 +45,10 @@ class IRemmeSwap(metaclass=abc.ABCMeta):
         """
         Set secret lock to swap with given swap id.
         Send transaction into REMChain.
-        :param swap_id: string
-        :param secret_lock: string
+
+        Args:
+            swap_id (string): swap id
+            secret_lock (string): hash from secret key that will be provided in close
         """
         pass
 
@@ -50,8 +58,10 @@ class IRemmeSwap(metaclass=abc.ABCMeta):
         """
         Close swap with given id and secret key for checking who can close swap.
         Send transaction into REMChain.
-        :param swap_id: string
-        :param secret_key: string
+
+        Args:
+            swap_id (string): swap id
+            secret_key (string): secret key
         """
         pass
 
@@ -60,7 +70,9 @@ class IRemmeSwap(metaclass=abc.ABCMeta):
     def get_info(swap_id):
         """
         Get info about swap by given swap id.
-        :param swap_id: string
+
+        Args:
+            swap_id (string): swap id
         """
         pass
 

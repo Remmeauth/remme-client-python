@@ -28,39 +28,39 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
     """
     Class for working with public key storage.
 
-    @example
-    ```python
-    from remme.models.keys.key_type import KeyType
+    To use:
+        .. code-block:: python
 
-    keys = await RemmeKeys.construct(KeyType.RSA)
+            from remme.models.keys.key_type import KeyType
 
-    store_response = await remme.public_key_storage.create_and_store(
-        data='store data',
-        keys=keys,
-        valid_from=valid_from,
-        valid_to=valid_to,
-        signature=signature,
-        do_owner_pay=do_owner_pay,
-    )
+            keys = await RemmeKeys.construct(KeyType.RSA)
 
-    async for msg in store_response.connect_to_web_socket():
-        print(msg)
+            store_response = await remme.public_key_storage.create_and_store(
+                data='store data',
+                keys=keys,
+                valid_from=valid_from,
+                valid_to=valid_to,
+                signature=signature,
+                do_owner_pay=do_owner_pay,
+            )
 
-        key_is_valid = await remme.public_key_storage.check(keys.address)
-        print(key_is_valid)  # True
+            async for msg in store_response.connect_to_web_socket():
+                print(msg)
 
-        public_key_info = await remme.public_key_storage.get_info(keys.address)
-        print(public_key_info)  # PublicKeyInfo
+                key_is_valid = await remme.public_key_storage.check(keys.address)
+                print(key_is_valid)  # True
 
-        revoke = await remme.public_key_storage.revoke(remme_keys.address)
-        # You can connect_to_web_socket like in store method.
-        print(revoke.batch_id)  # r"\^[a-f0-9]{128}$\"
+                public_key_info = await remme.public_key_storage.get_info(keys.address)
+                print(public_key_info)  # PublicKeyInfo
 
-        public_key_addresses = await remme.publicKeyStorage.get_account_public_keys(remme.account.address)
-        print(public_key_addresses)  # []
+                revoke = await remme.public_key_storage.revoke(remme_keys.address)
+                # You can connect_to_web_socket like in store method.
+                print(revoke.batch_id)  # r"\^[a-f0-9]{128}$\"
 
-        store_response.close_web_socket()
-    ```
+                public_key_addresses = await remme.publicKeyStorage.get_account_public_keys(remme.account.address)
+                print(public_key_addresses)  # []
+
+                store_response.close_web_socket()
     """
 
     _family_name = RemmeFamilyName.PUBLIC_KEY.value
@@ -69,17 +69,20 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
 
     def __init__(self, remme_api, remme_account, remme_transaction_service):
         """
-        @example
-        Usage without remme main package.
-        ```python
-        api = RemmeAPI()
-        account = RemmeAccount()
-        transaction = RemmeTransactionService()
-        public_key_storage = RemmePublicKeyStorage(api, account, transaction)
-        ```
-        :param remme_api: RemmeAPI
-        :param remme_account: RemmeAccount
-        :param remme_transaction_service: RemmeTransactionService
+        Args:
+            remme_api: RemmeAPI
+            remme_account: RemmeAccount
+            remme_transaction_service: RemmeTransactionService
+
+        To use:
+            Usage without remme main package.
+
+            .. code-block:: python
+
+                api = RemmeAPI()
+                account = RemmeAccount()
+                transaction = RemmeTransactionService()
+                public_key_storage = RemmePublicKeyStorage(api, account, transaction)
         """
         self._remme_api = remme_api
         self._remme_account = remme_account
@@ -178,93 +181,98 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
     def create(self, data):
         """
         Create public key payload in bytes to store with another payer, private_key and public_key.
-        @example
-        ```python
-        from remme import Remme as remme
-        from remme.models.keys.key_type import KeyType
-        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
-        keys = remme.keys.construct(KeyType.RSA)
+        Args:
+            data (dict): data(
+                data: string
+                keys: object
+                signature: string (optional)
+                rsa_signature_padding: paddingRSA (optional)
+                valid_from: int
+                valid_to: int
+                do_owner_pay: boolean (optional)
+            )
 
-        payload_bytes = remme.public_key_storage.create(
-            data='store data',
-            keys,
-            rsa_signature_padding=RsaSignaturePadding.PSS,
-            valid_from=int(datetime.now().timestamp()),
-            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
-            do_owner_pay=False,
-        )
-        ```
+        Returns:
+            Payload bytes.
 
-        Create public key payload in bytes to store with private_key.
-        @example
-        ```python
-        from remme import Remme as remme
-        from remme.models.keys.key_type import KeyType
-        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
+        To use:
+            .. code-block:: python
 
-        keys = remme.keys.construct(KeyType.RSA)
+                from remme import Remme as remme
+                from remme.models.keys.key_type import KeyType
+                from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
-        payload_bytes = remme.public_key_storage.create(
-            data='store data',
-            keys,
-            rsa_signature_padding=RsaSignaturePadding.PSS,
-            valid_from=int(datetime.now().timestamp()),
-            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
-            do_owner_pay=True,
-        )
-        ```
+                keys = remme.keys.construct(KeyType.RSA)
 
-        Create public key payload in bytes to store with another payer with public_key and signature.
-        @example
-        ```python
-        from remme import Remme as remme
-        from remme.models.keys.key_type import KeyType
-        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
+                payload_bytes = remme.public_key_storage.create(
+                    data='store data',
+                    keys,
+                    rsa_signature_padding=RsaSignaturePadding.PSS,
+                    valid_from=int(datetime.now().timestamp()),
+                    valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+                    do_owner_pay=False,
+                )
 
-        private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
+            Create public key payload in bytes to store with private_key.
 
-        keys_from_private = remme.keys.construct(
-            key_type=KeyType.ECDSA,
-            private_key=private_key,
-            public_key=public_key,
-        )
+            .. code-block:: python
 
-        # Sign data with private_key
+                from remme import Remme as remme
+                from remme.models.keys.key_type import KeyType
+                from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
-        data = 'test'
-        signature = keys_from_private.sign(sha512(data))
+                keys = remme.keys.construct(KeyType.RSA)
 
-        # Construct keys from public_key
+                payload_bytes = remme.public_key_storage.create(
+                    data='store data',
+                    keys,
+                    rsa_signature_padding=RsaSignaturePadding.PSS,
+                    valid_from=int(datetime.now().timestamp()),
+                    valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+                    do_owner_pay=True,
+                )
 
-        keys_from_public = remme.keys.construct(
-            key_type=KeyType.ECDSA,
-            public_key=public_key,
-        )
+            Create public key payload in bytes to store with another payer with public_key and signature.
 
-        # Create public key payload with public_key only and signature.
-        # To store keys with signature sign data should be in sha512 or sha256 format.
+            .. code-block:: python
 
-        payload_bytes = remme.public_key_storage.create(
-            data=sha512(data),
-            keys_from_public,
-            signature,
-            rsa_signature_padding=RsaSignaturePadding.PSS,
-            valid_from=int(datetime.now().timestamp()),
-            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
-            do_owner_pay=False,
-        )
-        ```
-        :param data: dict {
-            data: string
-            keys: object
-            signature: string (optional)
-            rsa_signature_padding: paddingRSA (optional)
-            valid_from: int
-            valid_to: int
-            do_owner_pay: boolean (optional)
-        }
-        :return: payload bytes
+                from remme import Remme as remme
+                from remme.models.keys.key_type import KeyType
+                from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
+
+                private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
+
+                keys_from_private = remme.keys.construct(
+                    key_type=KeyType.ECDSA,
+                    private_key=private_key,
+                    public_key=public_key,
+                )
+
+                # Sign data with private_key
+
+                data = 'test'
+                signature = keys_from_private.sign(sha512(data))
+
+                # Construct keys from public_key
+
+                keys_from_public = remme.keys.construct(
+                    key_type=KeyType.ECDSA,
+                    public_key=public_key,
+                )
+
+                # Create public key payload with public_key only and signature.
+                # To store keys with signature sign data should be in sha512 or sha256 format.
+
+                payload_bytes = remme.public_key_storage.create(
+                    data=sha512(data),
+                    keys_from_public,
+                    signature,
+                    rsa_signature_padding=RsaSignaturePadding.PSS,
+                    valid_from=int(datetime.now().timestamp()),
+                    valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+                    do_owner_pay=False,
+                )
         """
         keys = data.get('keys')
 
@@ -337,20 +345,24 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         """
         Store public key payload bytes with data into REMChain.
         Send transaction to chain.
-        @example
-        ```python
-        # payload_bytes is the transaction payload generated from method
-        # remme.public_key_storage.create
-        from remme import Remme as remme
 
-        store_response = await remme.public_key_storage.store(payload_bytes)
+        Args:
+            data (object): payload bytes
 
-        async for msg in store_response.connect_to_web_socket():
-            print(msg)
-            store_response.close_web_socket()
-        ```
-        :param data: payload_bytes
-        :return: information about storing public key to REMChain
+        Returns:
+            Information about storing public key to REMChain.
+
+        To use:
+            .. code-block:: python
+
+                # payload_bytes is the transaction payload generated from method
+                # remme.public_key_storage.create
+                from remme import Remme as remme
+                store_response = await remme.public_key_storage.store(payload_bytes)
+
+                async for msg in store_response.connect_to_web_socket():
+                    print(msg)
+                    store_response.close_web_socket()
         """
         owner_address = ''
 
@@ -411,68 +423,72 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         """
         Create public key payload bytes and store public key with its data into REMChain.
         Send transaction to chain with private key.
-        @example
-        ```python
-        from remme.models.keys.key_type import KeyType
 
-        keys = await RemmeKeys.construct(KeyType.RSA)
+        Args:
+            data (kwargs): data
 
-        store_response = await remme.public_key_storage.create_and_store(
-            data='store data',
-            keys=keys,
-            valid_from=valid_from,
-            valid_to=valid_to,
-            signature=signature,
-            do_owner_pay=do_owner_pay,
-        )
+        Returns:
+            Information about storing public key to REMChain.
 
-        async for msg in store_response.connect_to_web_socket():
-            print(msg)
-        ```
+        To use:
+            .. code-block:: python
 
-        Create public key payload bytes and store public key with its data into REMChain.
-        Send transaction to chain with signature.
-        @example
-        ```python
-        from remme import Remme as remme
-        from remme.models.keys.key_type import KeyType
-        from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
+                from remme.models.keys.key_type import KeyType
 
-        private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
+                keys = await RemmeKeys.construct(KeyType.RSA)
+                store_response = await remme.public_key_storage.create_and_store(
+                    data='store data',
+                    keys=keys,
+                    valid_from=valid_from,
+                    valid_to=valid_to,
+                    signature=signature,
+                    do_owner_pay=do_owner_pay,
+                )
 
-        keys_from_private = remme.keys.construct(
-            key_type=KeyType.ECDSA,
-            private_key=private_key,
-            public_key=public_key,
-        )
+                async for msg in store_response.connect_to_web_socket():
+                    print(msg)
 
-        # Sign data with private_key
+            Create public key payload bytes and store public key with its data into REMChain.
+            Send transaction to chain with signature.
 
-        data = 'test'
-        signature = keys_from_private.sign(sha512(data))
+            .. code-block:: python
 
-        # Construct keys from public_key
+                from remme import Remme as remme
+                from remme.models.keys.key_type import KeyType
+                from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
-        keys_from_public = remme.keys.construct(
-            key_type=KeyType.ECDSA,
-            public_key=public_key,
-        )
+                private_key, public_key = remme.keys.generate_key_pair(KeyType.RSA)
 
-        # Create public key payload with public_key only and signature.
-        # To store keys with signature sign data should be in sha512 or sha256 format.
+                keys_from_private = remme.keys.construct(
+                    key_type=KeyType.ECDSA,
+                    private_key=private_key,
+                    public_key=public_key,
+                )
 
-        payload_bytes = remme.public_key_storage.create_and_store(
-            data=sha512(data),
-            keys_from_public,
-            signature,
-            rsa_signature_padding=RsaSignaturePadding.PSS,
-            valid_from=int(datetime.now().timestamp()),
-            valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
-            do_owner_pay=False,
-        )
-        ```
-        :param data: dict
-        :return: information about storing public key to REMChain
+                # Sign data with private_key
+
+                data = 'test'
+                signature = keys_from_private.sign(sha512(data))
+
+                # Construct keys from public_key
+
+                keys_from_public = remme.keys.construct(
+                    key_type=KeyType.ECDSA,
+                    public_key=public_key,
+                )
+
+                # Create public key payload with public_key only and signature.
+                # To store keys with signature sign data should be in sha512 or sha256 format.
+
+                payload_bytes = remme.public_key_storage.create_and_store(
+                    data=sha512(data),
+                    keys_from_public,
+                    signature,
+                    rsa_signature_padding=RsaSignaturePadding.PSS,
+                    valid_from=int(datetime.now().timestamp()),
+                    valid_to=int(CURRENT_TIMESTAMP + timedelta(365).total_seconds()),
+                    do_owner_pay=False,
+                )
         """
         payload_bytes = self.create(data=data)
         return await self.store(data=payload_bytes)
@@ -481,12 +497,17 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         """
         Check public key on validity and revocation.
         Take address of public key.
-        @example
-        ```python
-        is_valid = await remme.public_key_storage.check(public_key_address)
-        ```
-        :param address: string
-        :return: boolean
+
+        Args:
+            address (string): address
+
+        Returns:
+            Boolean ``True``.
+
+        To use:
+            .. code-block:: python
+
+                is_valid = await remme.public_key_storage.check(public_key_address)
         """
         try:
             await self._get_info_by_public_key(address=address)
@@ -498,26 +519,35 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
         """
         Get info about this public key.
         Take address of public key.
-        @example
-        ```python
-        info = await remme.public_key_storage.get_info(public_key_address)
-        ```
-        :param public_key_address: string
-        :return: information about public key
+
+        Args:
+            public_key_address (string): public key address
+
+        Returns:
+            Information about public key.
+
+        To use:
+            .. code-block:: python
+
+                info = await remme.public_key_storage.get_info(public_key_address)
         """
         return await self._get_info_by_public_key(address=public_key_address)
 
     async def revoke(self, public_key_address):
         """
         Revoke public key by address.
-
         Take address of public key. Send transaction to chain.
-        @example
-        ```python
-        revoke_response = await remme.public_key_storage.revoke(public_key_address)
-        ```
-        :param public_key_address: string
-        :return: information about revoked public key
+
+        Args:
+            public_key_address (string): public key address
+
+        Returns:
+            Information about revoked public key.
+
+        To use:
+            .. code-block:: python
+
+                revoke_response = await remme.public_key_storage.revoke(public_key_address)
         """
         validate_address(address=public_key_address)
 
@@ -536,13 +566,17 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
     async def get_account_public_keys(self, address):
         """
         Take account address (which describe in RemmePatterns.ADDRESS).
-        @example
-        ```python
-        remme = Remme()
-        public_key_addresses = await remme.public_key_storage.get_account_public_keys(remme.account.address)
-        ```
-        :param address: string
-        :return: list with public key addresses
+
+        Args:
+            address (string): address
+
+        Returns:
+            List with public key addresses.
+
+        To use:
+            .. code-block:: python
+
+                public_key_addresses = await remme.public_key_storage.get_account_public_keys(remme.account.address)
         """
         validate_address(address=address)
 

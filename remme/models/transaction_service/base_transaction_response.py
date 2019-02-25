@@ -15,8 +15,10 @@ class BaseTransactionResponse(RemmeWebSocket):
         """
         Get address of node, ssl mode, and identifier of batch.
         Then implement RemmeWebSocket class and provide data to it.
-        :param network_config: dict
-        :param batch_id: string
+
+        Args:
+            network_config (dict): config of network (node address and ssl mode)
+            batch_id (string): batch id
         """
         super(BaseTransactionResponse, self).__init__(network_config)
         self._batch_id = batch_id
@@ -28,8 +30,7 @@ class BaseTransactionResponse(RemmeWebSocket):
     @property
     def batch_id(self):
         """
-        Identifier of batch that contain sending transaction
-        :return: batch_id: string
+        Identifier of batch that contain sending transaction.
         """
         return self._batch_id
 
@@ -39,7 +40,9 @@ class BaseTransactionResponse(RemmeWebSocket):
         Set batch id. When you provide new batch id to this object, program check web socket connection,
         if connection is open, program close it and then provide new batch id.
         And you can connect to web socket again with new batch id.
-        :param value: string
+
+        Args:
+            value (string): batch id
         """
         if not (re.match(RemmePatterns.HEADER_SIGNATURE.value, value) is not None):
             raise Exception('Given batch id is invalid.')

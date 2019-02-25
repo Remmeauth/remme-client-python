@@ -7,31 +7,36 @@ class RemmeWebSocketEvents(RemmeWebSocket, IRemmeWebSocketsEvents):
     """
     Class for subscribing to events from WebSocket.
 
-    References:
+    References::
         Available types for subscribing - https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
-    @example
-    ```python
-    from remme.models.websocket.events.RemmeEvents
-    from remme.remme_websocket_events import RemmeWebSocketEvents
 
-    remme_events = RemmeWebSocketsEvents({
-        'node_address'='localhost:8080',
-        'ssl_mode'=False,
-    })
-    remme_events.subscribe(events=RemmeEvents.AtomicSwap)
-    ```
+    To use:
+        .. code-block:: python
+
+            from remme.models.websocket.events.RemmeEvents
+            from remme.remme_websocket_events import RemmeWebSocketEvents
+
+            remme_events = RemmeWebSocketsEvents({
+                'node_address'='localhost:8080',
+                'ssl_mode'=False,
+            })
+            remme_events.subscribe(events=RemmeEvents.AtomicSwap)
     """
 
     def __init__(self, network_config):
         """
         Implementation of RemmeWebSocketsEvents.
-        ```python
-        remme_events = RemmeWebSocketsEvents({
-            'node_address'='localhost:8080',
-            'ssl_mode'=False,
-        })
-        ```
-        :param network_config: dict
+
+        Args:
+            network_config (dict): config of network (node address and ssl mode)
+
+        To use:
+            .. code-block:: python
+
+                remme_events = RemmeWebSocketsEvents({
+                    'node_address'='localhost:8080',
+                    'ssl_mode'=False,
+                })
         """
         super(RemmeWebSocketEvents, self).__init__(network_config=network_config)
 
@@ -39,12 +44,19 @@ class RemmeWebSocketEvents(RemmeWebSocket, IRemmeWebSocketsEvents):
         """
         Subscribing to events from WebSocket.
 
-        References:
+        Args:
+            data (kwargs): data about event
+
+        Returns:
+            Message.
+
+        References::
             Available types for subscribing - https://docs.remme.io/remme-core/docs/remme-ws-events.html#registered-events
-        ```python
-        remme.events.subscribe(events=RemmeEvents.AtomicSwap.value)
-        ```
-        :param data: dict
+
+        To use:
+            .. code-block:: python
+
+                remme.events.subscribe(events=RemmeEvents.AtomicSwap.value)
         """
         if self._socket:
             await self.close_web_socket()
@@ -57,9 +69,11 @@ class RemmeWebSocketEvents(RemmeWebSocket, IRemmeWebSocketsEvents):
         """
         Unsubscribing from events.
         Regardless of how many events you subscribed to, you always unsubscribe from all.
-        ```python
-        remme_events.unsubscribe()
-        ```
+
+        To use:
+            .. code-block:: python
+
+                remme_events.unsubscribe()
         """
         self.data = data
 
