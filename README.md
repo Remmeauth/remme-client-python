@@ -1,22 +1,46 @@
-<img src="https://avatars1.githubusercontent.com/u/29229038" />
+ <img src="https://avatars1.githubusercontent.com/u/29229038" />
 
-REMME Python Client
+Remme Python Client
 ===================
 
-**An open source Python integration library for REMChain, simplifying the access and interaction with REMME nodes both public or permissioned.**
+**An open source Python integration library for REMChain, simplifying 
+the access and interaction with Remme nodes both public or permissioned.**
 
 ## How to use
 
-### 1. Install and run REMME node with required REST API methods enabled
+### 1. Install and run Remme protocol with required RPC API methods enabled
 
-You can check out how to do that at [REMME core repo](<https://github.com/Remmeauth/remme-core/>).
+You can check out how to do that at [Remme core repo](<https://github.com/Remmeauth/remme-core/>).
 
-*Note: you can enable/disable methods by modifying `REMME_REST_API_AVAILABLE_METHODS` environment variable at the `.env` file.*
-
-### 2. Install the latest version of library to your Python project
+### 2. Before installing the library, make sure that all the dependencies listed are installed:
+    
+**Python3.6**
 
 ```
-pip3 install remme
+$ sudo add-apt-repository ppa:deadsnakes/ppa
+$ sudo apt-get update
+$ sudo apt-get install python3.6-dev
+$ python3.6 -V or python3.6 --version
+```
+
+**Pip**
+
+```
+$ sudo apt-get -y install python3-pip
+$ pip3 --version or pip3 -V
+```
+
+**Some dependency**
+
+```
+$ sudo apt-get install build-essential automake libtool pkg-config libffi-dev -y
+$ sudo apt-get update && apt-get install pkg-config
+```
+
+### 3. Install the latest version of library to your Python project from terminal using `pip`
+
+```
+$ pip3 install remme
 ```
 
 ## Examples
@@ -109,4 +133,4 @@ remme.events.unsubscribe()
 
 ## License
 
-REMME software and documentation are licensed under `Apache License Version 2.0 <LICENSE>`.
+Remme software and documentation are licensed under `Apache License Version 2.0 <LICENSE>`.
