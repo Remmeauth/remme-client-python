@@ -1,10 +1,16 @@
- <img src="https://avatars1.githubusercontent.com/u/29229038" />
 
-Remme Python Client
-===================
+<p align="center">
+  <img src="assets/remme_icon.png" alt="Remme icon">
+</p>
 
-**An open source Python integration library for REMChain, simplifying 
-the access and interaction with Remme nodes both public or permissioned.**
+<h1 align="center">
+  Remme Python Client
+</h1>
+
+<p align="center">
+  An open source Python integration library for REMChain, simplifying the access
+   and interaction with Remme nodes both public or permissioned.
+</p>
 
 ## How to use
 
@@ -16,7 +22,7 @@ You can check out how to do that at [Remme core repo](<https://github.com/Remmea
     
 **Python3.6**
 
-```
+```sh
 $ sudo add-apt-repository ppa:deadsnakes/ppa
 $ sudo apt-get update
 $ sudo apt-get install python3.6-dev
@@ -25,16 +31,16 @@ $ python3.6 -V or python3.6 --version
 
 **Pip**
 
-```
+```sh
 $ sudo apt-get -y install python3-pip
 $ pip3 --version or pip3 -V
 ```
 
-**Some dependency**
+**Required by one of the requirements [system packages list](https://github.com/ludbb/secp256k1-py#installation-with-compilation)**
 
-```
+```sh
+$ sudo apt-get update
 $ sudo apt-get install build-essential automake libtool pkg-config libffi-dev -y
-$ sudo apt-get update && apt-get install pkg-config
 ```
 
 ### 3. Install the latest version of library to your Python project from terminal using `pip`

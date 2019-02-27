@@ -6,8 +6,8 @@
 Welcome to Remme's Client Python documentation!
 ===============================================
 
-.. image:: _static/docs.png
-    :alt: Remme documentation
+.. image:: _static/protocol-python-library.png
+    :alt: Remme protocol python library
     :align: center
 
 .. toctree::

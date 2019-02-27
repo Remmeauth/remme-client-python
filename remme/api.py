@@ -87,7 +87,7 @@ class RemmeAPI(IRemmeAPI):
         return f'{"https://" if ssl_mode else "http://"}{node_address}'
 
     @staticmethod
-    def _get_request_config(method, payload={}):
+    def _get_request_config(method, payload):
 
         options = {
             'method': method.value,
@@ -123,6 +123,9 @@ class RemmeAPI(IRemmeAPI):
         Returns:
             Promise.
         """
+        if params is None:
+            params = {}
+
         if not isinstance(method, RemmeMethods):
             raise Exception('Invalid RPC method given.')
 

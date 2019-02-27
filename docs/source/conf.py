@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'REMME Client Python'
+project = 'Remme Client Python'
 copyright = '2019, Anastasiia Bilova'
 author = 'Anastasiia Bilova'
 
@@ -106,7 +106,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'REMMEClientPythondoc'
+htmlhelp_basename = 'RemmeClientPythondoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -133,7 +133,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'REMMEClientPython.tex', 'REMME Client Python Documentation',
+    (master_doc, 'RemmeClientPython.tex', 'Remme Client Python Documentation',
      'Anastasiia Bilova', 'manual'),
 ]
 
@@ -143,7 +143,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'remmeclientpython', 'REMME Client Python Documentation',
+    (master_doc, 'remmeclientpython', 'Remme Client Python Documentation',
      [author], 1)
 ]
 
@@ -154,8 +154,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'REMMEClientPython', 'REMME Client Python Documentation',
-     author, 'REMMEClientPython', 'One line description of project.',
+    (master_doc, 'RemmeClientPython', 'Remme Client Python Documentation',
+     author, 'RemmeClientPython', 'One line description of project.',
      'Miscellaneous'),
 ]
 

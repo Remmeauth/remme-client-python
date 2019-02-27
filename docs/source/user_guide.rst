@@ -42,4 +42,4 @@ Installation
 
 .. code-block:: console
 
-    $ pip3 install remme-client-python
+    $ pip3 install remme
