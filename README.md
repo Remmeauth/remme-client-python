@@ -1,22 +1,52 @@
-<img src="https://avatars1.githubusercontent.com/u/29229038" />
 
-REMME Python Client
-===================
+<p align="center">
+  <img src="assets/remme_icon.png" alt="Remme icon">
+</p>
 
-**An open source Python integration library for REMChain, simplifying the access and interaction with REMME nodes both public or permissioned.**
+<h1 align="center">
+  Remme Python Client
+</h1>
+
+<p align="center">
+  An open source Python integration library for REMChain, simplifying the access
+   and interaction with Remme nodes both public or permissioned.
+</p>
 
 ## How to use
 
-### 1. Install and run REMME node with required REST API methods enabled
+### 1. Install and run Remme protocol with required RPC API methods enabled
 
-You can check out how to do that at [REMME core repo](<https://github.com/Remmeauth/remme-core/>).
+You can check out how to do that at [Remme core repo](<https://github.com/Remmeauth/remme-core/>).
 
-*Note: you can enable/disable methods by modifying `REMME_REST_API_AVAILABLE_METHODS` environment variable at the `.env` file.*
+### 2. Before installing the library, make sure that all the dependencies listed are installed:
+    
+**Python3.6**
 
-### 2. Install the latest version of library to your Python project
+```sh
+$ sudo add-apt-repository ppa:deadsnakes/ppa
+$ sudo apt-get update
+$ sudo apt-get install python3.6-dev
+$ python3.6 -V or python3.6 --version
+```
+
+**Pip**
+
+```sh
+$ sudo apt-get -y install python3-pip
+$ pip3 --version or pip3 -V
+```
+
+**Required by one of the requirements [system packages list](https://github.com/ludbb/secp256k1-py#installation-with-compilation)**
+
+```sh
+$ sudo apt-get update
+$ sudo apt-get install build-essential automake libtool pkg-config libffi-dev -y
+```
+
+### 3. Install the latest version of library to your Python project from terminal using `pip`
 
 ```
-pip3 install remme
+$ pip3 install remme
 ```
 
 ## Examples
@@ -109,4 +139,4 @@ remme.events.unsubscribe()
 
 ## License
 
-REMME software and documentation are licensed under `Apache License Version 2.0 <LICENSE>`.
+Remme software and documentation are licensed under `Apache License Version 2.0 <LICENSE>`.

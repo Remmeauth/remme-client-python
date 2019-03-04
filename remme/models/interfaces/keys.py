@@ -9,9 +9,9 @@ class IRemmeKeys(metaclass=abc.ABCMeta):
         """
         Sign provided data with selected key implementation.
 
-        :param data: data string which will be signed
-        :param rsa_signature_padding: RSA padding for signature (optional)
-        :return: hex string for signature
+        Args:
+            data (str): data string which will be signed
+            rsa_signature_padding (RsaSignaturePadding, optional): used in RSA
         """
         pass
 
@@ -21,9 +21,9 @@ class IRemmeKeys(metaclass=abc.ABCMeta):
         """
         Verify signature for selected key implementation.
 
-        :param data: data string which will be verified
-        :param signature: hex string of signature
-        :param rsa_signature_padding: RSA padding for signature (optional)
-        :return: none: in case signature is correct
+        Args:
+            data (str): data string which will be verified
+            signature (str): hex string of signature
+            rsa_signature_padding (RsaSignaturePadding, optional): used in RSA
         """
         pass

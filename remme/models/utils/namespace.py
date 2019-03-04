@@ -5,7 +5,7 @@ class RemmeNamespace(Enum):
     """
     First 6 symbols that belongs to family name.
 
-    References:
+    References::
         - https://sawtooth.hyperledger.org/docs/core/releases/latest/architecture/global_state.html#radix-addresses
     """
 

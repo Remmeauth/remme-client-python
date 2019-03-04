@@ -1,10 +1,10 @@
 __pycache__/
 .idea/
 docs.zip
-docs
 poetry.lock
 remme_client.egg-info/
 remme/protobuf/
+docs/build
 
 # IDE
 .idea/

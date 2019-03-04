@@ -25,9 +25,10 @@ class Remme:
 
     def __init__(self, private_key_hex='', network_config=None):
         """
-        :param private_key_hex: hex of private key, which is used for creating account in library
-        which would sign transactions (string)
-        :param network_config: config of network (dict)
+        Args:
+            private_key_hex (string): hex of private key, which is used for creating account in library
+            which would sign transactions
+            network_config (dict): config of network (node address and ssl mode)
         """
         self.private_key_hex = private_key_hex
         self.network_config = network_config if network_config else DEFAULT_NETWORK_CONFIG
@@ -48,18 +49,19 @@ class Remme:
     def account(self):
         """
         Get information about current account.
-        @example
-        ```python
-        print(remme.account)
-        ```
 
-        Provide an account which sign the transactions that send to our nodes.
-        For account use ECDSA (secp256k1) key pair.
-        @example
-        ```python
-        account = Remme.generate_account()
-        remme.account = account
-        ```
+        To use:
+            .. code-block:: python
+
+                print(remme.account)
+
+            Provide an account which sign the transactions that send to our nodes.
+            For account use ECDSA (secp256k1) key pair.
+
+            .. code-block:: python
+
+                account = Remme.generate_account()
+                remme.account = account
         """
         return self._account
 
@@ -78,10 +80,12 @@ class Remme:
     def generate_account():
         """
         Generate a new account.
-        @example
-        ```python
-        account = Remme.generate_account()
-        print(account)
+
+        To use:
+            .. code-block:: python
+
+                account = Remme.generate_account()
+                print(account)
         """
         return RemmeAccount()
 
@@ -90,18 +94,21 @@ class Remme:
         """
         This properties hold implementation of RemmeWebSocketEvents,
         which get a possibility to listen events from validator about transactions.
-        @example
-        Subscribe to event.
-        ```python
-        remme.events.subscribe(
-            events=RemmeEvents.AtomicSwap.value,
-            last_known_block_id=last_known_block_id <-- also can be set if you know it.
-        )
-        ```
 
-        Unsubscribe.
-        ```python
-        remme.events.unsubscribe()
-        ```
+        To use:
+            Subscribe to event.
+
+            .. code-block:: python
+
+                remme.events.subscribe(
+                    events=RemmeEvents.AtomicSwap.value,
+                    last_known_block_id=last_known_block_id  # also can be set if you know it
+                )
+
+            Unsubscribe.
+
+            .. code-block:: python
+
+                remme.events.unsubscribe()
         """
         return self._events

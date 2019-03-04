@@ -19,43 +19,45 @@ class RemmeWebSocket(IRemmeWebSocket):
     Class that work with sockets. Class can be used for inheritance.
     This class is used for response on transaction sending.
     Each method that return batch_id, for truth return class that inherit from RemmeWebSocket with preset data.
-    So for example:
-    @example
-    ```python
-    remme = Remme()
-    some_remme_address = "03c2e53acce583c8bb2382319f4dee3e816b67f3a733ef90fe3329062251d0c638"
-    transaction_result = await remme.token.transfer(some_remme_address, 10)
 
-    # transaction_result is inherit from RemmeWebSocket and
-    #    self.data = {
-    #        "event_type": "batch",
-    #        "id": transaction_result.batch_id,
-    #    }
-    # so you can connect_to_web_socket easy. Just:
+    To use:
+        .. code-block:: python
 
-    async for msg in transaction_result.connect_to_web_socket():
-        print(msg)
-        await transaction_result.close_web_socket()
-    ```
+            remme = Remme()
+            some_remme_address = "03c2e53acce583c8bb2382319f4dee3e816b67f3a733ef90fe3329062251d0c638"
+            transaction_result = await remme.token.transfer(some_remme_address, 10)
 
-    But you also can use your class for work with WebSockets. Just inherit it from RemmeWebSocket, like this:
-    ```python
-    class MySocketConnection(RemmeWebSocket):
-         def __init__(network_config, data):
-             super(MySocketConnection, self).__init__(network_config)
-             self.data = data
+            # transaction_result is inherit from RemmeWebSocket and
+            #    self.data = {
+            #        "event_type": "batch",
+            #        "id": transaction_result.batch_id,
+            #    }
+            # so you can connect_to_web_socket easy. Just:
 
-    web_socket = MySocketConnection(
-        network_config={
-            "node_address":"localhost:8080",
-            "ssl_mode":False
-        },
-        data={
-            "event_type":"batch",
-            "id":transaction_result.batch_id
-        }
-    )
-    ```
+            async for msg in transaction_result.connect_to_web_socket():
+                print(msg)
+                await transaction_result.close_web_socket()
+
+        But you also can use your class for work with WebSockets.
+        Just inherit it from RemmeWebSocket, like this:
+
+        .. code-block:: python
+
+            class MySocketConnection(RemmeWebSocket):
+                 def __init__(network_config, data):
+                     super(MySocketConnection, self).__init__(network_config)
+                     self.data = data
+
+            web_socket = MySocketConnection(
+                network_config={
+                    "node_address":"localhost:8080",
+                    "ssl_mode":False,
+                },
+                data={
+                    "event_type":"batch",
+                    "id":transaction_result.batch_id,
+                }
+            )
     """
 
     _session, _socket, data = None, None, None
@@ -63,11 +65,14 @@ class RemmeWebSocket(IRemmeWebSocket):
     def __init__(self, network_config):
         """
         Implement RemmeWebSocket by providing node address and ssl mode.
-        @example
-        ```python
-        remme_web_socket = remme_events(network_config)
-        ```
-        :param network_config: dict
+
+        Args:
+            network_config (dict): config of network (node address and ssl mode)
+
+        To use:
+            .. code-block:: python
+
+                remme_web_socket = remme_events(network_config)
         """
         validate_node_config(network_config=network_config)
         self._network_config = network_config
@@ -86,7 +91,9 @@ class RemmeWebSocket(IRemmeWebSocket):
     def _get_subscribe_url(self):
         """
         Get subscribe url.
-        :return: network url in string format
+
+        Returns:
+            Network url in string format.
         """
         node_address, ssl_mode = self._network_config.get('node_address'), self._network_config.get('ssl_mode')
         protocol = 'wss://' if ssl_mode else 'ws://'
@@ -95,11 +102,15 @@ class RemmeWebSocket(IRemmeWebSocket):
     def _get_socket_query(self, is_subscribe=True):
         """
         Get socket query.
-        :param is_subscribe: boolean
-        :return: query in string format
+
+        Args:
+            is_subscribe (boolean): True or False
+
+        Returns:
+            Query in string format.
         """
         if not self.data:
-            raise Exception("Data for subscribe was not provided.")
+            raise Exception('Data for subscribe was not provided.')
 
         method = RemmeWebSocketMethods.Subscribe.value if is_subscribe else RemmeWebSocketMethods.Unsubscribe.value
 
@@ -109,15 +120,19 @@ class RemmeWebSocket(IRemmeWebSocket):
         """
         Method for connect to WebSocket.
         For this method you should set property data.
-        ```python
-        async for msg in tx.connect_to_web_socket():
-            print("connected")
-            print("handle some messages")
-            await tx.close_web_socket()
 
-        print("connection closed")
-        ```
-        :return: async messages
+        To use:
+            .. code-block:: python
+
+                async for msg in tx.connect_to_web_socket():
+                    print('connected')
+                    print('handle some messages')
+                    await tx.close_web_socket()
+
+                print('connection closed')
+
+        Returns:
+            Messages.
         """
         self._session = ClientSession()
         self._socket = await self._session.ws_connect(self._get_subscribe_url())
@@ -148,7 +163,7 @@ class RemmeWebSocket(IRemmeWebSocket):
         Call this method when your connection is open for close it.
         """
         if not self._socket:
-            raise Exception("WebSocket is not running.")
+            raise Exception('WebSocket is not running.')
 
         await self._socket.send_str(self._get_socket_query(is_subscribe=False))
 

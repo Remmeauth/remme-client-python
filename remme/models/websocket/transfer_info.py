@@ -7,7 +7,8 @@ class TransferInfoDto:
 
     def __init__(self, data):
         """
-        :param data: dict {from: string, to: string}
+        Args:
+            data (dict): from (string), to (string)
         """
         self.data = data
 

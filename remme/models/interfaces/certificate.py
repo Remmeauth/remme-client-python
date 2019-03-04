@@ -9,8 +9,8 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
         """
         Create certificate.
 
-        :param certificate_data_to_create: dict
-        :return: signed certificate object
+        Args:
+            certificate_data_to_create (kwargs): certificate data
         """
         pass
 
@@ -21,8 +21,8 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
         Method that creates certificate and stores it in to REMChain.
         Send transaction to chain.
 
-        :param certificate_data_to_create: dict
-        :return: information about storing public key to REMChain
+        Args:
+            certificate_data_to_create (kwargs): certificate data
         """
         pass
 
@@ -34,8 +34,8 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
         Your certificate should contains private and public keys.
         Send transaction to chain.
 
-        :param certificate: object
-        :return: information about storing public key to REMChain
+        Args:
+            certificate (object): certificate object
         """
         pass
 
@@ -45,8 +45,8 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
         """
         Check certificate's public key on validity and revocation.
 
-        :param certificate: object
-        :return: boolean
+        Args:
+            certificate (object): certificate object
         """
         pass
 
@@ -56,8 +56,8 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
         """
         Get info about certificate's public key.
 
-        :param certificate: object
-        :return: information about public key
+        Args:
+            certificate (object): certificate object
         """
         pass
 
@@ -66,10 +66,10 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
     def revoke(certificate):
         """
         Revoke certificate's public key into REMChain.
-
         Send transaction to chain.
-        :param certificate: object
-        :return:
+
+        Args:
+            certificate (object): certificate object
         """
         pass
 
@@ -79,10 +79,10 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
         """
         Sign data with a certificate's private key and output DigestInfo DER-encoded bytes (default for PSS).
 
-        :param certificate: object
-        :param data: string
-        :param rsa_signature_padding: RsaSignaturePadding
-        :return: string
+        Args:
+            certificate (object): certificate object
+            data (string): data string which will be signed
+            rsa_signature_padding (RsaSignaturePadding): RSA padding
         """
         pass
 
@@ -92,10 +92,10 @@ class IRemmeCertificate(metaclass=abc.ABCMeta):
         """
         Verify data with a public key (default for PSS).
 
-        :param certificate: object
-        :param data: string
-        :param signature: string
-        :param rsa_signature_padding: RsaSignaturePadding
-        :return: boolean
+        Args:
+            certificate (object): certificate object
+            data (string): data string which will be verified
+            signature (string): hex string of signature
+            rsa_signature_padding (RsaSignaturePadding): RSA padding
         """
         pass

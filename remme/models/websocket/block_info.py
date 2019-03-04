@@ -7,7 +7,8 @@ class BlockInfoDto:
 
     def __init__(self, data):
         """
-        :param data: {id: string, timestamp: integer}
+        Args:
+            data (dict): id (string), timestamp (integer)
         """
         self.data = data
 

@@ -8,7 +8,9 @@ class IRemmeWebSocketsEvents(metaclass=abc.ABCMeta):
     def subscribe(data):
         """
         Subscribing to events from WebSocket.
-        :param data: dict
+
+        Args:
+            data (kwargs): data about event
         """
         pass
 
@@ -17,5 +19,6 @@ class IRemmeWebSocketsEvents(metaclass=abc.ABCMeta):
     def unsubscribe():
         """
         Unsubscribing from events.
+        Regardless of how many events you subscribed to, you always unsubscribe from all.
         """
         pass

@@ -16,26 +16,30 @@ from remme.utils import (
 class RemmeToken(IRemmeToken):
     """
     Class that work with tokens. Transfer them and getting balance by address.
-    @example
-    ```python
-    some_account_public_key_in_hex = '02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13'
-    some_remme_address = generate_address(RemmeFamilyName.ACCOUNT.value, some_account_public_key_in_hex)
 
-    receiver_balance = await remme.token.get_balance(some_remme_address)
-    print(f'Account {some_remme_address} as receiver, balance - {receiver_balance} REM')
+    To use:
+        .. code-block:: python
 
-    balance = await remme.token.get_balance(remme.account.address)
-    print(f'Account {remme.account.address} as sender, balance - {balance} REM')
+            some_account_public_key_in_hex = '02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13'
+            some_remme_address = generate_address(
+                RemmeFamilyName.ACCOUNT.value,
+                some_account_public_key_in_hex,
+            )
 
-    transaction_result = await remme.token.transfer(some_remme_address, 10)
-    print(f'Sending tokens...Batch_id: {transaction_result.batch_id}')
+            receiver_balance = await remme.token.get_balance(some_remme_address)
+            print(f'Account {some_remme_address} as receiver, balance - {receiver_balance} REM')
 
-    async for batch_info in transaction_result.connect_to_web_socket():
-        if batch_info.status == BatchStatus.COMMITTED.value:
-            new_balance = await remme.token.get_balance(some_remme_address)
-            print(f'Account {some_remme_address} balance - {new_balance} REM')
-            await transaction_result.close_web_socket()
-    ```
+            balance = await remme.token.get_balance(remme.account.address)
+            print(f'Account {remme.account.address} as sender, balance - {balance} REM')
+
+            transaction_result = await remme.token.transfer(some_remme_address, 10)
+            print(f'Sending tokens...Batch_id: {transaction_result.batch_id}')
+
+            async for batch_info in transaction_result.connect_to_web_socket():
+                if batch_info.status == BatchStatus.COMMITTED.value:
+                    new_balance = await remme.token.get_balance(some_remme_address)
+                    print(f'Account {some_remme_address} balance - {new_balance} REM')
+                    await transaction_result.close_web_socket()
     """
 
     _family_name = RemmeFamilyName.ACCOUNT.value
@@ -43,16 +47,19 @@ class RemmeToken(IRemmeToken):
 
     def __init__(self, remme_api, remme_transaction):
         """
-        @example
-        Usage without remme main package.
-        ```python
-        remme_api = RemmeAPI() # See RemmeAPI implementation
-        remme_account = RemmeAccount() # See RemmeAccount implementation
-        remme_transaction = RemmeTransactionService(remme_api, remmeAccount)
-        remme_token = RemmeToken(remme_api, remme_transaction)
-        ```
-        :param remme_api: RemmeAPI
-        :param remme_transaction: RemmeTransactionService
+        Args:
+            remme_api: RemmeAPI
+            remme_transaction: RemmeTransactionService
+
+        To use:
+            Usage without main remme package.
+
+            .. code-block:: python
+
+                remme_api = RemmeAPI() # See RemmeAPI implementation
+                remme_account = RemmeAccount() # See RemmeAccount implementation
+                remme_transaction = RemmeTransactionService(remme_api, remmeAccount)
+                remme_token = RemmeToken(remme_api, remme_transaction)
         """
         self._remme_api = remme_api
         self._remme_transaction = remme_transaction
@@ -63,13 +70,18 @@ class RemmeToken(IRemmeToken):
     async def get_balance(self, address):
         """
         Get balance on given account address.
-        @example
-        ```python
-        balance = await remme.token.get_balance(remme.account.address)
-        print(f'Account {remme.account.address} as sender, balance - {balance} REM.')
-        ```
-        :param address: string
-        :return: amount (integer)
+
+        Args:
+            address (string): account address
+
+        Returns:
+            Balance.
+
+        To use:
+            .. code-block:: python
+
+                balance = await remme.token.get_balance(remme.account.address)
+                print(f'Account {remme.account.address} as sender, balance - {balance} REM.')
         """
         validate_address(address=address)
 
@@ -82,24 +94,31 @@ class RemmeToken(IRemmeToken):
         """
         Transfer tokens from signed address (remme.account.address) to given address.
         Send transaction to REMChain.
-        @example
-        ```python
-        some_account_public_key_in_hex = '02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13'
-        some_remme_address = generate_address(RemmeFamilyName.ACCOUNT.value, some_account_public_key_in_hex)
 
-        transaction_result = await remme.token.transfer(some_remme_address, 10)
-        print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
+        Args:
+            address_to (string): given address
+            amount (integer): amount of tokens
 
-        async for batch_info in transaction_result.connect_to_web_socket():
-            if batch_info.status == BatchStatus.COMMITTED.value:
-                new_balance = await remme.token.get_balance(some_remme_address)
-                print(f'Account {some_remme_address} balance - {new_balance} REM')
-                await transaction_result.close_web_socket()
-        ```
+        Returns:
+            Transaction result.
 
-        :param address_to: string
-        :param amount: integer
-        :return: transaction result
+        To use:
+            .. code-block:: python
+
+                some_account_public_key_in_hex = '02926476095ea28904c11f22d0da20e999801a267cd3455a00570aa1153086eb13'
+                some_remme_address = generate_address(
+                    RemmeFamilyName.ACCOUNT.value,
+                    some_account_public_key_in_hex,
+                )
+
+                transaction_result = await remme.token.transfer(some_remme_address, 10)
+                print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
+
+                async for batch_info in transaction_result.connect_to_web_socket():
+                    if batch_info.status == BatchStatus.COMMITTED.value:
+                        new_balance = await remme.token.get_balance(some_remme_address)
+                        print(f'Account {some_remme_address} balance - {new_balance} REM')
+                        await transaction_result.close_web_socket()
         """
         validate_address(address=address_to)
         validate_amount(amount=amount)

@@ -7,7 +7,8 @@ class NetworkStatus:
 
     def __init__(self, network_status):
         """
-        :param network_status: {is_synced: boolean, peer_count: integer}
+        Args:
+            network_status (dict): is_synced (boolean), peer_count (integer)
         """
         self.network_status = network_status
 

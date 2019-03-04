@@ -8,7 +8,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_transactions(query=None):
         """
         Get all transactions from REMChain.
-        :param query: dict
+
+        Args:
+            query (dict, optional): dictionary with specific parameters
         """
         pass
 
@@ -17,7 +19,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_transaction_by_id(id):
         """
         Get transaction by id (header_signature) from REMChain.
-        :param id: string
+
+        Args:
+            id (string): id
         """
         pass
 
@@ -26,7 +30,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def parse_transaction_payload(transaction):
         """
         Parse transaction payload. Take transaction and return object with payload and type.
-        :param transaction: dict
+
+        Args:
+            transaction (dict): transaction payload
         """
         pass
 
@@ -36,7 +42,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
         """
         Get all blocks from REMChain.
         You can specify one or more query parameters.
-        :param query: dict
+
+        Args:
+            query (dict, optional): dictionary with specific parameters
         """
         pass
 
@@ -45,7 +53,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_block_by_id(id):
         """
         Get block by id (header_signature) from REMChain.
-        :param id: string
+
+        Args:
+            id (string): id
         """
         pass
 
@@ -54,7 +64,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_block_info(query=None):
         """
         Get information about block.
-        :param query: dict
+
+        Args:
+            query (dict, optional): dictionary with specific parameters
         """
         pass
 
@@ -63,7 +75,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_batches(query=None):
         """
         Get all batches from REMChain.
-        :param query: dict
+
+        Args:
+            query (dict, optional): dictionary with specific parameters
         """
         pass
 
@@ -72,7 +86,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_batches_by_id(id):
         """
         Get batch by id (header_signature) from REMChain.
-        :param id: string
+
+        Args:
+            id (string): batch id
         """
         pass
 
@@ -81,7 +97,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_batch_status(batch_id):
         """
         Get status of batch.
-        :param batch_id: string
+
+        Args:
+            batch_id (string): batch id
         """
         pass
 
@@ -90,7 +108,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_state(query=None):
         """
         Get states in REMChain.
-        :param query: dict
+
+        Args:
+            query (dict, optional): dictionary with specific parameters
         """
         pass
 
@@ -99,7 +119,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def get_state_by_address(address):
         """
         Get state by address.
-        :param address: string
+
+        Args:
+            address (string): address
         """
         pass
 
@@ -108,7 +130,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     def parse_state_data(state):
         """
         Parse state data.
-        :param state: dict
+
+        Args:
+            state (dict): state data
         """
         pass
 

@@ -73,13 +73,16 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
 
     def __init__(self, remme_api):
         """
-        @example
-        Usage without remme main package.
-        ```python
-        remme_api = RemmeAPI()
-        remme_blockchain_info = RemmeBlockchainInfo(remme_api)
-        ```
-        :param remme_api: RemmeAPI
+        Args:
+            remme_api: RemmeAPI
+
+        To use:
+            Usage without remme main package.
+
+            .. code-block:: python
+
+                remme_api = RemmeAPI()
+                remme_blockchain_info = RemmeBlockchainInfo(remme_api)
         """
         self._remme_api = remme_api
 
@@ -97,40 +100,52 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         """
         Get all blocks from REMChain.
         You can specify one or more query parameters.
-        @example
-        Without query
-        ```python
-        blocks = await remme.blockchain_info.get_blocks()
-        print(blocks)
-        ```
 
-        Start from specifying block number
-        ```python
-        blocks = await remme.blockchain_info.get_blocks({'start':4})
-        print(blocks)
-        ```
+        Args:
+            query (dict, optional): dictionary with specific parameters
 
-        Reverse output
-        ```python
-        blocks = await remme.blockchain_info.get_blocks({'reverse':'false'})
-        print(blocks)
-        ```
+        Returns:
+            List of blocks.
 
-        Specify limit of output
-        ```python
-        blocks = await remme.blockchain_info.get_blocks({'limit':2})
-        print(blocks)
-        ```
+        To use:
+           Without query.
 
-        Specify head of block for start
-        ```python
-        blocks = await remme.blockchain_info.get_blocks({
-            'head':'9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
-        })
-        print(blocks)
-        ```
-        :param query: dict
-        :return block list
+            .. code-block:: python
+
+                blocks = await remme.blockchain_info.get_blocks()
+                print(blocks)
+
+           Start from specifying block number.
+
+            .. code-block:: python
+
+                blocks = await remme.blockchain_info.get_blocks({'start':4})
+                print(blocks)
+
+           Reverse output.
+
+            .. code-block:: python
+
+                blocks = await remme.blockchain_info.get_blocks({'reverse':'false'})
+                print(blocks)
+
+           Specify limit of output.
+
+            .. code-block:: python
+
+                blocks = await remme.blockchain_info.get_blocks({'limit':2})
+                print(blocks)
+
+           Specify head of block for start.
+
+            .. code-block:: python
+
+                head = '9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
+                blocks = await remme.blockchain_info.get_blocks({
+                    'head': head
+                })
+                print(blocks)
         """
         if query:
 
@@ -149,16 +164,21 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_block_by_id(self, id):
         """
         Get block by id (header_signature) from REMChain.
-        Specify limit of output
-        @example
-        ```python
-        block = await remme.blockchain_info.get_block_by_id(
-            '9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
-        )
-        print(block)
-        ```
-        :param id: string
-        :return block
+        Specify limit of output.
+
+        Args:
+            id (string): id
+
+        Returns:
+            Block.
+
+        To use:
+            .. code-block:: python
+
+                id = '9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
+                block = await remme.blockchain_info.get_block_by_id(id)
+                print(block)
         """
         self._check_id(id=id)
 
@@ -170,26 +190,34 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_block_info(self, query=None):
         """
         Get information about block.
-        @example
-        Without parameters
-        ```python
-        block_info = await remme.blockchain_info.get_block_info()
-        print(block_info)
-        ```
 
-        Start from specifying block number
-        ```python
-        block_info = await remme.blockchain_info.get_block_info({'start':2})
-        print(block_info)
-        ```
+        Args:
+            query (dict, optional): dictionary with specific parameters
 
-        Specify limit of output
-        ```python
-        block_info = await remme.blockchain_info.get_block_info({'limit':2})
-        print(block_info)
-        ```
-        :param query: dict
-        :return block info
+        Returns:
+            Information about block.
+
+        To use:
+          Without parameters.
+
+            .. code-block:: python
+
+                block_info = await remme.blockchain_info.get_block_info()
+                print(block_info)
+
+          Start from specifying block number.
+
+            .. code-block:: python
+
+                block_info = await remme.blockchain_info.get_block_info({'start':2})
+                print(block_info)
+
+          Specify limit of output.
+
+            .. code-block:: python
+
+                block_info = await remme.blockchain_info.get_block_info({'limit':2})
+                print(block_info)
         """
         blocks = await self._remme_api.send_request(
             method=RemmeMethods.BLOCK_INFO,
@@ -204,42 +232,52 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_batches(self, query=None):
         """
         Get all batches from REMChain.
-        @example
-        Without parameters
-        ```python
-        batches = await remme.blockchain_info.get_batches()
-        print(batches)
-        ```
 
-        Start from specifying batch header_signature (batch ID)
-        ```python
-        batches = await remme.blockchain_info.get_batches({
-            'start':'8e4dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef5fe5c'
-        })
-        print(batches)
-        ```
+        Args:
+            query (dict, optional): dictionary with specific parameters
 
-        Reverse output
-        ```python
-        batches = await remme.blockchain_info.get_batches({'reverse':'false'})
-        print(batches)
-        ```
+        Returns:
+            List of batches.
 
-        Specify limit of output
-        ```python
-        batches = await remme.blockchain_info.get_batches({'limit':2})
-        print(batches)
-        ```
+        To use:
+           Without parameters.
 
-        Specify head of block for start
-        ```python
-        batches = await remme.blockchain_info.get_batches({
-            'head':'9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
-        })
-        print(batches)
-        ```
-        :param query: dict
-        :return batch list
+            .. code-block:: python
+
+                batches = await remme.blockchain_info.get_batches()
+                print(batches)
+
+           Start from specifying batch header_signature (batch ID).
+
+            .. code-block:: python
+
+                start = '8e4dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef5fe5c'
+                batches = await remme.blockchain_info.get_batches({'start':start})
+                print(batches)
+
+           Reverse output.
+
+            .. code-block:: python
+
+                batches = await remme.blockchain_info.get_batches({'reverse':'false'})
+                print(batches)
+
+           Specify limit of output.
+
+            .. code-block:: python
+
+                batches = await remme.blockchain_info.get_batches({'limit':2})
+                print(batches)
+
+           Specify head of block for start.
+
+            .. code-block:: python
+
+                head = '9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
+                batches = await remme.blockchain_info.get_batches({'head':head})
+                print(batches)
         """
         if query:
             query = BaseQuery(query=query).get()
@@ -252,15 +290,20 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_batches_by_id(self, id):
         """
         Get batch by id (header_signature) from REMChain.
-        @example
-        ```python
-        batch = await remme.blockchain_info.get_batches_by_id(
-            '9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
-        )
-        print(batch)
-        ```
-        :param id: string
-        :return batch
+
+        Args:
+            id (string): batch id
+
+        Returns:
+            Batches.
+
+        To use:
+            .. code-block:: python
+
+                id = '9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
+                batch = await remme.blockchain_info.get_batches_by_id(id)
+                print(batch)
         """
         self._check_id(id=id)
 
@@ -272,15 +315,20 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_batch_status(self, batch_id):
         """
         Get status of batch.
-         @example
-        ```python
-        batch_status = await remme.blockchain_info.get_batch_status(
-            '8e4dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef5fe5c'
-        )
-        print(batch_status)
-        ```
-        :param batch_id: string
-        :return batch status
+
+        Args:
+            batch_id (string): batch id
+
+        Returns:
+            Batch status.
+
+        To use:
+            .. code-block:: python
+
+                id = '8e4dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef5fe5c'
+                batch_status = await remme.blockchain_info.get_batch_status(id)
+                print(batch_status)
         """
         self._check_id(id=batch_id)
 
@@ -292,42 +340,52 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_state(self, query=None):
         """
         Get states in REMChain.
-        @example
-        Without parameters
-        ```python
-        states = await remme.blockchain_info.get_state()
-        print(states)
-        ```
 
-        Start from specifying state address
-        ```python
-        states = await remme.blockchain_info.get_state({
-            'start':'6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
-        })
-        print(states)
-        ```
+        Args:
+            query (dict, optional): dictionary with specific parameters
 
-        Reverse output
-        ```python
-        states = await remme.blockchain_info.get_state({'reverse':'false'})
-        print(states)
-        ```
+        Returns:
+            List of states.
 
-        Specify limit of output
-        ```python
-        states = await remme.blockchain_info.get_state({'limit':2})
-        print(states)
-        ```
+        To use:
+           Without parameters.
 
-        Specify head of block for start
-        ```python
-        states = await remme.blockchain_info.get_state({
-            'head':'f650727dad9a402656179904e95144b1ee1dd4b78a696a4d6d6122c82f5b78fe29c07d45d8842e435d2266e58a18c846137d351b840c4d6fed60b1b71edcb3c9'
-        })
-        print(states)
-        ```
-        :param query: dict
-        :return state list
+            .. code-block:: python
+
+                states = await remme.blockchain_info.get_state()
+                print(states)
+
+           Start from specifying state address.
+
+            .. code-block:: python
+
+                states = await remme.blockchain_info.get_state({
+                    'start':'6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
+                })
+                print(states)
+
+           Reverse output.
+
+            .. code-block:: python
+
+                states = await remme.blockchain_info.get_state({'reverse':'false'})
+                print(states)
+
+           Specify limit of output.
+
+            .. code-block:: python
+
+                states = await remme.blockchain_info.get_state({'limit':2})
+                print(states)
+
+           Specify head of block for start.
+
+            .. code-block:: python
+
+                head = 'f650727dad9a402656179904e95144b1ee1dd4b78a696a4d6d6122c82f5b78fe' \
+                    '29c07d45d8842e435d2266e58a18c846137d351b840c4d6fed60b1b71edcb3c9'
+                states = await remme.blockchain_info.get_state({'head':head})
+                print(states)
         """
         if query:
             query = StateQuery(query=query).get()
@@ -340,15 +398,20 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_state_by_address(self, address):
         """
         Get state by address.
-        @example
-        ```python
-        state = await remme.blockchain_info.get_state_by_address(
-            '6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
-        )
-        print(state)
-        ```
-        :param address: string
-        :return state
+
+        Args:
+            address (string): address
+
+        Returns:
+            State by giving address.
+
+        To use:
+            .. code-block:: python
+
+                state = await remme.blockchain_info.get_state_by_address(
+                    '6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
+                )
+                print(state)
         """
         self._check_address(address=address)
 
@@ -360,18 +423,23 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def parse_state_data(self, state):
         """
         Parse state data.
-        @example
-        ```python
-        state = await remme.blockchain_info.get_state_by_address(
-            '6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
-        )
-        print(state)
-        state['address'] = '6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
-        parsed_state = await remme.blockchain_info.parse_state_data(state)
-        print(parsed_state)
-        ```
-        :param state: dict
-        :return parse state: dict
+
+        Args:
+            state (dict): state data
+
+        Returns:
+            Parsed state.
+
+        To use:
+            .. code-block:: python
+
+                state = await remme.blockchain_info.get_state_by_address(
+                    '6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
+                )
+                print(state)
+                state['address'] = '6a437247a1c12c0fb03aa6e242e6ce988d1cdc7fcc8c2a62ab3ab1202325d7d677e84c'
+                parsed_state = await remme.blockchain_info.parse_state_data(state)
+                print(parsed_state)
         """
         address = state.get('address')
 
@@ -394,42 +462,52 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_transactions(self, query=None):
         """
         Get all transactions from REMChain.
-        @example
-        Without parameters
-        ```python
-        transactions = await remme.blockchain_info.get_transactions()
-        print(transactions)
-        ```
 
-        Start from specifying transactions header_signature
-        ```python
-        transactions = await remme.blockchain_info.get_transactions({
-            'start':'f32fc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef543fe'
-        })
-        print(transactions)
-        ```
+        Args:
+            query (dict, optional): dictionary with specific parameters
 
-        Reverse output
-        ```python
-        transactions = await remme.blockchain_info.get_transactions({'reverse':'false'})
-        print(transactions)
-        ```
+        Returns:
+            List of transactions.
 
-        Specify limit of output
-        ```python
-        transactions = await remme.blockchain_info.get_transactions({'limit':2})
-        print(transactions)
-        ```
+        To use:
+           Without parameters.
 
-        Specify head of block for start
-        ```python
-        transactions = await remme.blockchain_info.get_transactions({
-            'head':'9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
-        })
-        print(transactions)
-        ```
-        :param query: dict
-        :return transactions list
+            .. code-block:: python
+
+                transactions = await remme.blockchain_info.get_transactions()
+                print(transactions)
+
+           Start from specifying transactions header_signature.
+
+            .. code-block:: python
+
+                start = 'f32fc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef543fe'
+                transactions = await remme.blockchain_info.get_transactions({'start':start})
+                print(transactions)
+
+           Reverse output.
+
+            .. code-block:: python
+
+                transactions = await remme.blockchain_info.get_transactions({'reverse':'false'})
+                print(transactions)
+
+           Specify limit of output.
+
+            .. code-block:: python
+
+                transactions = await remme.blockchain_info.get_transactions({'limit':2})
+                print(transactions)
+
+           Specify head of block for start.
+
+            .. code-block:: python
+
+                head = '9d2dc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef57491'
+                transactions = await remme.blockchain_info.get_transactions({'head':head})
+                print(transactions)
         """
         if query:
             query = BaseQuery(query=query).get()
@@ -442,15 +520,20 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_transaction_by_id(self, id):
         """
         Get transaction by id (header_signature) from REMChain.
-        @example
-        ```python
-        transaction = await remme.blockchain_info.get_transaction_by_id(
-            'f32fc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef543fe'
-        )
-        print(transaction)
-        ```
-        :param id: string
-        :return block
+
+        Args:
+            id (string): id
+
+        Returns:
+            Transaction.
+
+        To use:
+            .. code-block:: python
+
+                id = 'f32fc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef543fe'
+                transaction = await remme.blockchain_info.get_transaction_by_id(id)
+                print(transaction)
         """
         self._check_id(id=id)
 
@@ -462,16 +545,22 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def parse_transaction_payload(self, transaction):
         """
         Parse transaction payload. Take transaction and return object with payload and type.
-        @example
-        ```python
-        transaction = await remme.blockchain_info.get_transaction_by_id(
-            'f32fc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef543fe'
-        )
-        print(transaction)
-        parsed_transaction = remme.blockchain_info.parse_transaction_payload(transaction.get('data'))
-        print(parsed_transaction)
-        ```
-        :param transaction: dict
+
+        Args:
+            transaction (dict): transaction payload
+
+        Returns:
+            Parsed transaction payload.
+
+        To use:
+            .. code-block:: python
+
+                id = 'f32fc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08' \
+                    '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef543fe'
+                transaction = await remme.blockchain_info.get_transaction_by_id(id)
+                print(transaction)
+                parsed_transaction = remme.blockchain_info.parse_transaction_payload(transaction.get('data'))
+                print(parsed_transaction)
         """
         family_name = transaction.get('header').get('family_name')
 
@@ -480,7 +569,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
 
         payload = base64.b64decode(transaction.get('payload'))
 
-        transaction_payload = protos.TransactionPayload()
+        transaction_payload = protobuf.TransactionPayload()
         transaction_payload.ParseFromString(payload)
 
         method = transaction_payload.method
@@ -500,12 +589,15 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_network_status(self):
         """
         Get network status for node.
-        @example
-        ```python
-        network_status = await remme.blockchain_info.get_network_status()
-        print(network_status)
-        ```
-        :return network status
+
+        Returns:
+            Network status.
+
+        To use:
+            .. code-block:: python
+
+                network_status = await remme.blockchain_info.get_network_status()
+                print(network_status)
         """
         network_status_data = await self._remme_api.send_request(method=RemmeMethods.NETWORK_STATUS)
 
@@ -514,23 +606,38 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     async def get_peers(self):
         """
         Get peers that connected to this node.
-        @example
-        ```python
-        peers = await remme.blockchain_info.get_peers()
-        print(peers)
-        ```
-        :return list of peers
+
+        Returns:
+            List of peers.
+
+        To use:
+            .. code-block:: python
+
+                peers = await remme.blockchain_info.get_peers()
+                print(peers)
         """
         return (await self._remme_api.send_request(method=RemmeMethods.PEERS)).get('data')
 
     # TODO: uncomment after refactoring receipts
     # def get_receipts(self, ids):
     #     """
-    #     Get transactions receipts
-    #     :param ids: list of string
-    #     :return: receipt list
+    #     Get transactions receipts.
+    #
+    #     Args:
+    #         ids (list): list of string
+    #
+    #     Returns:
+    #         List of transactions receipts.
+    #
+    #     To use:
+    #         .. code-block:: python
+    #
+    #             receipts = await remme.blockchain_info.get_receipts(ids)
+    #             print(receipts)
     #     """
     #     for id in ids:
     #         self._check_id(id=id)
     #
-    #     return (await self._remme_api.send_request(method=RemmeMethods.RECEIPTS, params={'ids': ids})).get('data')
+    #     return (await self._remme_api.send_request(
+    #         method=RemmeMethods.RECEIPTS, params={'ids': ids}
+    #     )).get('data')

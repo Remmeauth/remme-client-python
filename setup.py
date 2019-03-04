@@ -1,14 +1,23 @@
-from setuptools import setup, find_packages
+from setuptools import (
+    find_packages,
+    setup,
+)
+
+
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
 
 setup(
-    name='remme-client',
-    version='0.0.1',
-    description='Remme Core Client',
-    author='REMME',
-    url='https://remme.io',
+    author='Remme',
+    description='Python integration library for REMChain.',
+    install_requires=required,
+    name='remme-client-python',
     packages=find_packages(),
-    package_data={
-        # 'remme.rest_api': ['openapi.yml'],
-        # 'remme.settings': ['default_config.toml']
-    }, install_requires=['requests', 'aiohttp', 'sawtooth-signing', 'sawtooth-sdk', 'cbor']
+    url='https://remme.io',
+    version='0.0.1',
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 3.6',
+    ],
 )

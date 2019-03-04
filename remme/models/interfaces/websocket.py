@@ -8,7 +8,7 @@ class IRemmeWebSocket(metaclass=abc.ABCMeta):
     def connect_to_web_socket():
         """
         Method for connect to WebSocket.
-        :return: async messages
+        For this method you should set property data.
         """
         pass
 

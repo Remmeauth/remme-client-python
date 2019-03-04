@@ -9,23 +9,28 @@ from remme.utils import (
 class RemmeAccount(ECDSA):
     """
     Account that is used for signing transactions and storing public keys which he was signed.
-    @example
-    ```python
-    account = RemmeAccount('ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9')
-    print(account.private_key_hex)  # 'ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9'
 
-    another_account = RemmeAccount()
-    print(another_account.private_key_hex)  # 'b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f'
+    To use:
+        .. code-block:: python
 
-    data = 'some data'
-    signed_data = account.sign(data)
+            private_key_hex = 'ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9'
+            account = RemmeAccount(private_key_hex)
+            print(account.private_key_hex)
+            # 'ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9'
 
-    is_verify = account.verify(data, signed_data)
-    print(is_verify)  # True
+            another_account = RemmeAccount()
+            print(another_account.private_key_hex)
+            # 'b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f'
 
-    is_verify_in_another_account = another_account.verify(data, signed_data)
-    print(is_verify_in_another_account)  # False
-    ```
+            data = 'some data'
+            signed_data = account.sign(data)
+            print(signed_data)  # signature
+
+            is_verify = account.verify(data, signed_data)
+            print(is_verify)  # True
+
+            is_verify_in_another_account = another_account.verify(data, signed_data)
+            print(is_verify_in_another_account)  # False
     """
 
     def __init__(self, private_key_hex=None):
@@ -33,22 +38,29 @@ class RemmeAccount(ECDSA):
         Get private key, create signer by using private key,
         generate public key from private key and generate account address by using public key and family name.
 
-        References:
+        Args:
+            private_key_hex (string): private key in hex format
+
+        References::
             - https://docs.remme.io/remme-core/docs/family-account.html#addressing
 
-        @example
-        Get private key
-        ```python
-        account = RemmeAccount('ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9')
-        print(account.private_key_hex)  # 'ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9'
-        ```
+        To use:
+            **Get private key:**
 
-        Generate new private key
-        ```python
-        account = RemmeAccount()
-        print(account.private_key_hex) # 'b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f'
-        ```
-        :param private_key_hex (optional): string
+            .. code-block:: python
+
+                private_key_hex = 'ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9'
+                account = RemmeAccount()
+                print(account.private_key_hex)
+                # 'ac124700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d1078391934f9'
+
+            **Generate new private key:**
+
+            .. sourcecode:: python
+
+                account = RemmeAccount()
+                print(account.private_key_hex)
+                # 'b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f'
         """
         if private_key_hex:
             private_key = hex_to_bytes(private_key_hex)

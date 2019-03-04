@@ -31,21 +31,24 @@ ATOMIC_SWAP_METHODS = [
 class RemmeSwap(IRemmeSwap):
     """
     Main class for working with Atomic Swap.
-    ```python
-    swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
-    secret_key = '039eaa877ff63694f8f09c8034403f8b5165a7418812a642396d5d539f90b170'
-    secret_lock = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
-    receiver_address = '112007484def48e1c6b77cf784aeabcac51222e48ae14f3821697f4040247ba01558b1'
-    sender_address_non_local = '0xe6ca0e7c974f06471759e9a05d18b538c5ced11e'
-    init = await remme.swap.init(
-        receiver_address=receiver_address,
-        sender_address_non_local=sender_address_non_local,
-        amount=100,
-        swap_id=swap_id,
-        secret_lock_by_solicitor=secret_lock_by_solicitor,
-        created_at=int(datetime.now().timestamp()),
-    )
-    ```
+
+    To use:
+        .. code-block:: python
+
+            swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
+            secret_key = '039eaa877ff63694f8f09c8034403f8b5165a7418812a642396d5d539f90b170'
+            secret_lock = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
+            receiver_address = '112007484def48e1c6b77cf784aeabcac51222e48ae14f3821697f4040247ba01558b1'
+            sender_address_non_local = '0xe6ca0e7c974f06471759e9a05d18b538c5ced11e'
+
+            init = await remme.swap.init(
+                receiver_address=receiver_address,
+                sender_address_non_local=sender_address_non_local,
+                amount=100,
+                swap_id=swap_id,
+                secret_lock_by_solicitor=secret_lock_by_solicitor,
+                created_at=int(datetime.now().timestamp()),
+            )
     """
 
     _family_name = RemmeFamilyName.SWAP.value
@@ -57,16 +60,20 @@ class RemmeSwap(IRemmeSwap):
 
     def __init__(self, remme_api, remme_transaction_service):
         """
-        @example
-        Usage without main remme package
-        ```python
-        remme_api = RemmeAPI()  # see RemmeAPI implementation
-        remme_account = RemmeAccount()  # see RemmeAccount implementation
-        remme_transaction = RemmeTransactionService(remme_api, remme_account)  # see RemmeTransactionService implementation
-        remme_swap = RemmeSwap(remme_api, remme_transaction)
-        ```
-        :param remme_api: RemmeAPI
-        :param remme_transaction_service: RemmeTransactionService
+        Args:
+            remme_api: RemmeAPI
+            remme_transaction_service: RemmeTransactionService
+
+        To use:
+            Usage without main remme package.
+
+            .. code-block:: python
+
+                remme_api = RemmeAPI()
+                remme_account = RemmeAccount()
+                remme_transaction = RemmeTransactionService(remme_api, remme_account)
+                remme_swap = RemmeSwap(remme_api, remme_transaction)
+
         """
         self._remme_api = remme_api
         self._remme_transaction_service = remme_transaction_service
@@ -74,10 +81,13 @@ class RemmeSwap(IRemmeSwap):
     def _get_addresses(self, method, swap_id, receiver_address=None):
         """
         Get addresses for inputs and outputs.
-        :param method: AtomicSwapMethod
-        :param swap_id: string
-        :param receiver_address: string (optional)
-        :return: inputs and outputs (lists)
+
+        Args:
+            method (protobuf): AtomicSwapMethod
+            swap_id (string): swap id
+            optional receiver_address (string): receiver address
+        Returns:
+            Lists of addresses inputs and outputs.
         """
         addresses = generate_address(_family_name=self._family_name, _public_key_to=swap_id)
 
@@ -152,13 +162,18 @@ class RemmeSwap(IRemmeSwap):
         """
         Approve swap with given id.
         Send transaction into REMChain.
-        @example
-        ```python
-        approve = await remme.swap.approve(swap_id)
-        print(approve.batch_id)
-        ```
-        :param swap_id: string
-        :return: object
+
+        Args:
+            swap_id (string): swap id
+
+        Returns:
+            Object.
+
+        To use:
+            .. code-block:: python
+
+                approve = await remme.swap.approve(swap_id)
+                print(approve.batch_id)
         """
         self._check_parameters(swap_id=swap_id)
 
@@ -182,14 +197,19 @@ class RemmeSwap(IRemmeSwap):
         """
         Close swap with given id and secret key for checking who can close swap.
         Send transaction into REMChain.
-        @example
-        ```python
-        close = await remme.swap.close(swap_id, secret_key)
-        print(close.batch_id)
-        ```
-        :param swap_id: string
-        :param secret_key: string
-        :return: object
+
+        Args:
+            swap_id (string): swap id
+            secret_key (string): secret key
+
+        Returns:
+            Object.
+
+        To use:
+            .. code-block:: python
+
+                close = await remme.swap.close(swap_id, secret_key)
+                print(close.batch_id)
         """
         self._check_parameters(swap_id=swap_id, secret_key=secret_key)
 
@@ -219,13 +239,18 @@ class RemmeSwap(IRemmeSwap):
         """
         Expire swap with given id. Could be expired after 24h after initiation.
         Send transaction into REMChain.
-        @example
-        ```python
-        expire = await remme.swap.expire(swap_id)
-        print(expire.batch_id)
-        ```
-        :param swap_id:
-        :return: object
+
+        Args:
+            swap_id (string): swap id
+
+        Returns:
+            Object
+
+        To use:
+            .. code-block:: python
+
+                expire = await remme.swap.expire(swap_id)
+                print(expire.batch_id)
         """
         self._check_parameters(swap_id=swap_id)
 
@@ -250,13 +275,18 @@ class RemmeSwap(IRemmeSwap):
     async def get_info(self, swap_id):
         """
         Get info about swap by given swap id.
-        @example
-        ```python
-        info = await remme.swap.get_info(swap_id)
-        print(info)  # SwapInfo
-        ```
-        :param swap_id: string
-        :return: information about swap
+
+        Args:
+            swap_id (string): swap id
+
+        Returns:
+            Information about swap.
+
+        To use:
+            .. code-block:: python
+
+                info = await remme.swap.get_info(swap_id)
+                print(info)  # SwapInfo
         """
         self._check_parameters(swap_id=swap_id)
 
@@ -270,12 +300,15 @@ class RemmeSwap(IRemmeSwap):
     async def get_public_key(self):
         """
         Get swap public key.
-        @example
-        ```python
-        public_key = await remme.swap.get_public_key()
-        print(public_key)
-        ```
-        :return: swap public key
+
+        Returns:
+            Swap public key.
+
+        To use:
+            .. code-block:: python
+
+                public_key = await remme.swap.get_public_key()
+                print(public_key)
         """
         return await self._remme_api.send_request(method=RemmeMethods.ATOMIC_SWAP_PUBLIC_KEY)
 
@@ -283,25 +316,31 @@ class RemmeSwap(IRemmeSwap):
         """
         Initiation of swap.
         Send transaction into REMChain.
-        @example
-        ```python
-        swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
-        # hash from secret key that will be provided in close
-        secret_lock_by_solicitor = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
-        receiver_address = '112007484def48e1c6b77cf784aeabcac51222e48ae14f3821697f4040247ba01558b1'
-        sender_address_non_local = '0xe6ca0e7c974f06471759e9a05d18b538c5ced11e'
-        init = await remme.swap.init(
-            receiver_address=receiver_address,
-            sender_address_non_local=sender_address_non_local,
-            amount=100,
-            swap_id=swap_id,
-            secret_lock_by_solicitor=secret_lock_by_solicitor,
-            created_at=int(datetime.now().timestamp()),
-        )
-        print(init.batch_id)
-        ```
-        :param data: dict
-        :return: object
+
+        Args:
+            data (kwargs): swap data
+
+        Returns:
+            Object.
+
+        To use:
+            .. code-block:: python
+
+                swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
+                # hash from secret key that will be provided in close
+                secret_lock_by_solicitor = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
+                receiver_address = '112007484def48e1c6b77cf784aeabcac51222e48ae14f3821697f4040247ba01558b1'
+                sender_address_non_local = '0xe6ca0e7c974f06471759e9a05d18b538c5ced11e'
+
+                init = await remme.swap.init(
+                    receiver_address=receiver_address,
+                    sender_address_non_local=sender_address_non_local,
+                    amount=100,
+                    swap_id=swap_id,
+                    secret_lock_by_solicitor=secret_lock_by_solicitor,
+                    created_at=int(datetime.now().timestamp()),
+                )
+                print(init.batch_id)
         """
         swap_init_data = SwapInitDto(data=data)
         swap_id = swap_init_data.swap_id
@@ -336,16 +375,24 @@ class RemmeSwap(IRemmeSwap):
         """
         Set secret lock to swap with given swap id.
         Send transaction into REMChain.
-        @example
-        ```python
-        swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
-        secret_lock_by_solicitor = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
-        setting = await remme.swap.set_secret_lock(swap_id=swap_id, secret_lock_by_solicitor=secret_lock_by_solicitor)
-        print(setting.batch_id)
-        ```
-        :param swap_id: string
-        :param secret_lock: string - hash from secret key that will be provided in close
-        :return: object
+
+        Args:
+            swap_id (string): swap id
+            secret_lock (string): hash from secret key that will be provided in close
+
+        Returns:
+            Object.
+
+        To use:
+            .. code-block:: python
+
+                swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
+                secret_lock_by_solicitor = 'b605112c2d7489034bbd7beab083fb65ba02af787786bb5e3d99bb26709f4f68'
+                setting = await remme.swap.set_secret_lock(
+                    swap_id=swap_id,
+                    secret_lock_by_solicitor=secret_lock_by_solicitor,
+                )
+                print(setting.batch_id)
         """
         self._check_parameters(swap_id=swap_id, secret_lock_by_solicitor=secret_lock)
 
