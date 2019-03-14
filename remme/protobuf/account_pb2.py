@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='account.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\raccount.proto\"4\n\rAccountMethod\"#\n\x06Method\x12\x0c\n\x08TRANSFER\x10\x00\x12\x0b\n\x07GENESIS\x10\x01\"4\n\x0fTransferPayload\x12\x12\n\naddress_to\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04\"&\n\x0eGenesisPayload\x12\x14\n\x0ctotal_supply\x18\x01 \x01(\x04\",\n\x07\x41\x63\x63ount\x12\x0f\n\x07\x62\x61lance\x18\x01 \x01(\x04\x12\x10\n\x08pub_keys\x18\x02 \x03(\t\"\x1f\n\rGenesisStatus\x12\x0e\n\x06status\x18\x01 \x01(\x08\x62\x06proto3')
+  serialized_pb=_b('\n\raccount.proto\"4\n\rAccountMethod\"#\n\x06Method\x12\x0c\n\x08TRANSFER\x10\x00\x12\x0b\n\x07GENESIS\x10\x01\"\xa9\x01\n\x0fTransferPayload\x12?\n\x13sender_account_type\x18\x01 \x01(\x0e\x32\".TransferPayload.SenderAccountType\x12\x12\n\naddress_to\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x04\"2\n\x11SenderAccountType\x12\x0b\n\x07\x41\x43\x43OUNT\x10\x00\x12\x10\n\x0cNODE_ACCOUNT\x10\x01\"&\n\x0eGenesisPayload\x12\x14\n\x0ctotal_supply\x18\x01 \x01(\x04\",\n\x07\x41\x63\x63ount\x12\x0f\n\x07\x62\x61lance\x18\x01 \x01(\x04\x12\x10\n\x08pub_keys\x18\x02 \x03(\t\"\x1f\n\rGenesisStatus\x12\x0e\n\x06status\x18\x01 \x01(\x08\x62\x06proto3')
 )
 
 
@@ -45,6 +45,28 @@ _ACCOUNTMETHOD_METHOD = _descriptor.EnumDescriptor(
   serialized_end=69,
 )
 _sym_db.RegisterEnumDescriptor(_ACCOUNTMETHOD_METHOD)
+
+_TRANSFERPAYLOAD_SENDERACCOUNTTYPE = _descriptor.EnumDescriptor(
+  name='SenderAccountType',
+  full_name='TransferPayload.SenderAccountType',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='ACCOUNT', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='NODE_ACCOUNT', index=1, number=1,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=191,
+  serialized_end=241,
+)
+_sym_db.RegisterEnumDescriptor(_TRANSFERPAYLOAD_SENDERACCOUNTTYPE)
 
 
 _ACCOUNTMETHOD = _descriptor.Descriptor(
@@ -80,15 +102,22 @@ _TRANSFERPAYLOAD = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='address_to', full_name='TransferPayload.address_to', index=0,
-      number=1, type=9, cpp_type=9, label=1,
+      name='sender_account_type', full_name='TransferPayload.sender_account_type', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='address_to', full_name='TransferPayload.address_to', index=1,
+      number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='value', full_name='TransferPayload.value', index=1,
-      number=2, type=4, cpp_type=4, label=1,
+      name='value', full_name='TransferPayload.value', index=2,
+      number=3, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -98,6 +127,7 @@ _TRANSFERPAYLOAD = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
+    _TRANSFERPAYLOAD_SENDERACCOUNTTYPE,
   ],
   options=None,
   is_extendable=False,
@@ -105,8 +135,8 @@ _TRANSFERPAYLOAD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=71,
-  serialized_end=123,
+  serialized_start=72,
+  serialized_end=241,
 )
 
 
@@ -136,8 +166,8 @@ _GENESISPAYLOAD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=125,
-  serialized_end=163,
+  serialized_start=243,
+  serialized_end=281,
 )
 
 
@@ -174,8 +204,8 @@ _ACCOUNT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=165,
-  serialized_end=209,
+  serialized_start=283,
+  serialized_end=327,
 )
 
 
@@ -205,11 +235,13 @@ _GENESISSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=211,
-  serialized_end=242,
+  serialized_start=329,
+  serialized_end=360,
 )
 
 _ACCOUNTMETHOD_METHOD.containing_type = _ACCOUNTMETHOD
+_TRANSFERPAYLOAD.fields_by_name['sender_account_type'].enum_type = _TRANSFERPAYLOAD_SENDERACCOUNTTYPE
+_TRANSFERPAYLOAD_SENDERACCOUNTTYPE.containing_type = _TRANSFERPAYLOAD
 DESCRIPTOR.message_types_by_name['AccountMethod'] = _ACCOUNTMETHOD
 DESCRIPTOR.message_types_by_name['TransferPayload'] = _TRANSFERPAYLOAD
 DESCRIPTOR.message_types_by_name['GenesisPayload'] = _GENESISPAYLOAD
