@@ -19,14 +19,14 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='consensus_messages.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x18\x63onsensus_messages.proto\"P\n\x17\x43onsensusMessagePayload\x12\x0e\n\x06period\x18\x01 \x01(\x04\x12\x13\n\x0bproposal_id\x18\x02 \x01(\t\x12\x10\n\x08voter_id\x18\x03 \x01(\t\"\xb8\x01\n\x16\x43onsensusMessageHeader\x12*\n\x04type\x18\x01 \x01(\x0e\x32\x1c.ConsensusMessageHeader.Type\x12)\n\x07payload\x18\x02 \x01(\x0b\x32\x18.ConsensusMessagePayload\"G\n\x04Type\x12\x12\n\x0eVALUE_PROPOSAL\x10\x00\x12\r\n\tSOFT_VOTE\x10\x01\x12\r\n\tCERT_VOTE\x10\x02\x12\r\n\tNEXT_VOTE\x10\x03\"U\n\x10\x43onsensusMessage\x12\'\n\x06header\x18\x01 \x01(\x0b\x32\x17.ConsensusMessageHeader\x12\x18\n\x10header_signature\x18\x02 \x01(\x0c\"?\n\rConsensusSeal\x12.\n\x13previous_cert_votes\x18\x02 \x03(\x0b\x32\x11.ConsensusMessageb\x06proto3')
+  serialized_pb=_b('\n\x18\x63onsensus_messages.proto\"P\n\x17\x43onsensusMessagePayload\x12\x0e\n\x06period\x18\x01 \x01(\x04\x12\x13\n\x0bproposal_id\x18\x02 \x01(\x0c\x12\x10\n\x08voter_id\x18\x03 \x01(\x0c\"\xac\x01\n\x10\x43onsensusMessage\x12$\n\x04type\x18\x01 \x01(\x0e\x32\x16.ConsensusMessage.Type\x12)\n\x07payload\x18\x02 \x01(\x0b\x32\x18.ConsensusMessagePayload\"G\n\x04Type\x12\x12\n\x0eVALUE_PROPOSAL\x10\x00\x12\r\n\tSOFT_VOTE\x10\x01\x12\r\n\tCERT_VOTE\x10\x02\x12\r\n\tNEXT_VOTE\x10\x03\"W\n\x16SignedConsensusMessage\x12\x19\n\x11message_signature\x18\x01 \x01(\x0c\x12\"\n\x07message\x18\x02 \x01(\x0b\x32\x11.ConsensusMessage\"E\n\rConsensusSeal\x12\x34\n\x13previous_cert_votes\x18\x01 \x03(\x0b\x32\x17.SignedConsensusMessage\"(\n\x14\x43onsensusSealRequest\x12\x10\n\x08\x62lock_id\x18\x01 \x01(\x0c\x62\x06proto3')
 )
 
 
 
-_CONSENSUSMESSAGEHEADER_TYPE = _descriptor.EnumDescriptor(
+_CONSENSUSMESSAGE_TYPE = _descriptor.EnumDescriptor(
   name='Type',
-  full_name='ConsensusMessageHeader.Type',
+  full_name='ConsensusMessage.Type',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -49,10 +49,10 @@ _CONSENSUSMESSAGEHEADER_TYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=224,
-  serialized_end=295,
+  serialized_start=212,
+  serialized_end=283,
 )
-_sym_db.RegisterEnumDescriptor(_CONSENSUSMESSAGEHEADER_TYPE)
+_sym_db.RegisterEnumDescriptor(_CONSENSUSMESSAGE_TYPE)
 
 
 _CONSENSUSMESSAGEPAYLOAD = _descriptor.Descriptor(
@@ -71,15 +71,15 @@ _CONSENSUSMESSAGEPAYLOAD = _descriptor.Descriptor(
       options=None),
     _descriptor.FieldDescriptor(
       name='proposal_id', full_name='ConsensusMessagePayload.proposal_id', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
       name='voter_id', full_name='ConsensusMessagePayload.voter_id', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      number=3, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -100,22 +100,22 @@ _CONSENSUSMESSAGEPAYLOAD = _descriptor.Descriptor(
 )
 
 
-_CONSENSUSMESSAGEHEADER = _descriptor.Descriptor(
-  name='ConsensusMessageHeader',
-  full_name='ConsensusMessageHeader',
+_CONSENSUSMESSAGE = _descriptor.Descriptor(
+  name='ConsensusMessage',
+  full_name='ConsensusMessage',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='type', full_name='ConsensusMessageHeader.type', index=0,
+      name='type', full_name='ConsensusMessage.type', index=0,
       number=1, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='payload', full_name='ConsensusMessageHeader.payload', index=1,
+      name='payload', full_name='ConsensusMessage.payload', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -126,7 +126,7 @@ _CONSENSUSMESSAGEHEADER = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
-    _CONSENSUSMESSAGEHEADER_TYPE,
+    _CONSENSUSMESSAGE_TYPE,
   ],
   options=None,
   is_extendable=False,
@@ -135,28 +135,28 @@ _CONSENSUSMESSAGEHEADER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=111,
-  serialized_end=295,
+  serialized_end=283,
 )
 
 
-_CONSENSUSMESSAGE = _descriptor.Descriptor(
-  name='ConsensusMessage',
-  full_name='ConsensusMessage',
+_SIGNEDCONSENSUSMESSAGE = _descriptor.Descriptor(
+  name='SignedConsensusMessage',
+  full_name='SignedConsensusMessage',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='ConsensusMessage.header', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='message_signature', full_name='SignedConsensusMessage.message_signature', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='header_signature', full_name='ConsensusMessage.header_signature', index=1,
-      number=2, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b(""),
+      name='message', full_name='SignedConsensusMessage.message', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -172,8 +172,8 @@ _CONSENSUSMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=297,
-  serialized_end=382,
+  serialized_start=285,
+  serialized_end=372,
 )
 
 
@@ -186,7 +186,7 @@ _CONSENSUSSEAL = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='previous_cert_votes', full_name='ConsensusSeal.previous_cert_votes', index=0,
-      number=2, type=11, cpp_type=10, label=3,
+      number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -203,19 +203,51 @@ _CONSENSUSSEAL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=384,
-  serialized_end=447,
+  serialized_start=374,
+  serialized_end=443,
 )
 
-_CONSENSUSMESSAGEHEADER.fields_by_name['type'].enum_type = _CONSENSUSMESSAGEHEADER_TYPE
-_CONSENSUSMESSAGEHEADER.fields_by_name['payload'].message_type = _CONSENSUSMESSAGEPAYLOAD
-_CONSENSUSMESSAGEHEADER_TYPE.containing_type = _CONSENSUSMESSAGEHEADER
-_CONSENSUSMESSAGE.fields_by_name['header'].message_type = _CONSENSUSMESSAGEHEADER
-_CONSENSUSSEAL.fields_by_name['previous_cert_votes'].message_type = _CONSENSUSMESSAGE
+
+_CONSENSUSSEALREQUEST = _descriptor.Descriptor(
+  name='ConsensusSealRequest',
+  full_name='ConsensusSealRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='block_id', full_name='ConsensusSealRequest.block_id', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=445,
+  serialized_end=485,
+)
+
+_CONSENSUSMESSAGE.fields_by_name['type'].enum_type = _CONSENSUSMESSAGE_TYPE
+_CONSENSUSMESSAGE.fields_by_name['payload'].message_type = _CONSENSUSMESSAGEPAYLOAD
+_CONSENSUSMESSAGE_TYPE.containing_type = _CONSENSUSMESSAGE
+_SIGNEDCONSENSUSMESSAGE.fields_by_name['message'].message_type = _CONSENSUSMESSAGE
+_CONSENSUSSEAL.fields_by_name['previous_cert_votes'].message_type = _SIGNEDCONSENSUSMESSAGE
 DESCRIPTOR.message_types_by_name['ConsensusMessagePayload'] = _CONSENSUSMESSAGEPAYLOAD
-DESCRIPTOR.message_types_by_name['ConsensusMessageHeader'] = _CONSENSUSMESSAGEHEADER
 DESCRIPTOR.message_types_by_name['ConsensusMessage'] = _CONSENSUSMESSAGE
+DESCRIPTOR.message_types_by_name['SignedConsensusMessage'] = _SIGNEDCONSENSUSMESSAGE
 DESCRIPTOR.message_types_by_name['ConsensusSeal'] = _CONSENSUSSEAL
+DESCRIPTOR.message_types_by_name['ConsensusSealRequest'] = _CONSENSUSSEALREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 ConsensusMessagePayload = _reflection.GeneratedProtocolMessageType('ConsensusMessagePayload', (_message.Message,), dict(
@@ -225,13 +257,6 @@ ConsensusMessagePayload = _reflection.GeneratedProtocolMessageType('ConsensusMes
   ))
 _sym_db.RegisterMessage(ConsensusMessagePayload)
 
-ConsensusMessageHeader = _reflection.GeneratedProtocolMessageType('ConsensusMessageHeader', (_message.Message,), dict(
-  DESCRIPTOR = _CONSENSUSMESSAGEHEADER,
-  __module__ = 'consensus_messages_pb2'
-  # @@protoc_insertion_point(class_scope:ConsensusMessageHeader)
-  ))
-_sym_db.RegisterMessage(ConsensusMessageHeader)
-
 ConsensusMessage = _reflection.GeneratedProtocolMessageType('ConsensusMessage', (_message.Message,), dict(
   DESCRIPTOR = _CONSENSUSMESSAGE,
   __module__ = 'consensus_messages_pb2'
@@ -239,12 +264,26 @@ ConsensusMessage = _reflection.GeneratedProtocolMessageType('ConsensusMessage', 
   ))
 _sym_db.RegisterMessage(ConsensusMessage)
 
+SignedConsensusMessage = _reflection.GeneratedProtocolMessageType('SignedConsensusMessage', (_message.Message,), dict(
+  DESCRIPTOR = _SIGNEDCONSENSUSMESSAGE,
+  __module__ = 'consensus_messages_pb2'
+  # @@protoc_insertion_point(class_scope:SignedConsensusMessage)
+  ))
+_sym_db.RegisterMessage(SignedConsensusMessage)
+
 ConsensusSeal = _reflection.GeneratedProtocolMessageType('ConsensusSeal', (_message.Message,), dict(
   DESCRIPTOR = _CONSENSUSSEAL,
   __module__ = 'consensus_messages_pb2'
   # @@protoc_insertion_point(class_scope:ConsensusSeal)
   ))
 _sym_db.RegisterMessage(ConsensusSeal)
+
+ConsensusSealRequest = _reflection.GeneratedProtocolMessageType('ConsensusSealRequest', (_message.Message,), dict(
+  DESCRIPTOR = _CONSENSUSSEALREQUEST,
+  __module__ = 'consensus_messages_pb2'
+  # @@protoc_insertion_point(class_scope:ConsensusSealRequest)
+  ))
+_sym_db.RegisterMessage(ConsensusSealRequest)
 
 
 # @@protoc_insertion_point(module_scope)
