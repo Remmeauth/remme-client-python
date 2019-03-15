@@ -77,6 +77,13 @@ class RemmeWebSocket(IRemmeWebSocket):
         validate_node_config(network_config=network_config)
         self._network_config = network_config
 
+    @property
+    def network_config(self):
+        """
+        Return network config object which contain domain name, port and ssl.
+        """
+        return self._network_config
+
     def _map(self, event, data):
 
         events_data = {

@@ -1,5 +1,9 @@
 import asyncio
+import os
+import sys
 from datetime import datetime
+
+sys.path.insert(0, os.path.realpath('./'))
 
 from remme import Remme
 

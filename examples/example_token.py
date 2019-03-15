@@ -1,4 +1,9 @@
 import asyncio
+import os
+import sys
+
+sys.path.insert(0, os.path.realpath('./'))
+
 from remme import Remme
 from remme.models.general.batch_status import BatchStatus
 

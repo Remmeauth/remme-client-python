@@ -28,6 +28,13 @@ class CertificateTransactionResponse(BaseTransactionResponse):
             public_key=public_key_to_der(self._certificate.public_key()),
         )
 
+    @property
+    def certificate(self):
+        """
+        Return x509 certificate object.
+        """
+        return self._certificate
+
     def sign(self, data, rsa_signature_padding=None):
         """
         Sign data with a certificate's private key and output DigestInfo DER-encoded bytes (default for PSS).
