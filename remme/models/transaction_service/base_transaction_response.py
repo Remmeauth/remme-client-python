@@ -20,7 +20,7 @@ class BaseTransactionResponse(RemmeWebSocket):
             network_config (dict): config of network (node address and ssl mode)
             batch_id (string): batch id
         """
-        super(BaseTransactionResponse, self).__init__(network_config)
+        super(BaseTransactionResponse, self).__init__(network_config=network_config)
         self._batch_id = batch_id
         self.data = RemmeRequestParams({
             'event_type': RemmeEvents.Batch.value,

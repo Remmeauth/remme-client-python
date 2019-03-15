@@ -1,5 +1,9 @@
 import asyncio
+import os
+import sys
 from datetime import datetime, timedelta
+
+sys.path.insert(0, os.path.realpath('./'))
 
 from remme import Remme
 from remme.models.keys.key_type import KeyType

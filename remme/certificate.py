@@ -171,7 +171,7 @@ class RemmeCertificate(IRemmeCertificate):
 
         return certificate
 
-    def create(self, **certificate_data_to_create):
+    def create(self, certificate_data_to_create):
         """
         Create certificate.
 
@@ -184,15 +184,15 @@ class RemmeCertificate(IRemmeCertificate):
         To use:
             .. code-block:: python
 
-                certificate = remme.certificate.create(
-                    common_name='user_name',
-                    email='user@email.com',
-                    name='John',
-                    surname='Smith',
-                    country_name='US',
-                    validity=360,
-                    serial=str(datetime.now())
-                )
+                certificate = remme.certificate.create({
+                    'common_name':'user_name',
+                    'email':'user@email.com',
+                    'name':'John',
+                    'surname':'Smith',
+                    'country_name':'US',
+                    'validity':360,
+                    'serial':str(datetime.now()),
+                })
         """
         return self._create_certificate(
             keys=RSA.generate_key_pair(),
@@ -262,7 +262,7 @@ class RemmeCertificate(IRemmeCertificate):
         valid_from = math.floor(int(certificate.not_valid_before.strftime("%s")) / 1000)
         valid_to = math.floor(int(certificate.not_valid_after.strftime("%s")) / 1000)
 
-        batch_response = await self._remme_public_key_storage.store(
+        batch_response = await self._remme_public_key_storage.create_and_store(
             data=certificate_pem,
             keys=RSA(
                 private_key=private_key_to_der(certificate.private_key),
@@ -271,6 +271,7 @@ class RemmeCertificate(IRemmeCertificate):
             rsa_signature_padding=RsaSignaturePadding.PSS,
             valid_from=valid_from,
             valid_to=valid_to,
+            do_owner_pay=False,
         )
 
         return CertificateTransactionResponse(
