@@ -1,7 +1,9 @@
 import asyncio
 import os
 import sys
+from aiohttp_json_rpc.exceptions import RpcGenericServerDefinedError
 from datetime import datetime
+
 
 sys.path.insert(0, os.path.realpath('./'))
 
@@ -21,14 +23,20 @@ async def example():
         validity=360,
         serial=str(datetime.now())
     )
+    certificate = certificate_transaction_result.certificate
 
-    async for response in certificate_transaction_result.connect_to_web_socket():
-        print('connected')
-        print('certificate', response)
-        print(f'Certificate was saved on REMchain at block number: {response.block_number}')
-        certificate_status = remme.certificate.check(certificate_transaction_result.certificate)
-        print(f'Certificate is_valid = {certificate_status}')
-        await certificate_transaction_result.close_web_socket()
+    while True:
+
+        try:
+            info = await remme.certificate.get_info(certificate)
+            print(f'Info: {info.data}')
+
+            certificate_status = await remme.certificate.check(certificate)
+            print(f'Certificate is valid: {certificate_status}')
+            break
+
+        except RpcGenericServerDefinedError:
+            continue
 
 
 loop = asyncio.get_event_loop()

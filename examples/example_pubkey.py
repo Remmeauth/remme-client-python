@@ -2,6 +2,7 @@ import asyncio
 import os
 import sys
 from datetime import datetime, timedelta
+from aiohttp_json_rpc.exceptions import RpcGenericServerDefinedError
 
 sys.path.insert(0, os.path.realpath('./'))
 
@@ -19,7 +20,7 @@ async def example():
     current_timestamp = int(datetime.now().timestamp())
     current_timestamp_plus_year = int(current_timestamp + timedelta(365).total_seconds())
 
-    pubkey_transaction_result = await remme.public_key_storage.create_and_store(
+    await remme.public_key_storage.create_and_store(
         data='some',
         keys=keys,
         rsa_signature_padding=RsaSignaturePadding.PSS,
@@ -28,16 +29,19 @@ async def example():
         do_owner_pay=False,
     )
 
-    async for response in pubkey_transaction_result.connect_to_web_socket():
-        print('connected')
-        print(response)
-        info = await remme.public_key_storage.get_info(keys.address)
-        print('info', info)
-        is_valid = await remme.public_key_storage.check(keys.address)
-        print('is_valid:', is_valid)
-        public_key_addresses = await remme.public_key_storage.get_account_public_keys(remme.account.address)
-        print('list_public_key_addresses:', public_key_addresses)
-        await pubkey_transaction_result.close_web_socket()
+    while True:
+
+        try:
+            info = await remme.public_key_storage.get_info(keys.address)
+            print('Info:', info.data)
+            is_valid = await remme.public_key_storage.check(keys.address)
+            print('Public key is valid:', is_valid)
+            public_key_addresses = await remme.public_key_storage.get_account_public_keys(remme.account.address)
+            print('List public key addresses:', public_key_addresses)
+            break
+
+        except RpcGenericServerDefinedError:
+            continue
 
 
 loop = asyncio.get_event_loop()

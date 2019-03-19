@@ -12,6 +12,21 @@
    and interaction with Remme nodes both public or permissioned.
 </p>
 
+<p align="center">
+  <a href="https://github.com/Remmeauth/remme-client-python">
+    <img src="https://img.shields.io/github/release/Remmeauth/remme-client-python.svg" alt="PyPI version for Remme python library."/>
+  </a>
+  <a href="https://pypi.python.org/pypi/remme">
+    <img src="https://img.shields.io/pypi/dm/remme.svg" alt="PyPI download month."/>
+  </a>
+  <a href="http://remme.readthedocs.io/?badge=latest">
+    <img src="https://readthedocs.org/projects/remme/badge/?version=latest" alt="Documentation Status."/>
+  </a>
+  <img src="https://img.shields.io/badge/Python-3.6-brightgreen.svg" alt="Python3.6"/>
+  <img src="https://img.shields.io/badge/Python-3.7-brightgreen.svg" alt="Python3.7"/>
+</p>
+
+
 ## How to use
 
 ### 1. Install and run Remme protocol with required RPC API methods enabled
@@ -19,22 +34,6 @@
 You can check out how to do that at [Remme core repo](<https://github.com/Remmeauth/remme-core/>).
 
 ### 2. Before installing the library, make sure that all the dependencies listed are installed:
-    
-**Python3.6**
-
-```sh
-$ sudo add-apt-repository ppa:deadsnakes/ppa
-$ sudo apt-get update
-$ sudo apt-get install python3.6-dev
-$ python3.6 -V or python3.6 --version
-```
-
-**Pip**
-
-```sh
-$ sudo apt-get -y install python3-pip
-$ pip3 --version or pip3 -V
-```
 
 **Required by one of the requirements [system packages list](https://github.com/ludbb/secp256k1-py#installation-with-compilation)**
 
@@ -68,40 +67,42 @@ remme = Remme(private_key_hex=private_key_hex, network_config=network_config)
 #### Tokens
 
 ```python
-some_remme_address = '1120077f88b0b798347b3f52751bb99fa8cabaf926c5a1dad2d975d7b966a85b3a9c21'
+remme_address = '1120077f88b0b798347b3f52751bb99fa8cabaf926c5a1dad2d975d7b966a85b3a9c21'
 
-balance = await remme.token.get_balance(some_remme_address)
-print(f'Account {some_remme_address}, balance - {balance} REM')
+balance = await remme.token.get_balance(address=remme_address)
+print(f'Account — {remme_address}, balance — {balance} REM.')
 
-transaction_result = await remme.token.transfer(some_remme_address, 10)
-print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
+transaction_result = await remme.token.transfer(address_to=remme_address, amount=10)
+print(f'Transaction batch id: {transaction_result.batch_id}')
 
-async for batch_info in transaction_result.connect_to_web_socket():
-	if batch_info.status == BatchStatus.COMMITTED.value:
-    	new_balance = await remme.token.get_balance(some_remme_address)
-        print(f'Account {some_remme_address}, balance - {new_balance} REM')
-        await transaction_result.close_web_socket()
 ```
 
 #### Certificates
 
 ```python
 certificate_transaction_result = await remme.certificate.create_and_store(
-    common_name='user_name',
-    email='user@email.com',
-    name='John',
-    surname='Smith',
-    country_name='US',
-    validity=360,
-    serial='some serial'
-)
+        common_name='user_name',
+        email='user@email.com',
+        name='John',
+        surname='Smith',
+        country_name='US',
+        validity=360,
+        serial=str(datetime.now())
+    )
+certificate = certificate_transaction_result.certificate
 
-async for response in certificate_transaction_result.connect_to_web_socket():
-    print('certificate', response)
-    print(f'Certificate was saved on REMchain at block number: {response.block_number}')
-    certificate_status = remme.certificate.check(certificate_transaction_result.certificate)
-    print(f'Certificate is_valid = {certificate_status}')
-    await certificate_transaction_result.close_web_socket()
+while True:
+
+    try:
+        info = await remme.certificate.get_info(certificate)
+        print(f'Info: {info.data}')
+
+        certificate_status = await remme.certificate.check(certificate)
+        print(f'Certificate is valid: {certificate_status}')
+        break
+
+    except RpcGenericServerDefinedError:
+        continue
 ```
 
 #### Subscribing to Events
@@ -112,9 +113,20 @@ RemmeEvents is enums which describe all available events.
 from remme.models.websocket.events import RemmeEvents
 
 events = await remme.events.subscribe(events=RemmeEvents.AtomicSwap.value)
+
 async for response in events:
-    print('connected')
-    print('events', response)
+
+    print("connected")
+    
+    if isinstance(response, dict):
+        print(response)
+    
+    else:
+        print(f'State: {response.state}')
+        print(f'Sender address: {response.sender_address}')
+        print(f'Receiver address: {response.receiver_address}')
+        print(f'Amount: {response.amount}')
+
 ```
 
 Also we give a possibility to start listen events from previous block by providing last known block id.
@@ -126,15 +138,25 @@ events = await remme.events.subscribe(
     events=RemmeEvents.AtomicSwap.value, 
     last_known_block_id='db19f0e3b3f001670bebc814e238df48cef059f3f0668f57702ba9ff0c4b8ec45c7298f08b4c2fa67602da27a84b3df5dc78ce0f7774b3d3ae094caeeb9cbc82',
 )
+
 async for response in events:
-    print('connected')
-    print('events', response)
+
+    print("connected")
+    
+    if isinstance(response, dict):
+        print(response)
+    
+    else:
+        print(f'State: {response.state}')
+        print(f'Sender address: {response.sender_address}')
+        print(f'Receiver address: {response.receiver_address}')
+        print(f'Amount: {response.amount}')
 ```
 
 Unsubscribe from listening events.
 
 ```python
-remme.events.unsubscribe()
+await remme.events.unsubscribe(events=RemmeEvents.AtomicSwap.value)
 ```
 
 ## License
