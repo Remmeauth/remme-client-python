@@ -4,6 +4,7 @@
 # Remme Python Client
 
 [![Release](https://img.shields.io/github/release/Remmeauth/remme-client-python.svg)](https://github.com/Remmeauth/remme-client-python/releases)
+[![PyPI version shields.io](https://img.shields.io/pypi/v/remme.svg)](https://pypi.python.org/pypi/remme/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/remme.svg)](https://pypi.python.org/pypi/remme)
 [![Documentation status](https://readthedocs.org/projects/remme/badge/?version=latest)](http://remme.readthedocs.io/?badge=latest)
 [![PyPI license](https://img.shields.io/pypi/l/remme.svg)](https://pypi.python.org/pypi/remme/)
@@ -13,9 +14,9 @@ An open source Python integration library for REMChain, simplifying the access
 and interaction with Remme nodes both public or permissioned.
 
 * [How to use](#how-to-use)
-    * [1. Install and run Remme protocol with required RPC API methods enabled](#1-install-and-run-remme-protocol-with-required-rpc-api-methods-enabled)
-    * [2. Before installing the library, make sure that all the dependencies listed are installed:](#2-before-installing-the-library-make-sure-that-all-the-dependencies-listed-are-installed)
-    * [3. Install the latest version of library to your Python project from terminal using `pip`](#3-install-the-latest-version-of-library-to-your-python-project-from-terminal-using-pip)
+    * [1. Install Remme protocol](#1-install-remme-protocol)
+    * [2. Install dependencies](#2-install-dependencies)
+    * [3. Install library](#3-install-library)
 * [Examples](#examples)
     * [Remme client](#remme-client)
     * [Tokens](#tokens)
@@ -26,11 +27,15 @@ and interaction with Remme nodes both public or permissioned.
 
 ## How to use
 
-### 1. Install and run Remme protocol with required RPC API methods enabled
+### 1. Install Remme protocol
+
+Install and run Remme protocol with required RPC API methods enabled.
 
 You can check out how to do that at [Remme core repo](<https://github.com/Remmeauth/remme-core/>).
 
-### 2. Before installing the library, make sure that all the dependencies listed are installed:
+### 2. Install dependencies:
+
+Before installing the library, make sure that all the dependencies listed are installed.
 
 **Required by one of the requirements [system packages list](https://github.com/ludbb/secp256k1-py#installation-with-compilation)**
 
@@ -40,7 +45,9 @@ $ sudo apt-get install python3-dev python3-setuptools -y
 $ sudo apt-get install build-essential automake libtool pkg-config libffi-dev -y
 ```
 
-### 3. Install the latest version of library to your Python project from terminal using `pip`
+### 3. Install library
+
+Install the latest version of library to your Python project from terminal using `pip`:
 
 ```bash
 $ pip3 install remme

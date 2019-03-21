@@ -5,6 +5,8 @@ poetry.lock
 remme_client.egg-info/
 remme/protobuf/
 docs/build
+dist/
+remme.egg-info/
 
 # IDE
 .idea/

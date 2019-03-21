@@ -3,7 +3,7 @@ from setuptools import (
     setup,
 )
 
-VERSION = '0.0.1'
+VERSION = '1.0.0'
 
 
 with open('README.md', 'r', encoding='utf-8') as read_me:
@@ -17,6 +17,7 @@ setup(
     description='Python integration library for REMChain.',
     long_description=long_description,
     long_description_content_type='text/markdown',
+    license='Apache License 2.0',
     install_requires=required,
     name='remme',
     packages=find_packages(),
