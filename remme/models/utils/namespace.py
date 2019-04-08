@@ -10,5 +10,6 @@ class RemmeNamespace(Enum):
     """
 
     ACCOUNT = '112007'
+    NODE_ACCOUNT = '116829',
     PUBLIC_KEY = 'a23be1'
     SWAP = '78173b'
