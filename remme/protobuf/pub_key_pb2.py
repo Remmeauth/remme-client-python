@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -19,6 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='pub_key.proto',
   package='',
   syntax='proto3',
+  serialized_options=None,
   serialized_pb=_b('\n\rpub_key.proto\"B\n\x0cPubKeyMethod\"2\n\x06Method\x12\t\n\x05STORE\x10\x00\x12\n\n\x06REVOKE\x10\x01\x12\x11\n\rSTORE_AND_PAY\x10\x02\"\x9f\x05\n\x10NewPubKeyPayload\x12=\n\x11hashing_algorithm\x18\x01 \x01(\x0e\x32\".NewPubKeyPayload.HashingAlgorithm\x12\x13\n\x0b\x65ntity_hash\x18\x02 \x01(\x0c\x12\x1d\n\x15\x65ntity_hash_signature\x18\x03 \x01(\x0c\x12\x12\n\nvalid_from\x18\x04 \x01(\r\x12\x10\n\x08valid_to\x18\x05 \x01(\r\x12\x31\n\x03rsa\x18\x06 \x01(\x0b\x32\".NewPubKeyPayload.RSAConfigurationH\x00\x12\x35\n\x05\x65\x63\x64sa\x18\x07 \x01(\x0b\x32$.NewPubKeyPayload.ECDSAConfigurationH\x00\x12\x39\n\x07\x65\x64\x32\x35\x35\x31\x39\x18\x08 \x01(\x0b\x32&.NewPubKeyPayload.Ed25519ConfigurationH\x00\x1a~\n\x10RSAConfiguration\x12\x0b\n\x03key\x18\x01 \x01(\x0c\x12;\n\x07padding\x18\x02 \x01(\x0e\x32*.NewPubKeyPayload.RSAConfiguration.Padding\" \n\x07Padding\x12\x07\n\x03PSS\x10\x00\x12\x0c\n\x08PKCS1v15\x10\x01\x1ak\n\x12\x45\x43\x44SAConfiguration\x12\x0b\n\x03key\x18\x01 \x01(\x0c\x12\x33\n\x02\x65\x63\x18\x02 \x01(\x0e\x32\'.NewPubKeyPayload.ECDSAConfiguration.EC\"\x13\n\x02\x45\x43\x12\r\n\tSECP256k1\x10\x00\x1a#\n\x14\x45\x64\x32\x35\x35\x31\x39\x43onfiguration\x12\x0b\n\x03key\x18\x01 \x01(\x0c\"*\n\x10HashingAlgorithm\x12\n\n\x06SHA256\x10\x00\x12\n\n\x06SHA512\x10\x01\x42\x0f\n\rconfiguration\"\x7f\n\x1bNewPubKeyStoreAndPayPayload\x12*\n\x0fpub_key_payload\x18\x01 \x01(\x0b\x32\x11.NewPubKeyPayload\x12\x18\n\x10owner_public_key\x18\x02 \x01(\x0c\x12\x1a\n\x12signature_by_owner\x18\x03 \x01(\x0c\"&\n\x13RevokePubKeyPayload\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\"V\n\rPubKeyStorage\x12\r\n\x05owner\x18\x01 \x01(\t\x12\"\n\x07payload\x18\x02 \x01(\x0b\x32\x11.NewPubKeyPayload\x12\x12\n\nis_revoked\x18\x03 \x01(\x08\x62\x06proto3')
 )
 
@@ -32,19 +32,19 @@ _PUBKEYMETHOD_METHOD = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='STORE', index=0, number=0,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='REVOKE', index=1, number=1,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='STORE_AND_PAY', index=2, number=2,
-      options=None,
+      serialized_options=None,
       type=None),
   ],
   containing_type=None,
-  options=None,
+  serialized_options=None,
   serialized_start=33,
   serialized_end=83,
 )
@@ -58,15 +58,15 @@ _NEWPUBKEYPAYLOAD_RSACONFIGURATION_PADDING = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='PSS', index=0, number=0,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='PKCS1v15', index=1, number=1,
-      options=None,
+      serialized_options=None,
       type=None),
   ],
   containing_type=None,
-  options=None,
+  serialized_options=None,
   serialized_start=518,
   serialized_end=550,
 )
@@ -80,11 +80,11 @@ _NEWPUBKEYPAYLOAD_ECDSACONFIGURATION_EC = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='SECP256k1', index=0, number=0,
-      options=None,
+      serialized_options=None,
       type=None),
   ],
   containing_type=None,
-  options=None,
+  serialized_options=None,
   serialized_start=640,
   serialized_end=659,
 )
@@ -98,15 +98,15 @@ _NEWPUBKEYPAYLOAD_HASHINGALGORITHM = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='SHA256', index=0, number=0,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='SHA512', index=1, number=1,
-      options=None,
+      serialized_options=None,
       type=None),
   ],
   containing_type=None,
-  options=None,
+  serialized_options=None,
   serialized_start=698,
   serialized_end=740,
 )
@@ -127,7 +127,7 @@ _PUBKEYMETHOD = _descriptor.Descriptor(
   enum_types=[
     _PUBKEYMETHOD_METHOD,
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -151,14 +151,14 @@ _NEWPUBKEYPAYLOAD_RSACONFIGURATION = _descriptor.Descriptor(
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='padding', full_name='NewPubKeyPayload.RSAConfiguration.padding', index=1,
       number=2, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -166,7 +166,7 @@ _NEWPUBKEYPAYLOAD_RSACONFIGURATION = _descriptor.Descriptor(
   enum_types=[
     _NEWPUBKEYPAYLOAD_RSACONFIGURATION_PADDING,
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -189,14 +189,14 @@ _NEWPUBKEYPAYLOAD_ECDSACONFIGURATION = _descriptor.Descriptor(
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='ec', full_name='NewPubKeyPayload.ECDSAConfiguration.ec', index=1,
       number=2, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -204,7 +204,7 @@ _NEWPUBKEYPAYLOAD_ECDSACONFIGURATION = _descriptor.Descriptor(
   enum_types=[
     _NEWPUBKEYPAYLOAD_ECDSACONFIGURATION_EC,
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -227,14 +227,14 @@ _NEWPUBKEYPAYLOAD_ED25519CONFIGURATION = _descriptor.Descriptor(
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -257,56 +257,56 @@ _NEWPUBKEYPAYLOAD = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='entity_hash', full_name='NewPubKeyPayload.entity_hash', index=1,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='entity_hash_signature', full_name='NewPubKeyPayload.entity_hash_signature', index=2,
       number=3, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='valid_from', full_name='NewPubKeyPayload.valid_from', index=3,
       number=4, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='valid_to', full_name='NewPubKeyPayload.valid_to', index=4,
       number=5, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='rsa', full_name='NewPubKeyPayload.rsa', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='ecdsa', full_name='NewPubKeyPayload.ecdsa', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='ed25519', full_name='NewPubKeyPayload.ed25519', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -314,7 +314,7 @@ _NEWPUBKEYPAYLOAD = _descriptor.Descriptor(
   enum_types=[
     _NEWPUBKEYPAYLOAD_HASHINGALGORITHM,
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -341,28 +341,28 @@ _NEWPUBKEYSTOREANDPAYPAYLOAD = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='owner_public_key', full_name='NewPubKeyStoreAndPayPayload.owner_public_key', index=1,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='signature_by_owner', full_name='NewPubKeyStoreAndPayPayload.signature_by_owner', index=2,
       number=3, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -386,14 +386,14 @@ _REVOKEPUBKEYPAYLOAD = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -417,28 +417,28 @@ _PUBKEYSTORAGE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='payload', full_name='PubKeyStorage.payload', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='is_revoked', full_name='PubKeyStorage.is_revoked', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
