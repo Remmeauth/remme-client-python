@@ -13,3 +13,4 @@ class BlockInfo:
         self.previous_header_signature = self.data.get('previous_header_signature')
         self.header_signature = self.data.get('header_signature')
         self.signer_public_key = self.data.get('signer_public_key')
+        self.cert_votes = self.data.get('cert_votes')

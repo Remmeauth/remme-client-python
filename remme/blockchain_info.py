@@ -62,7 +62,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             ),
             protobuf.NodeAccountMethod.TRANSFER_FROM_FROZEN_TO_UNFROZEN: get_namespace_params(
                 type='transfer from frozen to unfrozen',
-                parser=protobuf.NodeAccountInternalTransferPayload(),
+                parser=protobuf.EmptyPayload(),
             ),
             protobuf.NodeAccountMethod.TRANSFER_FROM_UNFROZEN_TO_OPERATIONAL: get_namespace_params(
                 type='transfer from unfrozen to operational',
