@@ -28,3 +28,4 @@ class RemmeMethods(Enum):
     FETCH_STATE = 'fetch_state'
     PEERS = 'fetch_peers'
     RECEIPTS = 'list_receipts'
+    NODE_ACCOUNT = 'get_node_account'

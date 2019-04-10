@@ -13,12 +13,12 @@ async def test_create_remme_client():
     Expect: remme object.
     """
     remme = Remme(
-            private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
-            network_config={
-                'node_address': 'localhost:8080',
-                'ssl_mode': False,
-            }
-        )
+        account_config={'private_key_hex': 'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8'},
+        network_config={
+            'node_address': 'localhost:8080',
+            'ssl_mode': False,
+        }
+    )
 
     assert isinstance(remme, Remme)
 
@@ -33,7 +33,7 @@ async def test_create_remme_client_with_invalid_data():
 
     with pytest.raises(Exception) as error:
         Remme(
-            private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
+            account_config={'private_key_hex': 'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8'},
             network_config={
                 'node_address': 'test',
                 'ssl_mode': False,

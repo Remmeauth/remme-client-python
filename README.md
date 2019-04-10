@@ -61,12 +61,15 @@ $ pip3 install remme
 from remme import Remme
 
 private_key_hex = 'bcf42d0194f7f6448e6f03ca0fa1f53cc3fe7768d546cd4d028144aba654d7aa'
+account_config = {
+    'private_key_hex':'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
+}
 network_config = {
     'node_address': 'localhost:8080',
     'ssl_mode': False,
 }
 
-remme = Remme(private_key_hex=private_key_hex, network_config=network_config)
+remme = Remme(account_config=account_config, network_config=network_config)
 ```
 
 #### Tokens

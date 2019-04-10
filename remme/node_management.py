@@ -52,7 +52,6 @@ class RemmeNodeManagement(IRemmeNodeManagement):
         self._remme_transaction = remme_transaction
 
     async def _check_node(self):
-
         node_account = await self.get_node_account()
 
         node_state = node_account.state.get('node_state')
@@ -91,7 +90,6 @@ class RemmeNodeManagement(IRemmeNodeManagement):
 
                 open_node = await remme.node_management.open_node()
         """
-
         open_node_payload = EmptyPayload().SerializeToString()
 
         inputs_and_outputs = []
