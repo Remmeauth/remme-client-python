@@ -30,6 +30,9 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         RemmeNamespace.ACCOUNT.value: get_namespace_params(
             type='account', parser=protobuf.Account(),
         ),
+        RemmeNamespace.NODE_ACCOUNT.value: get_namespace_params(
+            type='node account', parser=protobuf.NodeAccount(),
+        ),
         RemmeNamespace.PUBLIC_KEY.value: get_namespace_params(
             type='storage public key', parser=protobuf.PubKeyStorage(),
         ),
@@ -42,6 +45,28 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             ),
             protobuf.AccountMethod.GENESIS: get_namespace_params(
                 type='genesis', parser=protobuf.GenesisPayload(),
+            ),
+        },
+        RemmeFamilyName.NODE_ACCOUNT.value: {
+            protobuf.NodeAccountMethod.INITIALIZE_MASTERNODE: get_namespace_params(
+                type='initialize masternode',
+                parser=protobuf.NodeAccountInternalTransferPayload(),
+            ),
+            protobuf.NodeAccountMethod.CLOSE_MASTERNODE: get_namespace_params(
+                type='close masternode',
+                parser=protobuf.EmptyPayload(),
+            ),
+            protobuf.NodeAccountMethod.SET_BET: get_namespace_params(
+                type='set bet',
+                parser=protobuf.SetBetPayload(),
+            ),
+            protobuf.NodeAccountMethod.TRANSFER_FROM_FROZEN_TO_UNFROZEN: get_namespace_params(
+                type='transfer from frozen to unfrozen',
+                parser=protobuf.NodeAccountInternalTransferPayload(),
+            ),
+            protobuf.NodeAccountMethod.TRANSFER_FROM_UNFROZEN_TO_OPERATIONAL: get_namespace_params(
+                type='transfer from unfrozen to operational',
+                parser=protobuf.NodeAccountInternalTransferPayload(),
             ),
         },
         RemmeFamilyName.SWAP.value: {
