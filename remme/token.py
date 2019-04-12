@@ -5,11 +5,19 @@ from remme.protobuf.account_pb2 import (
     AccountMethod,
     TransferPayload,
 )
-from remme.protobuf.transaction_pb2 import TransactionPayload
+from remme.protobuf.node_account_pb2 import (
+    NodeAccountMethod,
+    NodeAccountInternalTransferPayload,
+)
+from remme.protobuf.transaction_pb2 import (
+    TransactionPayload,
+    EmptyPayload,
+)
 from remme.utils import (
     public_key_address,
     validate_address,
     validate_amount,
+    validate_family_node_account,
 )
 
 
@@ -42,14 +50,17 @@ class RemmeToken(IRemmeToken):
                     await transaction_result.close_web_socket()
     """
 
-    _family_name = RemmeFamilyName.ACCOUNT.value
+    _account_family_name = RemmeFamilyName.ACCOUNT.value
+    _node_account_family_name = RemmeFamilyName.NODE_ACCOUNT.value
     _family_version = '0.1'
+    _stake_settings_address = "remme.settings.minimum_stake"
 
-    def __init__(self, remme_api, remme_transaction):
+    def __init__(self, remme_api, remme_transaction, remme_account):
         """
         Args:
             remme_api: RemmeAPI
             remme_transaction: RemmeTransactionService
+            remme_account: RemmeAccount
 
         To use:
             Usage without main remme package.
@@ -63,9 +74,27 @@ class RemmeToken(IRemmeToken):
         """
         self._remme_api = remme_api
         self._remme_transaction = remme_transaction
+        self._remme_account = remme_account
 
         self.transfer_payload = TransferPayload()
+        self.node_account_internal_transfer_payload = NodeAccountInternalTransferPayload()
+        self.empty_payload = EmptyPayload()
         self.transaction_payload = TransactionPayload()
+
+    async def _generate_and_send_transfer_payload(self, transfer_method, family_name, transfer_payload, inputs_outputs):
+
+        self.transaction_payload.method = transfer_method
+        self.transaction_payload.data = transfer_payload
+
+        payload = await self._remme_transaction.create(
+            family_name=family_name,
+            family_version=self._family_version,
+            inputs=inputs_outputs,
+            outputs=inputs_outputs,
+            payload_bytes=self.transaction_payload.SerializeToString(),
+        )
+
+        return await self._remme_transaction.send(payload=payload)
 
     async def get_balance(self, address):
         """
@@ -126,15 +155,81 @@ class RemmeToken(IRemmeToken):
         self.transfer_payload.address_to = address_to
         self.transfer_payload.value = amount
 
-        self.transaction_payload.method = AccountMethod.TRANSFER
-        self.transaction_payload.data = self.transfer_payload.SerializeToString()
+        if self._remme_account._family_name == self._node_account_family_name:
+            self.transfer_payload.sender_account_type = TransferPayload.NODE_ACCOUNT
+        else:
+            self.transfer_payload.sender_account_type = TransferPayload.ACCOUNT
 
-        payload = await self._remme_transaction.create(
-            family_name=self._family_name,
-            family_version=self._family_version,
-            inputs=[address_to],
-            outputs=[address_to],
-            payload_bytes=self.transaction_payload.SerializeToString(),
+        return await self._generate_and_send_transfer_payload(
+            transfer_method=AccountMethod.TRANSFER,
+            family_name=self._account_family_name,
+            transfer_payload=self.transfer_payload.SerializeToString(),
+            inputs_outputs=[address_to],
         )
 
-        return await self._remme_transaction.send(payload=payload)
+    async def transfer_from_unfrozen_to_operational(self, amount):
+        """
+        Transfer tokens from unfrozen to operational address.
+        Send transaction to REMChain.
+
+        Args:
+            amount (integer): amount of tokens
+
+        Returns:
+            Transaction result.
+
+        To use:
+            .. code-block:: python
+
+                transaction_result = await remme.token.transfer_from_unfrozen_to_operational(10)
+                print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
+        """
+        if self.remme_account._family_name != self._node_account_family_name:
+            raise Exception(
+                f'This operation is allowed under NodeAccount. '
+                f'Your account type is {self._remme_account.family_name} '
+                f'and address is: ${self._remme_account.address}.',
+            )
+        validate_amount(amount=amount)
+
+        self.node_account_internal_transfer_payload.value = amount
+
+        return await self._generate_and_send_transfer_payload(
+            transfer_method=NodeAccountMethod.TRANSFER_FROM_UNFROZEN_TO_OPERATIONAL,
+            family_name=self._node_account_family_name,
+            transfer_payload=self.node_account_internal_transfer_payload.SerializeToString(),
+            inputs_outputs=[self._remme_account._address],
+        )
+
+    async def transfer_from_frozen_to_unfrozen(self):
+        """
+        Transfer tokens from frozen to unfrozen address.
+        Send transaction to REMChain.
+
+        Returns:
+            Transaction result.
+
+        To use:
+            .. code-block:: python
+
+                transaction_result = await remme.token.transfer_from_frozen_to_unfrozen()
+                print(f'Sending tokens...BatchId: {transaction_result.batch_id}')
+        """
+        if self.remme_account._family_name != self._node_account_family_name:
+            raise Exception(
+                f'This operation is allowed under NodeAccount. '
+                f'Your account type is {self._remme_account.family_name} '
+                f'and address is: ${self._remme_account.address}.',
+            )
+
+        self.transaction_payload.method = NodeAccountMethod.TRANSFER_FROM_FROZEN_TO_UNFROZEN
+        self.transaction_payload.data = self.empty_payload.SerializeToString()
+
+        stake_settings_address = self._stake_settings_address
+
+        return await self._generate_and_send_transfer_payload(
+            transfer_method=NodeAccountMethod.TRANSFER_FROM_FROZEN_TO_UNFROZEN,
+            family_name=self._node_account_family_name,
+            transfer_payload=self.empty_payload.SerializeToString(),
+            inputs_outputs=[stake_settings_address],
+        )
