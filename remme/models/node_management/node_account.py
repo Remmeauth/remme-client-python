@@ -45,7 +45,7 @@ class NodeAccount:
         elif response.get(BetType.FIXED_AMOUNT.value.lower()):
             return {
                 'type': BetType.FIXED_AMOUNT,
-                'value': response.get(BetType.FIXED_AMOUNT.value),
+                'value': response.get(BetType.FIXED_AMOUNT.value).lower(),
             }
 
         else:

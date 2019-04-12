@@ -12,7 +12,9 @@ from remme.utils import web3_hash
 
 async def example():
 
-    remme = Remme(private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8')
+    remme = Remme(account_config={
+        'private_key_hex': 'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
+    })
 
     swap_id = '133102e41346242476b15a3a7966eb5249271025fc7fb0b37ed3fdb4bcce3806'
     secret_key = '3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16'

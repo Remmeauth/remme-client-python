@@ -13,7 +13,9 @@ from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 
 async def example():
 
-    remme = Remme(private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8')
+    remme = Remme(account_config={
+        'private_key_hex': 'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
+    })
 
     generate_keys = remme.keys.generate_key_pair(KeyType.RSA)
     print(f'Keys: {generate_keys}')

@@ -9,7 +9,9 @@ from remme import Remme
 
 async def example():
 
-    remme = Remme(private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8')
+    remme = Remme(account_config={
+        'private_key_hex': 'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
+    })
 
     block_info = await remme.blockchain_info.get_block_info()
     print(f'Block info: {block_info}')
