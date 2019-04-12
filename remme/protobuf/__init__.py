@@ -5,6 +5,13 @@ from remme.protobuf.account_pb2 import (
     GenesisStatus,
     TransferPayload,
 )
+from remme.protobuf.node_account_pb2 import (
+    NodeAccount,
+    NodeAccountMethod,
+    NodeAccountInternalTransferPayload,
+    NodeState,
+    SetBetPayload,
+)
 from remme.protobuf.atomic_swap_pb2 import (
     AtomicSwapApprovePayload,
     AtomicSwapClosePayload,
@@ -24,4 +31,7 @@ from remme.protobuf.pub_key_pb2 import (
     PubKeyStorage,
     RevokePubKeyPayload,
 )
-from remme.protobuf.transaction_pb2 import TransactionPayload
+from remme.protobuf.transaction_pb2 import (
+    TransactionPayload,
+    EmptyPayload,
+)
