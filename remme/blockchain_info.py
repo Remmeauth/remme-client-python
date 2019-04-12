@@ -52,6 +52,10 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 type='initialize masternode',
                 parser=protobuf.NodeAccountInternalTransferPayload(),
             ),
+            protobuf.NodeAccountMethod.INITIALIZE_NODE: get_namespace_params(
+                type='initialize node',
+                parser=protobuf.EmptyPayload(),
+            ),
             protobuf.NodeAccountMethod.CLOSE_MASTERNODE: get_namespace_params(
                 type='close masternode',
                 parser=protobuf.EmptyPayload(),
