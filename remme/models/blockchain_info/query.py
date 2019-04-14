@@ -3,9 +3,9 @@ import re
 from remme.models.general.patterns import RemmePatterns
 
 
-class BaseQuery:
+class BasicQuery:
     """
-    Class for checking base query on request parameters.
+    Class parent for basic query on request parameters.
     """
 
     def __init__(self, query):
@@ -14,7 +14,6 @@ class BaseQuery:
 
         self.head = self.query.get('head')
         self.start = self.query.get('start')
-        self.family_name = self.query.get('family_name')
         self.limit = self.query.get('limit')
         self.reverse = '' if self.query.get('reverse') else 'false'
 
@@ -32,8 +31,32 @@ class BaseQuery:
             else:
                 raise Exception('Parameter `start` is not a valid.')
 
+
+class BaseQuery(BasicQuery):
+    """
+    Class for checking base query on request parameters.
+    """
+
+    def __init__(self, query):
+        super(BaseQuery, self).__init__(query)
+
+        self.ids = self.query.get('ids')
+        self.family_name = self.query.get('family_name')
+
+        if self.ids is not None:
+            if isinstance(self.ids, list):
+                for transaction_id in self.ids:
+
+                    if not isinstance(self.ids, str) \
+                            and not (re.match(RemmePatterns.BLOCKCHAIN_INFO.value, transaction_id) is not None):
+                        raise Exception('Parameter `ids` stris not a valid.')
+
+            else:
+                raise Exception('Parameter `ids` is not a valid.')
+
     def get(self):
         return {
+            'ids': self.ids,
             'head': self.head,
             'start': self.start,
             'family_name': self.family_name,
@@ -42,7 +65,7 @@ class BaseQuery:
         }
 
 
-class StateQuery(BaseQuery):
+class StateQuery(BasicQuery):
     """
     Class for checking state query on request parameters.
     """
@@ -57,6 +80,10 @@ class StateQuery(BaseQuery):
             raise Exception('Parameter `address` need to a valid.')
 
     def get(self):
-        get_data = super(StateQuery, self).get()
-        get_data.update({'address': self.address})
-        return get_data
+        return {
+            'address': self.address,
+            'head': self.head,
+            'start': self.start,
+            'limit': self.limit,
+            'reverse': self.reverse,
+        }

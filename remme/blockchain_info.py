@@ -116,8 +116,8 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         self._remme_api = remme_api
 
     @staticmethod
-    def _check_id(id):
-        if id is None or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, id) is not None):
+    def _check_id(check_id):
+        if check_id is None or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, check_id) is not None):
             raise Exception('Given `id` is not a valid.')
 
     @staticmethod
@@ -190,13 +190,13 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             params=query,
         )
 
-    async def get_block_by_id(self, id):
+    async def get_block_by_id(self, block_id):
         """
         Get block by id (header_signature) from REMChain.
         Specify limit of output.
 
         Args:
-            id (string): id
+            block_id (string): block_id
 
         Returns:
             Block.
@@ -209,11 +209,11 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 block = await remme.blockchain_info.get_block_by_id(id)
                 print(block)
         """
-        self._check_id(id=id)
+        self._check_id(check_id=block_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.FETCH_BLOCK,
-            params={'id': id},
+            params={'id': block_id},
         )
 
     async def get_block_info(self, query=None):
@@ -316,12 +316,12 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             params=query,
         )
 
-    async def get_batches_by_id(self, id):
+    async def get_batches_by_id(self, batch_id):
         """
         Get batch by id (header_signature) from REMChain.
 
         Args:
-            id (string): batch id
+            batch_id (string): batch id
 
         Returns:
             Batches.
@@ -334,11 +334,11 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 batch = await remme.blockchain_info.get_batches_by_id(id)
                 print(batch)
         """
-        self._check_id(id=id)
+        self._check_id(check_id=batch_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.FETCH_BATCH,
-            params={'id': id},
+            params={'id': batch_id},
         )
 
     async def get_batch_status(self, batch_id):
@@ -359,7 +359,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 batch_status = await remme.blockchain_info.get_batch_status(id)
                 print(batch_status)
         """
-        self._check_id(id=batch_id)
+        self._check_id(check_id=batch_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BATCH_STATUS,
@@ -546,12 +546,12 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             params=query,
         )
 
-    async def get_transaction_by_id(self, id):
+    async def get_transaction_by_id(self, transaction_id):
         """
         Get transaction by id (header_signature) from REMChain.
 
         Args:
-            id (string): id
+            transaction_id (string): transaction_id
 
         Returns:
             Transaction.
@@ -564,11 +564,11 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 transaction = await remme.blockchain_info.get_transaction_by_id(id)
                 print(transaction)
         """
-        self._check_id(id=id)
+        self._check_id(check_id=transaction_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.FETCH_TRANSACTION,
-            params={'id': id},
+            params={'id': transaction_id},
         )
 
     async def parse_transaction_payload(self, transaction):
@@ -665,7 +665,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     #             print(receipts)
     #     """
     #     for id in ids:
-    #         self._check_id(id=id)
+    #         self._check_id(check_id=id)
     #
     #     return (await self._remme_api.send_request(
     #         method=RemmeMethods.RECEIPTS, params={'ids': ids}
