@@ -39,7 +39,7 @@ class Remme:
         self.transaction = RemmeTransactionService(self._remme_api, self._account)
         self.public_key_storage = RemmePublicKeyStorage(self._remme_api, self._account, self.transaction)
         self.certificate = RemmeCertificate(self.public_key_storage)
-        self.token = RemmeToken(self._remme_api, self.transaction)
+        self.token = RemmeToken(self._remme_api, self.transaction, self.account)
         self.swap = RemmeSwap(self._remme_api, self.transaction)
         self.blockchain_info = RemmeBlockchainInfo(self._remme_api)
 

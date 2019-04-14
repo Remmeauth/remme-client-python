@@ -17,7 +17,6 @@ from remme.utils import (
     public_key_address,
     validate_address,
     validate_amount,
-    validate_family_node_account,
 )
 
 

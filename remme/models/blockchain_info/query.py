@@ -48,7 +48,7 @@ class BaseQuery(BasicQuery):
                 for transaction_id in self.ids:
 
                     if not isinstance(self.ids, str) \
-                            and not (re.match(RemmePatterns.BLOCKCHAIN_INFO.value, transaction_id) is not None):
+                            and not (re.match(RemmePatterns.HEADER_SIGNATURE.value, transaction_id) is not None):
                         raise Exception('Parameter `ids` stris not a valid.')
 
             else:
