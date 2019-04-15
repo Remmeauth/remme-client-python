@@ -1,9 +1,15 @@
-from remme.models.utils.family_name import RemmeFamilyName
+from remme.models.account.accoun_type import AccountType
 from remme.models.keys.ecdsa import ECDSA
+from remme.models.utils.family_name import RemmeFamilyName
 from remme.utils import (
     generate_address,
     hex_to_bytes,
 )
+
+DEFAULT_ACCOUNT_CONFIG = {
+    'private_key_hex': '',
+    'account_type': AccountType.USER,
+}
 
 
 class RemmeAccount(ECDSA):
@@ -33,13 +39,14 @@ class RemmeAccount(ECDSA):
             print(is_verify_in_another_account)  # False
     """
 
-    def __init__(self, private_key_hex=None):
+    def __init__(self, private_key_hex='', account_type=AccountType.USER):
         """
         Get private key, create signer by using private key,
         generate public key from private key and generate account address by using public key and family name.
 
         Args:
             private_key_hex (string): private key in hex format
+            account_type (enum): account type (user, node)
 
         References::
             - https://docs.remme.io/remme-core/docs/family-account.html#addressing
@@ -69,5 +76,7 @@ class RemmeAccount(ECDSA):
 
         super(RemmeAccount, self).__init__(private_key=private_key)
 
-        self._family_name = RemmeFamilyName.ACCOUNT.value
+        is_user = account_type == AccountType.USER
+
+        self._family_name = RemmeFamilyName.ACCOUNT.value if is_user else RemmeFamilyName.NODE_ACCOUNT.value
         self._address = generate_address(self._family_name, self._public_key_hex)

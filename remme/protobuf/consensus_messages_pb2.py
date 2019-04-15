@@ -7,6 +7,7 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -18,7 +19,6 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='consensus_messages.proto',
   package='',
   syntax='proto3',
-  serialized_options=None,
   serialized_pb=_b('\n\x18\x63onsensus_messages.proto\"P\n\x17\x43onsensusMessagePayload\x12\x0e\n\x06period\x18\x01 \x01(\x04\x12\x13\n\x0bproposal_id\x18\x02 \x01(\x0c\x12\x10\n\x08voter_id\x18\x03 \x01(\x0c\"\xac\x01\n\x10\x43onsensusMessage\x12$\n\x04type\x18\x01 \x01(\x0e\x32\x16.ConsensusMessage.Type\x12)\n\x07payload\x18\x02 \x01(\x0b\x32\x18.ConsensusMessagePayload\"G\n\x04Type\x12\x12\n\x0eVALUE_PROPOSAL\x10\x00\x12\r\n\tSOFT_VOTE\x10\x01\x12\r\n\tCERT_VOTE\x10\x02\x12\r\n\tNEXT_VOTE\x10\x03\"W\n\x16SignedConsensusMessage\x12\x19\n\x11message_signature\x18\x01 \x01(\x0c\x12\"\n\x07message\x18\x02 \x01(\x0b\x32\x11.ConsensusMessage\"E\n\rConsensusSeal\x12\x34\n\x13previous_cert_votes\x18\x01 \x03(\x0b\x32\x17.SignedConsensusMessage\"(\n\x14\x43onsensusSealRequest\x12\x10\n\x08\x62lock_id\x18\x01 \x01(\x0c\x62\x06proto3')
 )
 
@@ -32,23 +32,23 @@ _CONSENSUSMESSAGE_TYPE = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='VALUE_PROPOSAL', index=0, number=0,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='SOFT_VOTE', index=1, number=1,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='CERT_VOTE', index=2, number=2,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='NEXT_VOTE', index=3, number=3,
-      serialized_options=None,
+      options=None,
       type=None),
   ],
   containing_type=None,
-  serialized_options=None,
+  options=None,
   serialized_start=212,
   serialized_end=283,
 )
@@ -68,28 +68,28 @@ _CONSENSUSMESSAGEPAYLOAD = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='proposal_id', full_name='ConsensusMessagePayload.proposal_id', index=1,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='voter_id', full_name='ConsensusMessagePayload.voter_id', index=2,
       number=3, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -113,14 +113,14 @@ _CONSENSUSMESSAGE = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='payload', full_name='ConsensusMessage.payload', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
@@ -128,7 +128,7 @@ _CONSENSUSMESSAGE = _descriptor.Descriptor(
   enum_types=[
     _CONSENSUSMESSAGE_TYPE,
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -152,21 +152,21 @@ _SIGNEDCONSENSUSMESSAGE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='message', full_name='SignedConsensusMessage.message', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -190,14 +190,14 @@ _CONSENSUSSEAL = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -221,14 +221,14 @@ _CONSENSUSSEALREQUEST = _descriptor.Descriptor(
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],

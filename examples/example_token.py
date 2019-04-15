@@ -10,7 +10,9 @@ from remme.models.websocket.events import RemmeEvents
 
 async def example():
 
-    remme = Remme(private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8')
+    remme = Remme(account_config={
+        'private_key_hex': 'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
+    })
 
     address = '112007db8a00c010402e2e3a7d03491323e761e0ea612481c518605648ceeb5ed454f7'
 
