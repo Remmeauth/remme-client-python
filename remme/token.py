@@ -156,9 +156,9 @@ class RemmeToken(IRemmeToken):
         self.transfer_payload.value = amount
 
         if self._remme_account.family_name == self._node_family_name:
-            self.transfer_payload.sender_account_type = TransferPayload.SenderAccountType.Value('ACCOUNT')
-        else:
             self.transfer_payload.sender_account_type = TransferPayload.SenderAccountType.Value('NODE_ACCOUNT')
+        else:
+            self.transfer_payload.sender_account_type = TransferPayload.SenderAccountType.Value('ACCOUNT')
 
         inputs_outputs = [address_to]
 

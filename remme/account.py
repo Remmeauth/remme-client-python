@@ -8,7 +8,7 @@ from remme.utils import (
 
 DEFAULT_ACCOUNT_CONFIG = {
     'private_key_hex': '',
-    'account_type': AccountType.USER.value,
+    'account_type': AccountType.USER,
 }
 
 
@@ -39,7 +39,7 @@ class RemmeAccount(ECDSA):
             print(is_verify_in_another_account)  # False
     """
 
-    def __init__(self, private_key_hex=None, account_type=None):
+    def __init__(self, private_key_hex='', account_type=AccountType.USER):
         """
         Get private key, create signer by using private key,
         generate public key from private key and generate account address by using public key and family name.
@@ -69,9 +69,6 @@ class RemmeAccount(ECDSA):
                 print(account.private_key_hex)
                 # 'b5167700cc4325cc2a78b22b9acb039d9efe859ef673b871d55d10783919129f'
         """
-        private_key_hex = private_key_hex if private_key_hex else ''
-        account_type = account_type if account_type else AccountType.USER
-
         if private_key_hex:
             private_key = hex_to_bytes(private_key_hex)
         else:
