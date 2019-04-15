@@ -7,6 +7,7 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -18,7 +19,6 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='node_account.proto',
   package='',
   syntax='proto3',
-  serialized_options=None,
   serialized_pb=_b('\n\x12node_account.proto\"u\n\tShareInfo\x12\x11\n\tblock_num\x18\x01 \x01(\x04\x12\x14\n\x0c\x66rozen_share\x18\x02 \x01(\x04\x12\x0e\n\x06reward\x18\x03 \x01(\x04\x12\x17\n\x0f\x62lock_timestamp\x18\x04 \x01(\x04\x12\x16\n\x0e\x64\x65\x66rost_months\x18\x05 \x01(\r\"\xce\x02\n\x0bNodeAccount\x12\x0f\n\x07\x62\x61lance\x18\x01 \x01(\x04\x12*\n\nnode_state\x18\x02 \x01(\x0e\x32\x16.NodeAccount.NodeState\x12+\n\nreputation\x18\x03 \x01(\x0b\x32\x17.NodeAccount.Reputation\x12\x16\n\x0c\x66ixed_amount\x18\x04 \x01(\rH\x00\x12\r\n\x03min\x18\x05 \x01(\x08H\x00\x12\r\n\x03max\x18\x06 \x01(\x08H\x00\x12\x1e\n\x16last_defrost_timestamp\x18\x07 \x01(\x04\x12\x1a\n\x06shares\x18\x08 \x03(\x0b\x32\n.ShareInfo\x1a.\n\nReputation\x12\x0e\n\x06\x66rozen\x18\x01 \x01(\x04\x12\x10\n\x08unfrozen\x18\x02 \x01(\x04\",\n\tNodeState\x12\x07\n\x03NEW\x10\x00\x12\n\n\x06OPENED\x10\x01\x12\n\n\x06\x43LOSED\x10\x02\x42\x05\n\x03\x62\x65t\"!\n\tNodeState\x12\x14\n\x0cmaster_nodes\x18\x01 \x03(\t\"\xce\x01\n\x11NodeAccountMethod\"\xb8\x01\n\x06Method\x12$\n TRANSFER_FROM_FROZEN_TO_UNFROZEN\x10\x00\x12)\n%TRANSFER_FROM_UNFROZEN_TO_OPERATIONAL\x10\x01\x12\x19\n\x15INITIALIZE_MASTERNODE\x10\x02\x12\x14\n\x10\x43LOSE_MASTERNODE\x10\x03\x12\x13\n\x0fINITIALIZE_NODE\x10\x04\x12\x0b\n\x07SET_BET\x10\x05\x12\n\n\x06\x44O_BET\x10\x06\"3\n\"NodeAccountInternalTransferPayload\x12\r\n\x05value\x18\x01 \x01(\x04\"L\n\rSetBetPayload\x12\x16\n\x0c\x66ixed_amount\x18\x01 \x01(\x02H\x00\x12\r\n\x03min\x18\x02 \x01(\x08H\x00\x12\r\n\x03max\x18\x03 \x01(\x08H\x00\x42\x05\n\x03\x62\x65tb\x06proto3')
 )
 
@@ -32,19 +32,19 @@ _NODEACCOUNT_NODESTATE = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='NEW', index=0, number=0,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='OPENED', index=1, number=1,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='CLOSED', index=2, number=2,
-      serialized_options=None,
+      options=None,
       type=None),
   ],
   containing_type=None,
-  serialized_options=None,
+  options=None,
   serialized_start=425,
   serialized_end=469,
 )
@@ -58,35 +58,35 @@ _NODEACCOUNTMETHOD_METHOD = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='TRANSFER_FROM_FROZEN_TO_UNFROZEN', index=0, number=0,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='TRANSFER_FROM_UNFROZEN_TO_OPERATIONAL', index=1, number=1,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='INITIALIZE_MASTERNODE', index=2, number=2,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='CLOSE_MASTERNODE', index=3, number=3,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='INITIALIZE_NODE', index=4, number=4,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='SET_BET', index=5, number=5,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='DO_BET', index=6, number=6,
-      serialized_options=None,
+      options=None,
       type=None),
   ],
   containing_type=None,
-  serialized_options=None,
+  options=None,
   serialized_start=536,
   serialized_end=720,
 )
@@ -106,42 +106,42 @@ _SHAREINFO = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='frozen_share', full_name='ShareInfo.frozen_share', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='reward', full_name='ShareInfo.reward', index=2,
       number=3, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='block_timestamp', full_name='ShareInfo.block_timestamp', index=3,
       number=4, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='defrost_months', full_name='ShareInfo.defrost_months', index=4,
       number=5, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -165,21 +165,21 @@ _NODEACCOUNT_REPUTATION = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='unfrozen', full_name='NodeAccount.Reputation.unfrozen', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -202,56 +202,56 @@ _NODEACCOUNT = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='node_state', full_name='NodeAccount.node_state', index=1,
       number=2, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='reputation', full_name='NodeAccount.reputation', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='fixed_amount', full_name='NodeAccount.fixed_amount', index=3,
       number=4, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='min', full_name='NodeAccount.min', index=4,
       number=5, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='max', full_name='NodeAccount.max', index=5,
       number=6, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='last_defrost_timestamp', full_name='NodeAccount.last_defrost_timestamp', index=6,
       number=7, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='shares', full_name='NodeAccount.shares', index=7,
       number=8, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
@@ -259,7 +259,7 @@ _NODEACCOUNT = _descriptor.Descriptor(
   enum_types=[
     _NODEACCOUNT_NODESTATE,
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -286,14 +286,14 @@ _NODESTATE = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -318,7 +318,7 @@ _NODEACCOUNTMETHOD = _descriptor.Descriptor(
   enum_types=[
     _NODEACCOUNTMETHOD_METHOD,
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -342,14 +342,14 @@ _NODEACCOUNTINTERNALTRANSFERPAYLOAD = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -373,28 +373,28 @@ _SETBETPAYLOAD = _descriptor.Descriptor(
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='min', full_name='SetBetPayload.min', index=1,
       number=2, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='max', full_name='SetBetPayload.max', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],

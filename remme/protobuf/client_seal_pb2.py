@@ -7,6 +7,7 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -19,7 +20,6 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='client_seal.proto',
   package='',
   syntax='proto3',
-  serialized_options=None,
   serialized_pb=_b('\n\x11\x63lient_seal.proto\x1a\x18\x63onsensus_messages.proto\"\x13\n\x11\x43lientSealRequest\"\xa4\x01\n\x12\x43lientSealResponse\x12*\n\x06status\x18\x01 \x01(\x0e\x32\x1a.ClientSealResponse.Status\x12+\n\ncert_votes\x18\x02 \x03(\x0b\x32\x17.SignedConsensusMessage\"5\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\x12\n\x0eINTERNAL_ERROR\x10\x01\x12\x0f\n\x0bNO_RESOURCE\x10\x02\x62\x06proto3')
   ,
   dependencies=[consensus__messages__pb2.DESCRIPTOR,])
@@ -34,19 +34,19 @@ _CLIENTSEALRESPONSE_STATUS = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='OK', index=0, number=0,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='INTERNAL_ERROR', index=1, number=1,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='NO_RESOURCE', index=2, number=2,
-      serialized_options=None,
+      options=None,
       type=None),
   ],
   containing_type=None,
-  serialized_options=None,
+  options=None,
   serialized_start=180,
   serialized_end=233,
 )
@@ -66,7 +66,7 @@ _CLIENTSEALREQUEST = _descriptor.Descriptor(
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -90,14 +90,14 @@ _CLIENTSEALRESPONSE = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='cert_votes', full_name='ClientSealResponse.cert_votes', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
@@ -105,7 +105,7 @@ _CLIENTSEALRESPONSE = _descriptor.Descriptor(
   enum_types=[
     _CLIENTSEALRESPONSE_STATUS,
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],

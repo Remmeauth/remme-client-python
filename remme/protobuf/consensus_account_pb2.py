@@ -7,6 +7,7 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -18,7 +19,6 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='consensus_account.proto',
   package='',
   syntax='proto3',
-  serialized_options=None,
   serialized_pb=_b('\n\x17\x63onsensus_account.proto\"@\n\x16\x43onsensusAccountMethod\"&\n\x06Method\x12\x0f\n\x0bSEND_REWARD\x10\x00\x12\x0b\n\x07GENESIS\x10\x01\"\xaf\x01\n\x10\x43onsensusAccount\x12\x12\n\npublic_key\x18\x01 \x01(\t\x12\x1b\n\x13obligatory_payments\x18\x02 \x01(\x04\x12\x12\n\nblock_cost\x18\x03 \x01(\x04\x12)\n\x04\x62\x65ts\x18\x04 \x03(\x0b\x32\x1b.ConsensusAccount.BetsEntry\x1a+\n\tBetsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x62\x06proto3')
 )
 
@@ -32,15 +32,15 @@ _CONSENSUSACCOUNTMETHOD_METHOD = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='SEND_REWARD', index=0, number=0,
-      serialized_options=None,
+      options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='GENESIS', index=1, number=1,
-      serialized_options=None,
+      options=None,
       type=None),
   ],
   containing_type=None,
-  serialized_options=None,
+  options=None,
   serialized_start=53,
   serialized_end=91,
 )
@@ -61,7 +61,7 @@ _CONSENSUSACCOUNTMETHOD = _descriptor.Descriptor(
   enum_types=[
     _CONSENSUSACCOUNTMETHOD_METHOD,
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -85,21 +85,21 @@ _CONSENSUSACCOUNT_BETSENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='value', full_name='ConsensusAccount.BetsEntry.value', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=_b('8\001'),
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -122,35 +122,35 @@ _CONSENSUSACCOUNT = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='obligatory_payments', full_name='ConsensusAccount.obligatory_payments', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='block_cost', full_name='ConsensusAccount.block_cost', index=2,
       number=3, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='bets', full_name='ConsensusAccount.bets', index=3,
       number=4, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
   nested_types=[_CONSENSUSACCOUNT_BETSENTRY, ],
   enum_types=[
   ],
-  serialized_options=None,
+  options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
@@ -190,5 +190,6 @@ _sym_db.RegisterMessage(ConsensusAccount)
 _sym_db.RegisterMessage(ConsensusAccount.BetsEntry)
 
 
-_CONSENSUSACCOUNT_BETSENTRY._options = None
+_CONSENSUSACCOUNT_BETSENTRY.has_options = True
+_CONSENSUSACCOUNT_BETSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 # @@protoc_insertion_point(module_scope)

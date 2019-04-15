@@ -11,7 +11,7 @@ from remme.models.websocket.events import RemmeEvents
 async def example():
 
     remme = Remme(
-            private_key_hex='f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8',
+            account_config={'private_key_hex': 'f4f551c178104595ff184f1786ddb2bfdc74b24562611edcab90d4729fb4bab8'},
             network_config={'node_address': 'localhost:8080', 'ssl_mode': False},
         )
 
