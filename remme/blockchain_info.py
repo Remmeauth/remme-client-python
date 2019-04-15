@@ -5,7 +5,8 @@ from remme import protobuf
 from remme.models.blockchain_info.block_info import BlockInfo
 from remme.models.blockchain_info.network_status import NetworkStatus
 from remme.models.blockchain_info.query import (
-    BaseQuery,
+    TransactionQuery,
+    FractionQuery,
     StateQuery,
 )
 from remme.models.general.methods import RemmeMethods
@@ -116,8 +117,8 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         self._remme_api = remme_api
 
     @staticmethod
-    def _check_id(check_id):
-        if check_id is None or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, check_id) is not None):
+    def _check_id(id_):
+        if id_ is None or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, id_) is not None):
             raise Exception('Given `id` is not a valid.')
 
     @staticmethod
@@ -183,7 +184,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 start = hex(query.get('start')).lstrip('0x')[-16:]
                 query['start'] = f'0x{start.zfill(16)}'
 
-            query = BaseQuery(query=query).get()
+            query = FractionQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BLOCKS,
@@ -209,7 +210,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 block = await remme.blockchain_info.get_block_by_id(id)
                 print(block)
         """
-        self._check_id(check_id=block_id)
+        self._check_id(id_=block_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.FETCH_BLOCK,
@@ -309,7 +310,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 print(batches)
         """
         if query:
-            query = BaseQuery(query=query).get()
+            query = FractionQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BATCHES,
@@ -334,7 +335,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 batch = await remme.blockchain_info.get_batches_by_id(id)
                 print(batch)
         """
-        self._check_id(check_id=batch_id)
+        self._check_id(id_=batch_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.FETCH_BATCH,
@@ -359,7 +360,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 batch_status = await remme.blockchain_info.get_batch_status(id)
                 print(batch_status)
         """
-        self._check_id(check_id=batch_id)
+        self._check_id(id_=batch_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BATCH_STATUS,
@@ -479,13 +480,13 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             raise Exception(f'This address {address} don\'t supported for parsing.')
 
         namespace_params = RemmeBlockchainInfo._address.get(address[0:6])
-        type, parser = namespace_params.get('type'), namespace_params.get('parser')
+        type_, parser = namespace_params.get('type'), namespace_params.get('parser')
 
         parser.ParseFromString(base64.b64decode(state.get('data')))
 
         return {
             'data': parser,
-            'type': type,
+            'type': type_,
         }
 
     async def get_transactions(self, query=None):
@@ -539,7 +540,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 print(transactions)
         """
         if query:
-            query = BaseQuery(query=query).get()
+            query = TransactionQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.TRANSACTIONS,
@@ -564,7 +565,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 transaction = await remme.blockchain_info.get_transaction_by_id(id)
                 print(transaction)
         """
-        self._check_id(check_id=transaction_id)
+        self._check_id(id_=transaction_id)
 
         return await self._remme_api.send_request(
             method=RemmeMethods.FETCH_TRANSACTION,
@@ -606,13 +607,13 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
 
         namespace_params = RemmeBlockchainInfo._correspond.get(family_name).get(method)
 
-        type, parser = namespace_params.get('type'), namespace_params.get('parser')
+        type_, parser = namespace_params.get('type'), namespace_params.get('parser')
 
         parser.ParseFromString(data)
 
         return {
             'payload': parser,
-            'type': type,
+            'type': type_,
         }
 
     async def get_network_status(self):
@@ -665,7 +666,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
     #             print(receipts)
     #     """
     #     for id in ids:
-    #         self._check_id(check_id=id)
+    #         self._check_id(id_=id)
     #
     #     return (await self._remme_api.send_request(
     #         method=RemmeMethods.RECEIPTS, params={'ids': ids}

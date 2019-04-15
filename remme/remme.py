@@ -53,12 +53,17 @@ class Remme:
     def account(self):
         """
         Get information about current account.
+
         To use:
             .. code-block:: python
+
                 print(remme.account)
+
             Provide an account which sign the transactions that send to our nodes.
             For account use ECDSA (secp256k1) key pair.
+
             .. code-block:: python
+
                 account = Remme.generate_account()
                 remme.account = account
         """
@@ -79,8 +84,10 @@ class Remme:
     def generate_account():
         """
         Generate a new account.
+
         To use:
             .. code-block:: python
+
                 account = Remme.generate_account()
                 print(account)
         """
@@ -91,15 +98,21 @@ class Remme:
         """
         This properties hold implementation of RemmeWebSocketEvents,
         which get a possibility to listen events from validator about transactions.
+
         To use:
             Subscribe to event.
+
             .. code-block:: python
+
                 remme.events.subscribe(
                     events=RemmeEvents.AtomicSwap.value,
                     last_known_block_id=last_known_block_id  # also can be set if you know it
                 )
+
             Unsubscribe.
+
             .. code-block:: python
+
                 remme.events.unsubscribe()
         """
         return self._events

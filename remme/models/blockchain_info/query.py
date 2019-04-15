@@ -1,11 +1,19 @@
 import re
 
 from remme.models.general.patterns import RemmePatterns
+from remme.models.utils.family_name import RemmeFamilyName
+
+FAMILY_NAMES = [
+    RemmeFamilyName.ACCOUNT.value,
+    RemmeFamilyName.NODE_ACCOUNT.value,
+    RemmeFamilyName.PUBLIC_KEY.value,
+    RemmeFamilyName.SWAP.value,
+]
 
 
-class BasicQuery:
+class BaseQuery:
     """
-    Class parent for basic query on request parameters.
+    Class parent for base query on request parameters.
     """
 
     def __init__(self, query):
@@ -31,17 +39,24 @@ class BasicQuery:
             else:
                 raise Exception('Parameter `start` is not a valid.')
 
+    def get(self):
+        return {
+            'head': self.head,
+            'start': self.start,
+            'limit': self.limit,
+            'reverse': self.reverse,
+        }
 
-class BaseQuery(BasicQuery):
+
+class FractionQuery(BaseQuery):
     """
-    Class for checking base query on request parameters.
+    Class for checking block and batch query on request parameters.
     """
 
     def __init__(self, query):
-        super(BaseQuery, self).__init__(query)
+        super(FractionQuery, self).__init__(query)
 
         self.ids = self.query.get('ids')
-        self.family_name = self.query.get('family_name')
 
         if self.ids is not None:
             if isinstance(self.ids, list):
@@ -55,17 +70,32 @@ class BaseQuery(BasicQuery):
                 raise Exception('Parameter `ids` is not a valid.')
 
     def get(self):
-        return {
-            'ids': self.ids,
-            'head': self.head,
-            'start': self.start,
-            'family_name': self.family_name,
-            'limit': self.limit,
-            'reverse': self.reverse,
-        }
+        data = super(FractionQuery, self).get()
+        data.update({'ids': self.ids})
+        return data
 
 
-class StateQuery(BasicQuery):
+class TransactionQuery(FractionQuery):
+    """
+    Class for checking transaction query on request parameters.
+    """
+
+    def __init__(self, query):
+        super(TransactionQuery, self).__init__(query)
+
+        self.family_name = self.query.get('family_name')
+
+        if self.family_name is not None:
+            if self.family_name not in FAMILY_NAMES:
+                raise Exception('Parameter `family_name` is not a valid.')
+
+    def get(self):
+        data = super(TransactionQuery, self).get()
+        data.update({'family_name': self.family_name})
+        return data
+
+
+class StateQuery(BaseQuery):
     """
     Class for checking state query on request parameters.
     """
@@ -80,10 +110,6 @@ class StateQuery(BasicQuery):
             raise Exception('Parameter `address` need to a valid.')
 
     def get(self):
-        return {
-            'address': self.address,
-            'head': self.head,
-            'start': self.start,
-            'limit': self.limit,
-            'reverse': self.reverse,
-        }
+        data = super(StateQuery, self).get()
+        data.update({'address': self.address})
+        return data
