@@ -16,12 +16,12 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def get_transaction_by_id(id):
+    def get_transaction_by_id(transaction_id):
         """
         Get transaction by id (header_signature) from REMChain.
 
         Args:
-            id (string): id
+            transaction_id (string): transaction_id
         """
         pass
 
@@ -50,12 +50,12 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def get_block_by_id(id):
+    def get_block_by_id(block_id):
         """
         Get block by id (header_signature) from REMChain.
 
         Args:
-            id (string): id
+            block_id (string): block_id
         """
         pass
 
@@ -83,12 +83,12 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def get_batches_by_id(id):
+    def get_batches_by_id(batch_id):
         """
         Get batch by id (header_signature) from REMChain.
 
         Args:
-            id (string): batch id
+            batch_id (string): batch id
         """
         pass
 
