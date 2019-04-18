@@ -11,5 +11,6 @@ class RemmeFamilyName(Enum):
 
     ACCOUNT = 'account'
     NODE_ACCOUNT = 'node_account'
+    CONSENSUS_ACCOUNT = 'consensus_account'
     PUBLIC_KEY = 'pub_key'
     SWAP = 'AtomicSwap'
