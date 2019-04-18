@@ -4,6 +4,7 @@ from remme.models.atomic_swap.swap_init_dto import SwapInitDto
 from remme.models.general.methods import RemmeMethods
 from remme.models.general.patterns import RemmePatterns
 from remme.models.interfaces.atomic_swap import IRemmeSwap
+from remme.models.utils.constants import CONSENSUS_ADDRESS
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.models.websocket.swap_info import SwapInfo
 from remme.protobuf.atomic_swap_pb2 import (
@@ -53,7 +54,7 @@ class RemmeSwap(IRemmeSwap):
 
     _family_name = RemmeFamilyName.SWAP.value
     _family_version = '0.1'
-    _zero_address = ZERO_ADDRESS
+    _consensus_address = CONSENSUS_ADDRESS
     _block_info_namespace_address = '00b10c00'
     _block_info_config_address = '00b10c01' + '0' * 62
     _settings_swap_comission = generate_settings_address('remme.settings.swap_comission')
@@ -100,14 +101,14 @@ class RemmeSwap(IRemmeSwap):
             inputs = [
                 addresses,
                 self._settings_swap_comission,
-                self._zero_address,
+                self._consensus_address,
                 self._block_info_namespace_address,
                 self._block_info_config_address,
             ]
             outputs = [
                 addresses,
                 self._settings_swap_comission,
-                self._zero_address,
+                self._consensus_address,
             ]
 
         elif method == AtomicSwapMethod.EXPIRE:

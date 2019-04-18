@@ -4,6 +4,7 @@ from remme.models.interfaces.public_key_storage import IRemmePublicKeyStorage
 from remme.models.keys.key_type import KeyType
 from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 from remme.models.public_key_storage.public_key_info import PublicKeyInfo
+from remme.models.utils.constants import CONSENSUS_ADDRESS
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.protobuf.pub_key_pb2 import (
     NewPubKeyPayload,
@@ -13,7 +14,6 @@ from remme.protobuf.pub_key_pb2 import (
 )
 from remme.protobuf.transaction_pb2 import TransactionPayload
 from remme.utils import (
-    ZERO_ADDRESS,
     check_sha,
     generate_address,
     generate_settings_address,
@@ -65,6 +65,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
 
     _family_name = RemmeFamilyName.PUBLIC_KEY.value
     _family_version = '0.1'
+    _consensus_address = CONSENSUS_ADDRESS
     _settings_address = generate_settings_address(key='remme.economy_enabled')
 
     def __init__(self, remme_api, remme_account, remme_transaction_service):
@@ -401,7 +402,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
 
         inputs_and_outputs = [
             pub_key_address,
-            ZERO_ADDRESS,
+            self._consensus_address,
             self._settings_address
         ]
 
