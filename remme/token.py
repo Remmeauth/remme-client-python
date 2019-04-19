@@ -14,6 +14,7 @@ from remme.protobuf.transaction_pb2 import (
     EmptyPayload,
 )
 from remme.utils import (
+    generate_settings_address,
     public_key_address,
     validate_address,
     validate_amount,
@@ -52,7 +53,7 @@ class RemmeToken(IRemmeToken):
     _account_family_name = RemmeFamilyName.ACCOUNT.value
     _node_family_name = RemmeFamilyName.NODE_ACCOUNT.value
     _family_version = '0.1'
-    _stake_settings_address = "remme.settings.minimum_stake"
+    _stake_settings_address = generate_settings_address(key='remme.settings.minimum_stake')
 
     def __init__(self, remme_api, remme_transaction, remme_account):
         """
@@ -190,7 +191,7 @@ class RemmeToken(IRemmeToken):
             raise Exception(
                 f'This operation is allowed under NodeAccount. '
                 f'Your account type is {self._remme_account.family_name} '
-                f'and address is: ${self._remme_account.address}.',
+                f'and address is: {self._remme_account.address}.',
             )
         validate_amount(amount=amount)
 
@@ -223,7 +224,7 @@ class RemmeToken(IRemmeToken):
             raise Exception(
                 f'This operation is allowed under NodeAccount. '
                 f'Your account type is {self._remme_account.family_name} '
-                f'and address is: ${self._remme_account.address}.',
+                f'and address is: {self._remme_account.address}.',
             )
 
         self.transaction_payload.method = NodeAccountMethod.TRANSFER_FROM_FROZEN_TO_UNFROZEN

@@ -7,7 +7,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_transactions(query=None):
         """
-        Get all transactions from REMChain.
+        Get list of transactions from REMChain.
 
         Args:
             query (dict, optional): dictionary with specific parameters
@@ -21,7 +21,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
         Get transaction by id (header_signature) from REMChain.
 
         Args:
-            transaction_id (string): transaction_id
+            transaction_id (string): header signature of transaction
         """
         pass
 
@@ -40,7 +40,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_blocks(query=None):
         """
-        Get all blocks from REMChain.
+        Get list of blocks from REMChain.
         You can specify one or more query parameters.
 
         Args:
@@ -55,7 +55,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
         Get block by id (header_signature) from REMChain.
 
         Args:
-            block_id (string): block_id
+            block_id (string): block id
         """
         pass
 
@@ -74,7 +74,7 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_batches(query=None):
         """
-        Get all batches from REMChain.
+        Get list of batches from REMChain.
 
         Args:
             query (dict, optional): dictionary with specific parameters
@@ -83,12 +83,12 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def get_batches_by_id(batch_id):
+    def get_batch_by_id(batch_id):
         """
         Get batch by id (header_signature) from REMChain.
 
         Args:
-            batch_id (string): batch id
+            batch_id (string): header signature of transaction
         """
         pass
 
@@ -105,9 +105,9 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def get_state(query=None):
+    def get_states(query=None):
         """
-        Get states in REMChain.
+        Get list of states in REMChain.
 
         Args:
             query (dict, optional): dictionary with specific parameters
@@ -152,12 +152,13 @@ class IRemmeBlockchainInfo(metaclass=abc.ABCMeta):
         """
         pass
 
-    # TODO: uncomment after refactoring receipts
-    # @staticmethod
-    # @abc.abstractmethod
-    # def get_receipts(ids):
-    #     """
-    #     Get transactions receipts
-    #     :param ids: list of string
-    #     """
-    #     pass
+    @staticmethod
+    @abc.abstractmethod
+    def get_receipts(ids):
+        """
+        Get list of transactions receipts.
+
+        Args:
+            ids (list): list of string
+        """
+        pass

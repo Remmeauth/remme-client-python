@@ -1,6 +1,7 @@
 import base64
 import codecs
 import hashlib
+import json
 import math
 import random
 import re
@@ -105,20 +106,20 @@ def create_nonce():
 
 def check_sha256(data):
 
-    if not (re.match(RemmePatterns.SHA256.value, data) is not None):
+    if re.match(RemmePatterns.SHA256.value, data) is None:
         raise Exception('Value should be SHA-256.')
 
 
 def check_sha512(data):
 
-    if not (re.match(RemmePatterns.SHA512.value, data) is not None):
+    if re.match(RemmePatterns.SHA512.value, data) is None:
         raise Exception('Value should be SHA-512.')
 
 
 def check_sha(data):
 
-    if not (re.match(RemmePatterns.SHA256.value, data) is not None) \
-            and not (re.match(RemmePatterns.SHA512.value, data) is not None):
+    if re.match(RemmePatterns.SHA256.value, data) is None \
+            and re.match(RemmePatterns.SHA512.value, data) is None:
         raise Exception('Value should be SHA-256 or SHA-512.')
 
 
@@ -126,11 +127,11 @@ def validate_node_config(network_config):
 
     node_address, ssl_mode = network_config.get('node_address'), network_config.get('ssl_mode')
 
-    if not (re.match(RemmePatterns.NODE_ADDRESS.value, node_address) is not None):
-        raise Exception('You try construct with invalid `node_address`.')
+    if re.match(RemmePatterns.PROTOCOL.value, node_address) is None:
+        raise Exception('You try construct with invalid `node_address`, remove protocol and try again.')
 
     elif not isinstance(ssl_mode, bool):
-        raise Exception('You try construct with invalid `ssl_mode`.')
+        raise Exception('You try construct with invalid `ssl_mode`, `ssl_mode` should has boolean type.')
 
 
 def sha512_hexdigest(data):
@@ -162,7 +163,7 @@ def web3_hash(data):
 
 
 def generate_address(_family_name, _public_key_to):
-    return "" + sha512_hexdigest(_family_name)[:6] + sha512_hexdigest(_public_key_to)[:64]
+    return f'{sha512_hexdigest(_family_name)[:6]}{sha512_hexdigest(_public_key_to)[:64]}'
 
 
 def generate_settings_address(key):
@@ -321,3 +322,10 @@ def get_namespace_params(type, parser):
         'type': type,
         'parser': parser,
     }
+
+
+def dict_to_pretty_json(data):
+    """
+    Convert dictionary to string with indents as human readable text.
+    """
+    return json.dumps(data, indent=4, sort_keys=True)

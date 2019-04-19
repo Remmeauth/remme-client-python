@@ -26,7 +26,7 @@ class BaseQuery:
         self.reverse = '' if self.query.get('reverse') else 'false'
 
         if self.head is not None \
-                and not (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.head) is not None):
+                and re.match(RemmePatterns.HEADER_SIGNATURE.value, self.head) is None:
             raise Exception('Parameter `head` is not a valid.')
 
         if self.start is not None:
@@ -63,7 +63,7 @@ class FractionQuery(BaseQuery):
                 for transaction_id in self.ids:
 
                     if not isinstance(self.ids, str) \
-                            and not (re.match(RemmePatterns.HEADER_SIGNATURE.value, transaction_id) is not None):
+                            and re.match(RemmePatterns.HEADER_SIGNATURE.value, transaction_id) is None:
                         raise Exception('Parameter `ids` stris not a valid.')
 
             else:
@@ -106,7 +106,7 @@ class StateQuery(BaseQuery):
         self.address = query.get('address')
 
         if isinstance(self.address, str) \
-                and not (re.match(RemmePatterns.ADDRESS.value, self.address) is not None):
+                and re.match(RemmePatterns.ADDRESS.value, self.address) is None:
             raise Exception('Parameter `address` need to a valid.')
 
     def get(self):

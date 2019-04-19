@@ -14,7 +14,7 @@ class WebSocketsBatchEventRequestParams:
         self.id = data.get('id')
 
         if self.id is None or not isinstance(self.id, str) \
-                or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.id) is not None):
+                or re.match(RemmePatterns.HEADER_SIGNATURE.value, self.id) is None:
             raise Exception('The `id` parameter is not correct or not provided.')
 
     def serialize_to_json(self):

@@ -47,12 +47,12 @@ class IRemmeNodeManagement(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def set_bet(payload):
+    def set_bet(bet_type):
         """
         Set bet by payload (fixed_amount, max, min).
 
         Args:
-            payload (dict): fixed_amount (int), max (bool), min (bool)
+            bet_type (string or integer): fixed_amount, max, min
 
         To use:
             .. code-block:: python

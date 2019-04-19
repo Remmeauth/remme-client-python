@@ -44,7 +44,7 @@ class BaseTransactionResponse(RemmeWebSocket):
         Args:
             value (string): batch id
         """
-        if not (re.match(RemmePatterns.HEADER_SIGNATURE.value, value) is not None):
+        if re.match(RemmePatterns.HEADER_SIGNATURE.value, value) is None:
             raise Exception('Given batch id is invalid.')
 
         if self._socket:

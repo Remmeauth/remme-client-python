@@ -27,14 +27,14 @@ class Remme:
 
     keys = RemmeKeys()
 
-    def __init__(self, account_config=None, network_config=None):
+    def __init__(self, account_config=DEFAULT_ACCOUNT_CONFIG, network_config=DEFAULT_NETWORK_CONFIG):
         """
         Args:
-            account_config (dict): config of user account (private_key_hex and account type)
+            account_config (dict): config of user account (private key hex and account type)
             network_config (dict): config of network (node address and ssl mode)
         """
-        self.account_config = account_config if account_config else DEFAULT_ACCOUNT_CONFIG
-        self.network_config = network_config if network_config else DEFAULT_NETWORK_CONFIG
+        self.account_config = account_config
+        self.network_config = network_config
 
         self._remme_api = RemmeAPI(self.network_config)
         self._account = RemmeAccount(**self.account_config)
