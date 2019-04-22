@@ -1,4 +1,4 @@
-from remme.models.account.accoun_type import AccountType
+from remme.models.account.account_type import AccountType
 from remme.models.keys.ecdsa import ECDSA
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.utils import (

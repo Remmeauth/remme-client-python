@@ -14,7 +14,7 @@ class WebSocketsTransferEventRequestParams:
         self.address = data.get('address')
 
         if self.address is None or not isinstance(self.address, str) \
-                or not (re.match(RemmePatterns.ADDRESS.value, self.address) is not None):
+                or re.match(RemmePatterns.ADDRESS.value, self.address) is None:
             raise Exception('The `address` parameter is not correct or not provided.')
 
     def serialize_to_json(self):

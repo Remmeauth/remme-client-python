@@ -4,6 +4,7 @@ from sawtooth_sdk.protobuf.setting_pb2 import Setting
 
 from remme.models.general.methods import RemmeMethods
 from remme.models.interfaces.node_management import IRemmeNodeManagement
+from remme.models.node_management.bet_type import BetType
 from remme.models.node_management.node_account import NodeAccount
 from remme.models.node_management.node_account_state import NodeAccountState
 from remme.models.node_management.node_config import NodeConfig
@@ -27,6 +28,7 @@ class RemmeNodeManagement(IRemmeNodeManagement):
     """
 
     _stake_settings_address = generate_settings_address(key='remme.settings.minimum_stake')
+    _genesis_owners_address = generate_settings_address(key='remme.settings.genesis_owners')
     _master_node_list_address = '0' * 69 + '2'
     _family_name = RemmeFamilyName.NODE_ACCOUNT.value
     _family_version = '0.1'
@@ -68,14 +70,14 @@ class RemmeNodeManagement(IRemmeNodeManagement):
         if amount < initial_stake:
             raise Exception(f'Value for initialize Master Node is lower than {initial_stake}.')
 
-    async def _create_and_send_transaction(self, method, data, inputs_and_outputs):
+    async def _create_and_send_transaction(self, method, data, inputs, outputs):
         transaction_payload = TransactionPayload(method=method, data=data).SerializeToString()
 
         transaction = await self._remme_transaction.create(
             family_name=self._family_name,
             family_version=self._family_version,
-            inputs=inputs_and_outputs,
-            outputs=inputs_and_outputs,
+            inputs=inputs,
+            outputs=outputs,
             payload_bytes=transaction_payload,
         )
 
@@ -97,7 +99,8 @@ class RemmeNodeManagement(IRemmeNodeManagement):
         return await self._create_and_send_transaction(
             method=NodeAccountMethod.INITIALIZE_NODE,
             data=open_node_payload,
-            inputs_and_outputs=inputs_and_outputs,
+            inputs=inputs_and_outputs,
+            outputs=inputs_and_outputs,
         )
 
     async def open_master_node(self, amount):
@@ -116,7 +119,7 @@ class RemmeNodeManagement(IRemmeNodeManagement):
             raise Exception(
                 f'This operation is allowed under NodeAccount. '
                 f'Your account type is {self._remme_account.family_name} '
-                f'and address is: ${self._remme_account.address}.',
+                f'and address is: {self._remme_account.address}.',
             )
 
         await self._check_node()
@@ -132,7 +135,8 @@ class RemmeNodeManagement(IRemmeNodeManagement):
         return await self._create_and_send_transaction(
             method=NodeAccountMethod.INITIALIZE_MASTERNODE,
             data=open_master_node_payload,
-            inputs_and_outputs=inputs_and_outputs,
+            inputs=inputs_and_outputs,
+            outputs=inputs_and_outputs,
         )
 
     async def close_master_node(self):
@@ -148,48 +152,67 @@ class RemmeNodeManagement(IRemmeNodeManagement):
             raise Exception(
                 f'This operation is allowed under NodeAccount. '
                 f'Your account type is {self._remme_account.family_name} '
-                f'and address is: ${self._remme_account.address}.',
+                f'and address is: {self._remme_account.address}.',
             )
 
         close_payload = EmptyPayload().SerializeToString()
 
-        inputs_and_outputs = [
+        inputs = [
+            self._master_node_list_address,
+            self._genesis_owners_address,
+        ]
+
+        outputs = [
             self._master_node_list_address,
         ]
 
         return await self._create_and_send_transaction(
             method=NodeAccountMethod.CLOSE_MASTERNODE,
             data=close_payload,
-            inputs_and_outputs=inputs_and_outputs,
+            inputs=inputs,
+            outputs=outputs,
         )
 
-    async def set_bet(self, payload):
+    async def set_bet(self, bet_type):
         """
-        Set bet by payload (fixed_amount, max, min).
+        Set bet by bet type (fixed_amount, max, min).
 
         Args:
-            payload (dict): fixed_amount (int), max (bool), min (bool)
+            bet_type (string or integer): fixed_amount, max, min
 
         To use:
             .. code-block:: python
 
-                set_bet = await remme.node_management.set_bet({'fixed_amount':1})
+                set_bet = await remme.node_management.set_bet(1)
+                set_bet = await remme.node_management.set_bet('MAX')
         """
         if self._remme_account.family_name != self._family_name:
             raise Exception(
                 f'This operation is allowed under NodeAccount. '
                 f'Your account type is {self._remme_account.family_name} '
-                f'and address is: ${self._remme_account.address}.',
+                f'and address is: {self._remme_account.address}.',
             )
 
-        bet_payload = SetBetPayload(**payload).SerializeToString()
+        bet = {}
+
+        if isinstance(bet_type, int):
+            bet['fixed_amount'] = bet_type
+
+        elif bet_type == BetType.MAX.value or bet_type == BetType.MIN.value:
+            bet[bet_type.lower()] = True
+
+        else:
+            raise Exception('Unknown betting behaviour.')
+
+        bet_payload = SetBetPayload(**bet).SerializeToString()
 
         inputs_and_outputs = []
 
         return await self._create_and_send_transaction(
             method=NodeAccountMethod.SET_BET,
             data=bet_payload,
-            inputs_and_outputs=inputs_and_outputs,
+            inputs=inputs_and_outputs,
+            outputs=inputs_and_outputs,
         )
 
     async def get_initial_stake(self):
@@ -249,7 +272,7 @@ class RemmeNodeManagement(IRemmeNodeManagement):
                 node_info = await remme.node_management.get_node_info()
         """
         api_result = await self._remme_api.send_request(method=RemmeMethods.NETWORK_STATUS)
-        return NodeInfo(node_info=api_result)
+        return NodeInfo(data=api_result)
 
     async def get_node_config(self):
         """

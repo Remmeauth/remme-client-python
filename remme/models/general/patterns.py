@@ -13,5 +13,4 @@ class RemmePatterns(Enum):
     HEADER_SIGNATURE = r"^[a-f0-9]{128}$"
     SHA256 = r"^[a-f0-9]{64}$"
     SHA512 = r"^[a-f0-9]{128}$"
-    NODE_ADDRESS = r"^(!(http|https):\/\/)?(([\w\d\-+%=~&@#?!;*,\._\(\)|$\/\\\]" \
-                   r"\[-]*)(\.|\:))+([\w\d\-+%=~&@#?!;*,\._\(\)|$\/\\\]\[-]+)$"
+    PROTOCOL = r"^(?!(http|https|ws|wss):\/\/)\S+$"

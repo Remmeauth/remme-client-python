@@ -2,7 +2,6 @@ import asyncio
 import os
 import sys
 from aiohttp_json_rpc.exceptions import RpcGenericServerDefinedError
-from datetime import datetime
 
 sys.path.insert(0, os.path.realpath('./'))
 
@@ -28,7 +27,6 @@ async def example():
         amount=10,
         swap_id=swap_id,
         secret_lock_by_solicitor=secret_lock,
-        created_at=int(datetime.now().timestamp()),
     )
     print(f'Init batch id: {init.batch_id}')
 

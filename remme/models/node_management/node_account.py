@@ -8,6 +8,8 @@ DEFAULT_NODE_ACCOUNT_INFO = {
         'frozen': '0.0000',
         'unfrozen': '0.0000',
     },
+    'last_defrost_timestamp': 0,
+    'shares': [],
     'min': True,
 }
 
@@ -21,13 +23,15 @@ class NodeAccount:
 
         self.node_account_response = node_account_response if node_account_response else DEFAULT_NODE_ACCOUNT_INFO
 
-        self.state = {'node_state': self.node_account_response.get('node_state')}
+        self.state = self.node_account_response.get('node_state')
         self.reputation = {
             'frozen': self.node_account_response.get('reputation').get('frozen'),
             'unfrozen': self.node_account_response.get('reputation').get('unfrozen'),
         }
-        self.balance = {'balance': self.node_account_response.get('balance')}
+        self.balance = self.node_account_response.get('balance')
+        self.shares = self.node_account_response.get('shares')
         self.bet = self._get_bet_value(response=node_account_response)
+        self.last_defrost_timestamp = self.node_account_response.get('last_defrost_timestamp')
 
     @staticmethod
     def _get_bet_value(response):
@@ -44,7 +48,7 @@ class NodeAccount:
 
         elif response.get(BetType.FIXED_AMOUNT.value.lower()):
             return {
-                'type': BetType.FIXED_AMOUNT,
+                'type': BetType.FIXED_AMOUNT.value,
                 'value': response.get(BetType.FIXED_AMOUNT.value.lower()),
             }
 

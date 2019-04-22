@@ -17,7 +17,6 @@ from remme.protobuf.atomic_swap_pb2 import (
 )
 from remme.protobuf.transaction_pb2 import TransactionPayload
 from remme.utils import (
-    ZERO_ADDRESS,
     generate_address,
     generate_settings_address,
 )
@@ -87,6 +86,7 @@ class RemmeSwap(IRemmeSwap):
             method (protobuf): AtomicSwapMethod
             swap_id (string): swap id
             optional receiver_address (string): receiver address
+
         Returns:
             Lists of addresses inputs and outputs.
         """
@@ -156,7 +156,7 @@ class RemmeSwap(IRemmeSwap):
             if value is None:
                 raise Exception(f'The `{key}` was missing in parameters.')
 
-            elif not re.search(RemmePatterns.SWAP_ID.value, value) is not None:
+            elif re.search(RemmePatterns.SWAP_ID.value, value) is None:
                 raise Exception(f'Given `{key}` is not a valid.')
 
     async def approve(self, swap_id):

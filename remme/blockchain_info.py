@@ -5,9 +5,9 @@ from remme import protobuf
 from remme.models.blockchain_info.block_info import BlockInfo
 from remme.models.blockchain_info.network_status import NetworkStatus
 from remme.models.blockchain_info.query import (
-    TransactionQuery,
     FractionQuery,
     StateQuery,
+    TransactionQuery,
 )
 from remme.models.general.methods import RemmeMethods
 from remme.models.general.patterns import RemmePatterns
@@ -118,17 +118,17 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
 
     @staticmethod
     def _check_id(id_):
-        if id_ is None or not (re.match(RemmePatterns.HEADER_SIGNATURE.value, id_) is not None):
+        if id_ is None or re.match(RemmePatterns.HEADER_SIGNATURE.value, id_) is None:
             raise Exception('Given `id` is not a valid.')
 
     @staticmethod
     def _check_address(address):
-        if address is None or not (re.match(RemmePatterns.ADDRESS.value, address) is not None):
+        if address is None or re.match(RemmePatterns.ADDRESS.value, address) is None:
             raise Exception('Given `address` is not a valid.')
 
     async def get_blocks(self, query=None):
         """
-        Get all blocks from REMChain.
+        Get list of blocks from REMChain.
         You can specify one or more query parameters.
 
         Args:
@@ -197,7 +197,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         Specify limit of output.
 
         Args:
-            block_id (string): block_id
+            block_id (string): block id
 
         Returns:
             Block.
@@ -249,19 +249,24 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 block_info = await remme.blockchain_info.get_block_info({'limit':2})
                 print(block_info)
         """
-        blocks = await self._remme_api.send_request(
+        block_info = await self._remme_api.send_request(
             method=RemmeMethods.BLOCK_INFO,
             params=query,
         )
 
-        if blocks is None:
+        if block_info is None:
             raise Exception('Unknown error occurs in the server.')
 
-        return BlockInfo(data=blocks[0])
+        empty_list_block = []
+
+        if block_info == empty_list_block:
+            return block_info
+
+        return BlockInfo(data=block_info[0])
 
     async def get_batches(self, query=None):
         """
-        Get all batches from REMChain.
+        Get list of batches from REMChain.
 
         Args:
             query (dict, optional): dictionary with specific parameters
@@ -317,15 +322,15 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             params=query,
         )
 
-    async def get_batches_by_id(self, batch_id):
+    async def get_batch_by_id(self, batch_id):
         """
         Get batch by id (header_signature) from REMChain.
 
         Args:
-            batch_id (string): batch id
+            batch_id (string): header signature of transaction
 
         Returns:
-            Batches.
+            Batch.
 
         To use:
             .. code-block:: python
@@ -367,9 +372,9 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
             params={'id': batch_id},
         )
 
-    async def get_state(self, query=None):
+    async def get_states(self, query=None):
         """
-        Get states in REMChain.
+        Get list of states in REMChain.
 
         Args:
             query (dict, optional): dictionary with specific parameters
@@ -491,7 +496,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
 
     async def get_transactions(self, query=None):
         """
-        Get all transactions from REMChain.
+        Get list of transactions from REMChain.
 
         Args:
             query (dict, optional): dictionary with specific parameters
@@ -552,7 +557,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         Get transaction by id (header_signature) from REMChain.
 
         Args:
-            transaction_id (string): transaction_id
+            transaction_id (string): header signature of transaction
 
         Returns:
             Transaction.
@@ -631,7 +636,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         """
         network_status_data = await self._remme_api.send_request(method=RemmeMethods.NETWORK_STATUS)
 
-        return NetworkStatus(network_status=network_status_data)
+        return NetworkStatus(data=network_status_data)
 
     async def get_peers(self):
         """
@@ -648,26 +653,27 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
         """
         return (await self._remme_api.send_request(method=RemmeMethods.PEERS)).get('data')
 
-    # TODO: uncomment after refactoring receipts
-    # def get_receipts(self, ids):
-    #     """
-    #     Get transactions receipts.
-    #
-    #     Args:
-    #         ids (list): list of string
-    #
-    #     Returns:
-    #         List of transactions receipts.
-    #
-    #     To use:
-    #         .. code-block:: python
-    #
-    #             receipts = await remme.blockchain_info.get_receipts(ids)
-    #             print(receipts)
-    #     """
-    #     for id in ids:
-    #         self._check_id(id_=id)
-    #
-    #     return (await self._remme_api.send_request(
-    #         method=RemmeMethods.RECEIPTS, params={'ids': ids}
-    #     )).get('data')
+    async def get_receipts(self, ids):
+        """
+        Get list of transactions receipts.
+
+        Args:
+            ids (list): list of string
+
+        Returns:
+            List of transactions receipts.
+
+        To use:
+            .. code-block:: python
+
+                ids = ['f32fc2ab673d028bc1dd8b5be8d2d885e4383a827cd0261f58334252bf807c08'
+                       '113207eabbd12d0786d6bba5378a791129f9c520c17597b5504d4b547ef543fe']
+                receipts = await remme.blockchain_info.get_receipts(ids)
+                print(receipts)
+        """
+        for identifier in ids:
+            self._check_id(id_=identifier)
+
+        return (await self._remme_api.send_request(
+            method=RemmeMethods.RECEIPTS, params={'ids': ids}
+        )).get('data')
