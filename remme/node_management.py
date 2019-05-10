@@ -9,6 +9,7 @@ from remme.models.node_management.node_account import NodeAccount
 from remme.models.node_management.node_account_state import NodeAccountState
 from remme.models.node_management.node_config import NodeConfig
 from remme.models.node_management.node_info import NodeInfo
+from remme.models.utils.constants import CONSENSUS_ADDRESS
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.protobuf.node_account_pb2 import (
     NodeAccountInternalTransferPayload,
@@ -56,7 +57,7 @@ class RemmeNodeManagement(IRemmeNodeManagement):
     async def _check_node(self):
         node_account = await self.get_node_account()
 
-        node_state = node_account.state.get('node_state')
+        node_state = node_account.state
 
         if node_state != NodeAccountState.NEW.value:
             raise Exception(f'Master Node is already {node_state}.')
@@ -130,6 +131,7 @@ class RemmeNodeManagement(IRemmeNodeManagement):
         inputs_and_outputs = [
             self._master_node_list_address,
             self._stake_settings_address,
+            CONSENSUS_ADDRESS,
         ]
 
         return await self._create_and_send_transaction(
@@ -160,10 +162,12 @@ class RemmeNodeManagement(IRemmeNodeManagement):
         inputs = [
             self._master_node_list_address,
             self._genesis_owners_address,
+            CONSENSUS_ADDRESS,
         ]
 
         outputs = [
             self._master_node_list_address,
+            CONSENSUS_ADDRESS,
         ]
 
         return await self._create_and_send_transaction(
@@ -206,7 +210,7 @@ class RemmeNodeManagement(IRemmeNodeManagement):
 
         bet_payload = SetBetPayload(**bet).SerializeToString()
 
-        inputs_and_outputs = []
+        inputs_and_outputs = [CONSENSUS_ADDRESS]
 
         return await self._create_and_send_transaction(
             method=NodeAccountMethod.SET_BET,

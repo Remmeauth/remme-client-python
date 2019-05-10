@@ -155,7 +155,10 @@ class RemmeSwap(IRemmeSwap):
                 CONSENSUS_ADDRESS,
             ]
 
-        return inputs.extend(addresses), outputs.extend(addresses)
+        inputs.extend(addresses)
+        outputs.extend(addresses)
+
+        return inputs, outputs
 
     @staticmethod
     def _generate_transaction_payload(method, data):
