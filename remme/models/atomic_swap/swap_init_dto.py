@@ -21,7 +21,6 @@ class SwapInitDto:
         self.swap_id = self.data.get('swap_id')
         self.secret_lock_by_solicitor = self.data.get('secret_lock_by_solicitor')
         self.email_address_encrypted_by_initiator = self.data.get('email_address_encrypted_by_initiator')
-        self.created_at = self.data.get('created_at')
 
         if self.receiver_address is None \
                 or re.match(RemmePatterns.ADDRESS.value, self.receiver_address) is None:
