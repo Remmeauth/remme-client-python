@@ -3,7 +3,7 @@ from setuptools import (
     setup,
 )
 
-VERSION = '1.1.0a1'
+VERSION = '1.1.1'
 
 
 with open('README.md', 'r', encoding='utf-8') as read_me:
