@@ -25,19 +25,11 @@ class BaseQuery:
         self.limit = self.query.get('limit')
         self.reverse = '' if self.query.get('reverse') else 'false'
 
-        if self.head is not None \
-                and re.match(RemmePatterns.HEADER_SIGNATURE.value, self.head) is None:
-            raise Exception('Parameter `head` is not a valid.')
+        if self.head is not None:
+            if not isinstance(self.head, str) \
+                    or re.match(RemmePatterns.HEADER_SIGNATURE.value, self.head) is None:
 
-        if self.start is not None:
-
-            if (isinstance(self.start, str)
-                    and (re.match(RemmePatterns.HEADER_SIGNATURE.value, self.start) is not None
-                         or re.match(r'^0x[a-f0-9]{16}$', self.start) is not None)) \
-                    or isinstance(self.start, int):
-                self.start = str(self.start)
-            else:
-                raise Exception('Parameter `start` is not a valid.')
+                raise Exception('Parameter `head` is not a valid.')
 
     def get(self):
         return {
@@ -48,34 +40,76 @@ class BaseQuery:
         }
 
 
-class FractionQuery(BaseQuery):
+class BaseListQuery(BaseQuery):
     """
-    Class for checking block and batch query on request parameters.
+    Class parent for base list query on request parameters.
     """
 
     def __init__(self, query):
-        super(FractionQuery, self).__init__(query)
+        super(BaseListQuery, self).__init__(query)
 
         self.ids = self.query.get('ids')
 
         if self.ids is not None:
             if isinstance(self.ids, list):
-                for transaction_id in self.ids:
+                for id_ in self.ids:
 
-                    if not isinstance(self.ids, str) \
-                            and re.match(RemmePatterns.HEADER_SIGNATURE.value, transaction_id) is None:
-                        raise Exception('Parameter `ids` stris not a valid.')
+                    if not isinstance(id_, str) \
+                            or re.match(RemmePatterns.HEADER_SIGNATURE.value, id_) is None:
+                        raise Exception('Parameter `ids` is not a valid.')
 
             else:
                 raise Exception('Parameter `ids` is not a valid.')
 
     def get(self):
-        data = super(FractionQuery, self).get()
+        data = super(BaseListQuery, self).get()
         data.update({'ids': self.ids})
         return data
 
 
-class TransactionQuery(FractionQuery):
+class BatchQuery(BaseListQuery):
+    """
+    Class for checking batch query on request parameters.
+    """
+
+    def __init__(self, query):
+        super(BatchQuery, self).__init__(query)
+
+        if self.start is not None:
+            if not isinstance(self.start, str) \
+                    or re.match(RemmePatterns.HEADER_SIGNATURE.value, self.start) is None:
+
+                raise Exception('Parameter `start` is not a valid.')
+
+    def get(self):
+        data = super(BatchQuery, self).get()
+        return data
+
+
+class BlockQuery(BaseListQuery):
+    """
+    Class for checking block query on request parameters.
+    """
+
+    def __init__(self, query):
+        super(BlockQuery, self).__init__(query)
+
+        if self.start is not None:
+            if isinstance(self.start, int):
+                self.start = hex(self.start).lstrip('0x')[-16:]
+                self.start = f'0x{self.start.zfill(16)}'
+
+            if not isinstance(self.start, str) \
+                    or re.match(RemmePatterns.BLOCK_NUMBER.value, self.start) is None:
+
+                raise Exception('Parameter `start` is not a valid.')
+
+    def get(self):
+        data = super(BlockQuery, self).get()
+        return data
+
+
+class TransactionQuery(BaseListQuery):
     """
     Class for checking transaction query on request parameters.
     """
@@ -88,6 +122,12 @@ class TransactionQuery(FractionQuery):
         if self.family_name is not None:
             if self.family_name not in FAMILY_NAMES:
                 raise Exception('Parameter `family_name` is not a valid.')
+
+        if self.start is not None:
+            if not isinstance(self.start, str) \
+                    or re.match(RemmePatterns.HEADER_SIGNATURE.value, self.start) is None:
+
+                raise Exception('Parameter `start` is not a valid.')
 
     def get(self):
         data = super(TransactionQuery, self).get()
@@ -105,9 +145,17 @@ class StateQuery(BaseQuery):
 
         self.address = query.get('address')
 
-        if isinstance(self.address, str) \
-                and re.match(RemmePatterns.ADDRESS.value, self.address) is None:
-            raise Exception('Parameter `address` need to a valid.')
+        if self.address is not None:
+
+            if not isinstance(self.address, str) \
+                    or re.match(RemmePatterns.ADDRESS.value, self.address) is None:
+                raise Exception('Parameter `address` need to a valid.')
+
+        if self.start is not None:
+
+            if not isinstance(self.start, str) \
+                    or re.match(RemmePatterns.ADDRESS.value, self.start) is None:
+                raise Exception('Parameter `start` is not a valid.')
 
     def get(self):
         data = super(StateQuery, self).get()

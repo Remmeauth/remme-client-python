@@ -5,7 +5,8 @@ from remme import protobuf
 from remme.models.blockchain_info.block_info import BlockInfo
 from remme.models.blockchain_info.network_status import NetworkStatus
 from remme.models.blockchain_info.query import (
-    FractionQuery,
+    BatchQuery,
+    BlockQuery,
     StateQuery,
     TransactionQuery,
 )
@@ -178,13 +179,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 print(blocks)
         """
         if query:
-
-            if isinstance(query.get('start'), int):
-
-                start = hex(query.get('start')).lstrip('0x')[-16:]
-                query['start'] = f'0x{start.zfill(16)}'
-
-            query = FractionQuery(query=query).get()
+            query = BlockQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BLOCKS,
@@ -315,7 +310,7 @@ class RemmeBlockchainInfo(IRemmeBlockchainInfo):
                 print(batches)
         """
         if query:
-            query = FractionQuery(query=query).get()
+            query = BatchQuery(query=query).get()
 
         return await self._remme_api.send_request(
             method=RemmeMethods.BATCHES,
