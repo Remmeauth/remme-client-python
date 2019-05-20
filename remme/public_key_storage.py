@@ -65,7 +65,6 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
 
     _family_name = RemmeFamilyName.PUBLIC_KEY.value
     _family_version = '0.1'
-    _consensus_address = CONSENSUS_ADDRESS
     _settings_address = generate_settings_address(key='remme.economy_enabled')
 
     def __init__(self, remme_api, remme_account, remme_transaction_service):
@@ -402,7 +401,7 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
 
         inputs_and_outputs = [
             pub_key_address,
-            self._consensus_address,
+            CONSENSUS_ADDRESS,
             self._settings_address
         ]
 
@@ -558,9 +557,14 @@ class RemmePublicKeyStorage(IRemmePublicKeyStorage):
             data=revoke_payload,
         )
 
+        inputs_and_outputs = [
+            public_key_address,
+            CONSENSUS_ADDRESS,
+        ]
+
         return await self._create_and_send_transaction(
-            inputs=[public_key_address],
-            outputs=[public_key_address],
+            inputs=inputs_and_outputs,
+            outputs=inputs_and_outputs,
             payload_bytes=payload_bytes,
         )
 

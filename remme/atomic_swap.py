@@ -4,7 +4,12 @@ from remme.models.atomic_swap.swap_init_dto import SwapInitDto
 from remme.models.general.methods import RemmeMethods
 from remme.models.general.patterns import RemmePatterns
 from remme.models.interfaces.atomic_swap import IRemmeSwap
-from remme.models.utils.constants import CONSENSUS_ADDRESS
+from remme.models.utils.constants import (
+    BLOCK_INFO_CONFIG_ADDRESS,
+    BLOCK_INFO_NAMESPACE_ADDRESS,
+    CONSENSUS_ADDRESS,
+    ZERO_ADDRESS,
+)
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.models.websocket.swap_info import SwapInfo
 from remme.protobuf.atomic_swap_pb2 import (
@@ -25,6 +30,8 @@ ATOMIC_SWAP_METHODS = [
     AtomicSwapMethod.INIT,
     AtomicSwapMethod.EXPIRE,
     AtomicSwapMethod.CLOSE,
+    AtomicSwapMethod.SET_SECRET_LOCK,
+    AtomicSwapMethod.APPROVE,
 ]
 
 
@@ -47,15 +54,11 @@ class RemmeSwap(IRemmeSwap):
                 amount=100,
                 swap_id=swap_id,
                 secret_lock_by_solicitor=secret_lock_by_solicitor,
-                created_at=int(datetime.now().timestamp()),
             )
     """
 
     _family_name = RemmeFamilyName.SWAP.value
     _family_version = '0.1'
-    _consensus_address = CONSENSUS_ADDRESS
-    _block_info_namespace_address = '00b10c00'
-    _block_info_config_address = '00b10c01' + '0' * 62
     _settings_swap_comission = generate_settings_address('remme.settings.swap_comission')
 
     def __init__(self, remme_api, remme_transaction_service):
@@ -90,44 +93,70 @@ class RemmeSwap(IRemmeSwap):
         Returns:
             Lists of addresses inputs and outputs.
         """
-        addresses = generate_address(_family_name=self._family_name, _public_key_to=swap_id)
+        addresses = [generate_address(_family_name=self._family_name, _public_key_to=swap_id)]
 
         inputs, outputs = None, None
 
         if method not in ATOMIC_SWAP_METHODS:
-            raise Exception(f'Given `{method}` is not a valid.')
+            inputs = outputs = addresses
+            return inputs, outputs
 
         if method == AtomicSwapMethod.INIT:
             inputs = [
-                addresses,
                 self._settings_swap_comission,
-                self._consensus_address,
-                self._block_info_namespace_address,
-                self._block_info_config_address,
+                CONSENSUS_ADDRESS,
+                ZERO_ADDRESS,
+                BLOCK_INFO_CONFIG_ADDRESS,
+                BLOCK_INFO_NAMESPACE_ADDRESS,
             ]
             outputs = [
-                addresses,
                 self._settings_swap_comission,
-                self._consensus_address,
+                CONSENSUS_ADDRESS,
+                ZERO_ADDRESS,
             ]
 
         elif method == AtomicSwapMethod.EXPIRE:
             inputs = [
-                addresses,
-                self._block_info_namespace_address,
-                self._block_info_config_address,
+                CONSENSUS_ADDRESS,
+                ZERO_ADDRESS,
+                BLOCK_INFO_CONFIG_ADDRESS,
+                BLOCK_INFO_NAMESPACE_ADDRESS,
             ]
-            outputs = [addresses]
+            outputs = [
+                CONSENSUS_ADDRESS,
+                ZERO_ADDRESS,
+            ]
 
         elif method == AtomicSwapMethod.CLOSE:
             inputs = [
-                addresses,
+                CONSENSUS_ADDRESS,
+                ZERO_ADDRESS,
                 receiver_address,
             ]
             outputs = [
-                addresses,
+                CONSENSUS_ADDRESS,
+                ZERO_ADDRESS,
                 receiver_address,
             ]
+
+        elif method == AtomicSwapMethod.SET_SECRET_LOCK:
+            inputs = [
+                CONSENSUS_ADDRESS,
+            ]
+            outputs = [
+                CONSENSUS_ADDRESS,
+            ]
+
+        elif method == AtomicSwapMethod.APPROVE:
+            inputs = [
+                CONSENSUS_ADDRESS,
+            ]
+            outputs = [
+                CONSENSUS_ADDRESS,
+            ]
+
+        inputs.extend(addresses)
+        outputs.extend(addresses)
 
         return inputs, outputs
 
@@ -339,7 +368,6 @@ class RemmeSwap(IRemmeSwap):
                     amount=100,
                     swap_id=swap_id,
                     secret_lock_by_solicitor=secret_lock_by_solicitor,
-                    created_at=int(datetime.now().timestamp()),
                 )
                 print(init.batch_id)
         """
@@ -353,7 +381,6 @@ class RemmeSwap(IRemmeSwap):
             swap_id=swap_id,
             secret_lock_by_solicitor=swap_init_data.secret_lock_by_solicitor,
             email_address_encrypted_by_initiator=swap_init_data.email_address_encrypted_by_initiator,
-            created_at=swap_init_data.created_at,
         ).SerializeToString()
 
         transaction_payload = self._generate_transaction_payload(

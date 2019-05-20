@@ -15,8 +15,6 @@ from remme.models.general.patterns import RemmePatterns
 from remme.models.keys.rsa_signature_padding import RsaSignaturePadding
 from remme.protobuf.pub_key_pb2 import NewPubKeyPayload
 
-ZERO_ADDRESS = '0' * 70
-
 HEX = re.compile(r'^[0-9a-f]+$')
 
 

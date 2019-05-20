@@ -1,5 +1,10 @@
 from remme.models.general.methods import RemmeMethods
 from remme.models.interfaces.token import IRemmeToken
+from remme.models.utils.constants import (
+    BLOCK_INFO_CONFIG_ADDRESS,
+    BLOCK_INFO_NAMESPACE_ADDRESS,
+    CONSENSUS_ADDRESS,
+)
 from remme.models.utils.family_name import RemmeFamilyName
 from remme.protobuf.account_pb2 import (
     AccountMethod,
@@ -161,7 +166,10 @@ class RemmeToken(IRemmeToken):
         else:
             self.transfer_payload.sender_account_type = TransferPayload.SenderAccountType.Value('ACCOUNT')
 
-        inputs_outputs = [address_to]
+        inputs_outputs = [
+            address_to,
+            CONSENSUS_ADDRESS,
+        ]
 
         return await self._generate_and_send_transfer_payload(
             transfer_method=AccountMethod.TRANSFER,
@@ -197,7 +205,7 @@ class RemmeToken(IRemmeToken):
 
         self.node_account_internal_transfer_payload.value = amount
 
-        inputs_outputs = []
+        inputs_outputs = [CONSENSUS_ADDRESS]
 
         return await self._generate_and_send_transfer_payload(
             transfer_method=NodeAccountMethod.TRANSFER_FROM_UNFROZEN_TO_OPERATIONAL,
@@ -230,7 +238,12 @@ class RemmeToken(IRemmeToken):
         self.transaction_payload.method = NodeAccountMethod.TRANSFER_FROM_FROZEN_TO_UNFROZEN
         self.transaction_payload.data = self.empty_payload.SerializeToString()
 
-        inputs_outputs = [self._stake_settings_address]
+        inputs_outputs = [
+            CONSENSUS_ADDRESS,
+            BLOCK_INFO_CONFIG_ADDRESS,
+            BLOCK_INFO_NAMESPACE_ADDRESS,
+            self._stake_settings_address,
+        ]
 
         return await self._generate_and_send_transfer_payload(
             transfer_method=NodeAccountMethod.TRANSFER_FROM_FROZEN_TO_UNFROZEN,
